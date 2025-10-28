@@ -524,7 +524,7 @@
             // Try Firebase connection in background
             setTimeout(async () => {
                 try {
-                    const firebaseReady = await waitForFirebaseQuick();
+                    const firebaseReady = await waitForFirebaseRobust(10000);
                     if (firebaseReady) {
                         console.log('🔥 Firebase verbunden! Lade echte Daten...');
                         await loadReports();
@@ -678,7 +678,7 @@
             displayReports(filteredReports);
         }
 
-        function addSpyReport() {
+        async function addSpyReport() {
             const spyReportInput = document.getElementById('spyReportInput');
             const spyReportLink = spyReportInput.value.trim();
             
@@ -687,57 +687,33 @@
                 return;
             }
             
-            // Spy-Bericht parsen und verarbeiten
             try {
                 console.log('🔍 Verarbeite Spy-Bericht:', spyReportLink);
-                
-                // Hier würde normalerweise der Spy-Bericht geparst werden
-                // Für jetzt fügen wir einen Demo-Bericht hinzu
-                const newReport = {
-                    id: 'spy-' + Date.now(),
-                    player: 'Neuer Spieler',
-                    planet: 'Neuer Planet',
-                    alliance: 'Neue Allianz',
-                    timestamp: new Date(),
-                    buildings: {
-                        planetCenter: Math.floor(Math.random() * 20),
-                        spaceport: Math.floor(Math.random() * 15),
-                        ironMine: Math.floor(Math.random() * 25),
-                        siliconRefinery: Math.floor(Math.random() * 20),
-                        carbonPlant: Math.floor(Math.random() * 18),
-                        shipFactory: Math.floor(Math.random() * 12),
-                        weaponFactory: Math.floor(Math.random() * 10),
-                        researchCenter: Math.floor(Math.random() * 8),
-                        research: Math.floor(Math.random() * 5)
-                    },
-                    military: {
-                        spyUnit: Math.floor(Math.random() * 15),
-                        stealthUnit: Math.floor(Math.random() * 12),
-                        invasionUnit: Math.floor(Math.random() * 20),
-                        plunderUnit: Math.floor(Math.random() * 18),
-                        sabotageUnit: Math.floor(Math.random() * 10)
-                    },
-                    source: 'Manuell hinzugefügt'
-                };
-                
-                // Bericht zur aktuellen Liste hinzufügen
-                currentReports.unshift(newReport);
-                filteredReports = [...currentReports];
-                
-                // Tabelle aktualisieren
-                displayReports(filteredReports);
-                
-                // Eingabefeld leeren
+
+                if (!window.SpyReportAPI || !window.SpyReportAPI.isValidUrl(spyReportLink)) {
+                    alert('Ungültige Spy-Bericht-URL.');
+                    return;
+                }
+
+                const allianceName = resolveAllianceName();
+                if (!allianceName) {
+                    alert('Keine Allianz zugeordnet. Bitte im Dashboard eine Allianz wählen.');
+                    return;
+                }
+
+                await waitForFirebaseRobust(10000);
+
+                const parsed = await window.SpyReportAPI.processUrl(spyReportLink);
+                await window.SpyDatabaseAPI.saveReport(parsed, allianceName);
+
+                await loadReports();
+
                 spyReportInput.value = '';
-                
-                // Erfolgsmeldung anzeigen
-                showStatusMessage('✅ Spy-Bericht erfolgreich hinzugefügt!', 'success');
-                
-                console.log('✅ Spy-Bericht hinzugefügt:', newReport);
-                
+                showStatusMessage('✅ Spy-Bericht gespeichert!', 'success');
+
             } catch (error) {
                 console.error('❌ Fehler beim Hinzufügen des Spy-Berichts:', error);
-                alert('Fehler beim Hinzufügen des Spy-Berichts: ' + error.message);
+                alert('Fehler beim Hinzufügen des Spy-Berichts: ' + (error?.message || error));
             }
         }
 
@@ -769,6 +745,7 @@
         async function retryFirebaseConnection() {
             console.log('Retrying Firebase connection...');
             try {
+                await waitForFirebaseRobust(10000);
                 await loadReports();
                 showMessage('Firebase-Verbindung erfolgreich!', 'success');
             } catch (error) {
@@ -777,57 +754,142 @@
         }
 
         // Firebase functions (simplified)
-        async function waitForFirebaseQuick() {
+        async function waitForFirebaseRobust(timeoutMs = 10000) {
             try {
-                if (window.FirebaseConfig && window.FirebaseConfig.isReady()) {
-                    return true;
+                if (window.FirebaseConfig && typeof window.FirebaseConfig.waitForReadyWithTimeout === 'function') {
+                    await window.FirebaseConfig.waitForReadyWithTimeout(timeoutMs);
                 }
-                return false;
+                if (window.AuthAPI && typeof window.AuthAPI.waitForInit === 'function') {
+                    await window.AuthAPI.waitForInit();
+                }
+                return !!(window.FirebaseConfig && window.FirebaseConfig.isReady());
             } catch (error) {
+                console.warn('⚠️ Firebase robust wait fehlgeschlagen:', error?.message);
                 return false;
             }
+        }
+
+        function resolveAllianceName() {
+            try {
+                if (window.SessionAPI) {
+                    const allianceData = window.SessionAPI.getAllianceData();
+                    if (allianceData) {
+                        return allianceData.name || allianceData;
+                    }
+                }
+                const storedAlliance = localStorage.getItem('currentAlliance');
+                if (storedAlliance) {
+                    try {
+                        const parsed = JSON.parse(storedAlliance);
+                        return parsed?.name || parsed;
+                    } catch (e) {
+                        return storedAlliance;
+                    }
+                }
+            } catch (e) {
+                console.warn('⚠️ Allianz-Auflösung fehlgeschlagen:', e?.message);
+            }
+            return null;
+        }
+
+        function normalizeReportsForTable(reports) {
+            return reports.map(r => {
+                const playerName = r.playerName || r.player?.name || r.player || '—';
+                const planetName = r.planetName || r.planet?.name || r.planet || '—';
+                const coords = r.planetCoordinates || r.planet?.coordinates || r.coordinates || '—';
+                const alliance = r.allianceName || r.alliance || r.player?.allianceName || '—';
+
+                const buildingsArray = Array.isArray(r.buildings) ? r.buildings : [];
+                const buildingsObject = (r.buildings && !Array.isArray(r.buildings)) ? r.buildings : {};
+                const getLevel = (keys) => {
+                    for (const key of keys) {
+                        const found = buildingsArray.find(b => (b.rawName === key) || (b.name && b.name.toLowerCase().includes(key.toLowerCase())));
+                        if (found && (found.level || found.value)) return found.level || found.value;
+                    }
+                    for (const key of keys) {
+                        if (typeof buildingsObject[key] !== 'undefined') return buildingsObject[key];
+                    }
+                    for (const key of keys) {
+                        if (typeof r[key] !== 'undefined') return r[key];
+                    }
+                    return '—';
+                };
+
+                const createdAt = r.createdAt?.toDate ? r.createdAt.toDate() : (r.createdAt ? new Date(r.createdAt) : (r.timestamp ? new Date(r.timestamp) : null));
+                const datum = createdAt ? createdAt.toLocaleDateString('de-DE') : (r.datum || '—');
+
+                return {
+                    player: playerName,
+                    planet: planetName,
+                    coordinates: coords,
+                    alliance: alliance,
+                    planetenzentrale: getLevel(['planetCenter', 'planetzentrale', 'planetenzentrale']),
+                    raumhafen: getLevel(['spaceport', 'raumhafen']),
+                    eisenmine: getLevel(['ironMine', 'eisenmine', 'metalMine']),
+                    siliziumraffinerie: getLevel(['siliconRefinery', 'siliziumraffinerie', 'crystalMine']),
+                    kohlenstoffgewinnungsanlage: getLevel(['carbonPlant', 'kohlenstoffgewinnungsanlage']),
+                    schiffsfabrik: getLevel(['shipFactory', 'schiffsfabrik', 'shipyard']),
+                    waffenfabrik: getLevel(['weaponFactory', 'waffenfabrik']),
+                    forschungszentrum: getLevel(['researchCenter', 'forschungszentrum', 'researchLab']),
+                    spionageeinheit: r.spionageeinheit || r.military?.spyUnit || '—',
+                    tarneinheit: r.tarneinheit || r.military?.stealthUnit || '—',
+                    invasionseinheit: r.invasionseinheit || r.military?.invasionUnit || '—',
+                    pluendereinheit: r.pluendereinheit || r.military?.plunderUnit || '—',
+                    sabotageeinheit: r.sabotageeinheit || r.military?.sabotageUnit || '—',
+                    datum: datum,
+                    originalUrl: r.originalUrl || null
+                };
+            });
         }
 
         async function loadReports() {
             try {
                 console.log('📋 Lade Spy-Reports...');
-                
+
+                const allianceName = resolveAllianceName();
+                if (!allianceName) {
+                    console.log('ℹ️ Keine Allianz zugeordnet – zeige leeren Zustand.');
+                    currentReports = [];
+                    filteredReports = [];
+                    await displayReports([]);
+                    showMessage('Keine Allianz zugeordnet. Bitte im Dashboard eine Allianz wählen.', 'info');
+                    return;
+                }
+
                 if (window.SpyDatabaseAPI) {
-                    const reports = await window.SpyDatabaseAPI.getAllianceReports();
-                    if (reports.length > 0) {
-                        currentReports = reports;
+                    const rawReports = await window.SpyDatabaseAPI.getAllianceReports(allianceName, { limit: 200 });
+                    if (rawReports && rawReports.length > 0) {
+                        currentReports = normalizeReportsForTable(rawReports);
                         filteredReports = [...currentReports];
                         await displayReports(currentReports);
                         await loadStatistics();
                         console.log(`✅ ${currentReports.length} Spy-Reports geladen`);
                         return;
+                    } else {
+                        console.log('ℹ️ 0 Spy-Reports vorhanden – zeige leeren Zustand.');
+                        currentReports = [];
+                        filteredReports = [];
+                        await displayReports([]);
+                        return;
                     }
                 }
-                
-                // Fallback to demo data
-                console.log('🔄 Keine echten Daten gefunden, zeige Demo-Daten...');
-                currentReports = getDemoReports();
-                filteredReports = [...currentReports];
-                await displayReports(currentReports);
-                currentStatistics = getDemoStatistics();
-                displayStatistics(currentStatistics);
-                showMessage('Demo-Modus: Keine echten Daten gefunden. Zeige Beispieldaten.', 'info');
-                
+
+                console.log('⚠️ SpyDatabaseAPI nicht verfügbar – bleibe im Demo-Modus');
+
             } catch (error) {
                 console.error('❌ Fehler beim Laden der Spy-Reports:', error);
-                currentReports = getDemoReports();
-                filteredReports = [...currentReports];
-                await displayReports(currentReports);
-                currentStatistics = getDemoStatistics();
-                displayStatistics(currentStatistics);
-                showMessage('Demo-Modus: Fehler beim Laden. Zeige Beispieldaten.', 'info');
+                currentReports = [];
+                filteredReports = [];
+                await displayReports([]);
+                showMessage('Fehler beim Laden der Berichte.', 'error');
             }
         }
 
         async function loadStatistics() {
             try {
-                if (window.SpyDatabaseAPI) {
-                    const stats = await window.SpyDatabaseAPI.getStatistics();
+                const allianceName = resolveAllianceName();
+                if (window.SpyDatabaseAPI && allianceName) {
+                    const stats = await window.SpyDatabaseAPI.getStatistics(allianceName);
                     currentStatistics = stats;
                     displayStatistics(currentStatistics);
                 }
