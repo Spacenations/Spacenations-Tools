@@ -15,7 +15,7 @@ Ein umfassendes **Tool-System** für Space Nations Spieler mit Allianz-Managemen
 - **Sabo Counter**: Sabotage-Planung und Gebäude-Schäden
 
 ### 🌌 **Proxima-System**
-- **Automatisierte Datenerfassung**: Wöchentliche API-Synchronisation (Mittwoch 18:45)
+- **Automatisierte Datenerfassung**: Wöchentliche API-Synchronisation (Mittwoch 17:01:50)
 - **Proxima-Planeten-Tracking**: Vollständige Übersicht aller Proxima-Planeten
 - **Score-Kategorisierung**: Intelligente Einteilung nach Bedrohungsstufen
 - **SQLite-Datenbank**: Lokale Speicherung mit historischen Daten
@@ -90,7 +90,7 @@ Das System bietet **4 verschiedene Kampf-Tools** für strategische Planung:
 ### 🌌 **Proxima-System**
 
 #### Automatisierte Datenerfassung
-- **Wöchentliche Synchronisation**: Jeden Mittwoch um 18:45 Uhr
+- **Wöchentliche Synchronisation**: Jeden Mittwoch um 17:01:50 Uhr
 - **API-Integration**: Direkte Verbindung zu Space Nations APIs
 - **Datenvalidierung**: Automatische Überprüfung der Datenqualität
 - **Fehlerbehandlung**: Robuste Behandlung von API-Ausfällen

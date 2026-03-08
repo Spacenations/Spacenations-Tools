@@ -353,7 +353,7 @@ class ProximaFetcher:
         </div>
         
         <div class="footer">
-            <p>Automatisch aktualisiert jeden Mittwoch um 18:45 Uhr</p>
+            <p>Automatisch aktualisiert jeden Mittwoch um 17:01:50 Uhr</p>
             <p>Datenquelle: <a href="https://beta1.game.spacenations.eu/api/proxima" target="_blank">Spacenations API</a></p>
         </div>
     </div>

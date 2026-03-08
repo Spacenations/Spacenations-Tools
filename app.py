@@ -13,6 +13,7 @@ from urllib.parse import urlparse, parse_qs
 import threading
 import time
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 # Logging konfigurieren
 logging.basicConfig(
@@ -209,14 +210,17 @@ class SpacenationsRequestHandler(SimpleHTTPRequestHandler):
     def handle_proxima_sync(self, post_data):
         """Handle Proxima sync requests"""
         try:
-            # Placeholder for Proxima sync logic
+            from proxima_fetcher import ProximaFetcher
+            fetcher = ProximaFetcher()
+            success = fetcher.run_sync()
+
             response_data = {
-                "success": True,
-                "message": "Proxima sync initiated",
+                "success": success,
+                "message": "Proxima sync completed" if success else "Proxima sync failed",
                 "timestamp": datetime.now().isoformat()
             }
             
-            self.send_response(200)
+            self.send_response(200 if success else 500)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps(response_data).encode())
@@ -241,20 +245,57 @@ class SpacenationsRequestHandler(SimpleHTTPRequestHandler):
 def start_proxima_scheduler():
     """Start Proxima data scheduler in background thread"""
     def scheduler():
+        berlin_tz = ZoneInfo("Europe/Berlin")
+        target_weekday = 2  # Mittwoch (Montag=0)
+        target_hour = 17
+        target_minute = 1
+        target_second = 50
+        last_run_week = None
+
+        logger.info("Proxima scheduler aktiv: Mittwoch 17:01:50 (Europe/Berlin)")
+
         while True:
             try:
-                # Import and run Proxima fetcher
-                try:
-                    from proxima_fetcher import ProximaFetcher
-                    fetcher = ProximaFetcher()
-                    fetcher.run_sync()
-                    logger.info("Proxima sync completed successfully")
-                except ImportError:
-                    logger.warning("Proxima fetcher not available")
-                except Exception as e:
-                    logger.error(f"Proxima sync error: {e}")
-                
-                time.sleep(3600)  # Run every hour
+                now_berlin = datetime.now(berlin_tz)
+                week_marker = now_berlin.strftime("%G-W%V")
+
+                should_run_exact = (
+                    now_berlin.weekday() == target_weekday
+                    and now_berlin.hour == target_hour
+                    and now_berlin.minute == target_minute
+                    and now_berlin.second == target_second
+                )
+
+                # Catch-up: falls der Dienst exakt zum Trigger-Zeitpunkt nicht lief,
+                # wird am gleichen Mittwoch später einmalig nachgeholt.
+                should_run_catchup = (
+                    now_berlin.weekday() == target_weekday
+                    and (
+                        now_berlin.hour > target_hour
+                        or (now_berlin.hour == target_hour and now_berlin.minute > target_minute)
+                        or (
+                            now_berlin.hour == target_hour
+                            and now_berlin.minute == target_minute
+                            and now_berlin.second > target_second
+                        )
+                    )
+                )
+
+                if (should_run_exact or should_run_catchup) and last_run_week != week_marker:
+                    try:
+                        from proxima_fetcher import ProximaFetcher
+                        fetcher = ProximaFetcher()
+                        if fetcher.run_sync():
+                            logger.info("Proxima sync completed successfully")
+                        else:
+                            logger.error("Proxima sync failed")
+                        last_run_week = week_marker
+                    except ImportError:
+                        logger.warning("Proxima fetcher not available")
+                    except Exception as e:
+                        logger.error(f"Proxima sync error: {e}")
+
+                time.sleep(1)
             except Exception as e:
                 logger.error(f"Proxima scheduler error: {e}")
                 time.sleep(60)  # Wait 1 minute on error

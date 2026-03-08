@@ -12,9 +12,9 @@ chmod +x proxima_simple.py
 echo "🧪 Führe Test-Ausführung durch..."
 python3 proxima_simple.py
 
-# Cron-Job einrichten (Mittwoch 18:45)
+# Cron-Job einrichten (Mittwoch 17:01:50)
 echo "⏰ Richte Cron-Job ein..."
-CRON_JOB="45 18 * * 3 cd $(pwd) && python3 proxima_simple.py >> proxima_cron.log 2>&1"
+CRON_JOB="1 17 * * 3 cd $(pwd) && sleep 50 && python3 proxima_simple.py >> proxima_cron.log 2>&1"
 
 # Prüfe ob Cron-Job bereits existiert
 if crontab -l 2>/dev/null | grep -q "proxima_simple.py"; then
@@ -22,7 +22,7 @@ if crontab -l 2>/dev/null | grep -q "proxima_simple.py"; then
 else
     # Füge Cron-Job hinzu
     (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
-    echo "✅ Cron-Job hinzugefügt: Mittwoch 18:45"
+    echo "✅ Cron-Job hinzugefügt: Mittwoch 17:01:50"
 fi
 
 echo ""
