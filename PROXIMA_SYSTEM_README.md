@@ -4,7 +4,7 @@ Ein automatisiertes System zur Verfolgung von Proxima-Planeten aus der Spacenati
 
 ## 📋 Übersicht
 
-Das System lädt jeden Mittwoch um 18:45 Uhr automatisch die aktuellen Proxima-Planetendaten von der API `https://beta1.game.spacenations.eu/api/proxima` und stellt sie in einer übersichtlichen Web-Oberfläche zur Verfügung.
+Das System lädt jeden Mittwoch um 17:01:50 Uhr automatisch die aktuellen Proxima-Planetendaten von der API `https://beta1.game.spacenations.eu/api/proxima` und stellt sie in einer übersichtlichen Web-Oberfläche zur Verfügung.
 
 ## 🗂️ Dateien
 
@@ -57,9 +57,9 @@ CREATE TABLE planets (
 
 ## ⏰ Automatisierung
 
-Das System wird automatisch jeden Mittwoch um 18:45 Uhr ausgeführt:
+Das System wird automatisch jeden Mittwoch um 17:01:50 Uhr ausgeführt:
 ```bash
-45 18 * * 3 cd /workspace && python3 proxima_simple.py >> proxima_cron.log 2>&1
+1 17 * * 3 cd /workspace && sleep 50 && python3 proxima_simple.py >> proxima_cron.log 2>&1
 ```
 
 ## 🌐 Web-Integration
@@ -160,7 +160,7 @@ GET https://beta1.game.spacenations.eu/api/proxima
 
 ## 🔄 Update-Prozess
 
-1. **Wöchentlich (Mittwoch 18:45):**
+1. **Wöchentlich (Mittwoch 17:01:50):**
    - API-Daten abrufen
    - Datenbank aktualisieren
    - HTML-Report generieren

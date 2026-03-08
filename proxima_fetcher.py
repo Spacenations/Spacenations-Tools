@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Proxima API Fetcher für Spacenations Tools
-Lädt jeden Mittwoch um 18:45 die Proxima-Planetendaten und speichert sie in der ProximaDB
+ Lädt jeden Mittwoch um 17:01:50 die Proxima-Planetendaten und speichert sie in der ProximaDB
 """
 
 import json
@@ -27,6 +27,8 @@ class ProximaFetcher:
     def __init__(self, db_path='proxima.db'):
         self.api_url = "https://beta1.game.spacenations.eu/api/proxima"
         self.db_path = db_path
+        self.discord_webhook_url = os.getenv('DISCORD_WEBHOOK_URL', '').strip()
+        self.notify_on_first_sync = os.getenv('PROXIMA_NOTIFY_ON_FIRST_SYNC', 'false').lower() == 'true'
         self.init_database()
     
     def init_database(self):
@@ -131,6 +133,58 @@ class ProximaFetcher:
             return False
         finally:
             conn.close()
+
+    def get_known_planet_names(self):
+        """Lädt alle bereits bekannten Planetennamen aus der Datenbank"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        try:
+            cursor.execute('SELECT DISTINCT name FROM planets')
+            return {row[0] for row in cursor.fetchall()}
+        except Exception as e:
+            logging.error(f"Fehler beim Laden bekannter Planetennamen: {e}")
+            return set()
+        finally:
+            conn.close()
+
+    def send_discord_webhook_for_new_planets(self, new_planets):
+        """Sendet neue Planeten an Discord, falls ein Webhook konfiguriert ist"""
+        if not new_planets:
+            return True
+
+        if not self.discord_webhook_url:
+            logging.info("DISCORD_WEBHOOK_URL nicht gesetzt - Discord-Benachrichtigung übersprungen")
+            return False
+
+        lines = []
+        for planet in new_planets[:15]:
+            delete_on = self.format_delete_date(planet.get('deleteOn', 'unbekannt'))
+            lines.append(
+                f"• **{planet.get('name', 'Unbekannt')}** | "
+                f"`{planet.get('coordinates', '?:?:?')}` | "
+                f"Score: **{planet.get('score', 0)}** | "
+                f"Delete: {delete_on}"
+            )
+
+        if len(new_planets) > 15:
+            lines.append(f"… und **{len(new_planets) - 15}** weitere neue Planeten.")
+
+        content = (
+            f"🌌 **Neue Proxima-Planeten entdeckt ({len(new_planets)})**\n"
+            f"{chr(10).join(lines)}"
+        )
+
+        # Discord akzeptiert maximal 2000 Zeichen im Content
+        payload = {"content": content[:1990]}
+
+        try:
+            response = requests.post(self.discord_webhook_url, json=payload, timeout=15)
+            response.raise_for_status()
+            logging.info(f"Discord-Webhook erfolgreich gesendet ({len(new_planets)} neue Planeten)")
+            return True
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Fehler beim Senden des Discord-Webhook: {e}")
+            return False
     
     def get_planets_summary(self):
         """Gibt eine Zusammenfassung der gespeicherten Planeten zurück"""
@@ -178,18 +232,37 @@ class ProximaFetcher:
         
         planets = self.fetch_planets()
         if planets:
+            known_planet_names = self.get_known_planet_names()
+            new_planets = [
+                planet for planet in planets
+                if planet.get('name') not in known_planet_names
+            ]
             success = self.save_planets(planets)
             if success:
                 logging.info("Proxima-Daten erfolgreich aktualisiert")
+                if known_planet_names:
+                    if new_planets:
+                        self.send_discord_webhook_for_new_planets(new_planets)
+                    else:
+                        logging.info("Keine neuen Proxima-Planeten entdeckt")
+                elif self.notify_on_first_sync and new_planets:
+                    logging.info("Erst-Sync erkannt - Discord-Benachrichtigung aktiviert")
+                    self.send_discord_webhook_for_new_planets(new_planets)
+                else:
+                    logging.info("Erst-Sync erkannt - Discord-Benachrichtigung übersprungen")
+                return True
             else:
                 logging.error("Fehler beim Speichern der Proxima-Daten")
+                return False
         else:
             logging.error("Keine Daten von der API erhalten")
+            return False
 
     def run_sync(self):
         """Kompatibilitätsmethode für Scheduler: führt Update und Report aus"""
         try:
-            self.update_planets()
+            if not self.update_planets():
+                return False
             html = self.generate_html_report()
             if html:
                 with open('proxima_report.html', 'w', encoding='utf-8') as f:
@@ -373,7 +446,7 @@ class ProximaFetcher:
         </div>
         
         <div class="footer">
-            <p>Automatisch aktualisiert jeden Mittwoch um 18:45 Uhr</p>
+            <p>Automatisch aktualisiert jeden Mittwoch um 17:01:50 Uhr</p>
             <p>Datenquelle: <a href="https://beta1.game.spacenations.eu/api/proxima" target="_blank">Spacenations API</a></p>
         </div>
     </div>
@@ -398,11 +471,10 @@ def main():
             f.write(html_report)
         logging.info("HTML-Report generiert: proxima_report.html")
     
-    # Scheduler für wöchentliche Updates (Mittwoch 18:45)
-    schedule.every().wednesday.at("18:45").do(fetcher.update_planets)
-    schedule.every().wednesday.at("18:46").do(lambda: fetcher.generate_html_report() and open('proxima_report.html', 'w', encoding='utf-8').write(fetcher.generate_html_report()))
+    # Scheduler für wöchentliche Updates (Mittwoch 17:01:50)
+    schedule.every().wednesday.at("17:01:50").do(fetcher.run_sync)
     
-    logging.info("Scheduler gestartet - wöchentliche Updates jeden Mittwoch um 18:45")
+    logging.info("Scheduler gestartet - wöchentliche Updates jeden Mittwoch um 17:01:50")
     
     # Hauptschleife
     while True:
