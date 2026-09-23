@@ -383,6 +383,7 @@
                 display: none;
             }
         }
+            .demo-row td { opacity: 0.6; font-style: italic; }
     </style>
 </head>
 <body>
@@ -478,7 +479,6 @@
 
         <!-- Status Message (bottom) -->
         <div id="status-message" style="position: fixed; bottom: 20px; right: 20px; background: var(--gaming-success); color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; display: none;">
-            ✅ Echte Daten geladen! Firebase-Verbindung erfolgreich.
         </div>
     </div>
 
@@ -506,41 +506,22 @@
         }
 
         // Initialize the application
+        async function waitForSpyApi(timeoutMs = 6000) {
+            const start = Date.now();
+            while (Date.now() - start < timeoutMs) {
+                if (window.SpyDatabaseAPI && window.FirebaseConfig &&
+                    window.FirebaseConfig.isReady && window.FirebaseConfig.isReady()) return true;
+                await new Promise(r => setTimeout(r, 250));
+            }
+            return false;
+        }
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🕵️ Spy Database Grid initialisiert - Version v24');
-            
-            // Load demo data immediately
-            console.log('🚀 Lade sofort Demo-Daten...');
-            currentReports = getDemoReports();
-            filteredReports = [...currentReports];
-            await displayReports(currentReports);
-            currentStatistics = getDemoStatistics();
-            displayStatistics(currentStatistics);
-            showMessage('🚀 Spy-Datenbank geladen! Demo-Modus aktiv. Versuche Firebase-Verbindung...', 'info');
-            
-            // Show retry button
+            console.log('🕵️ Spy Database initialisiert');
+            showMessage('Lade Spionageberichte …', 'info');
             document.getElementById('retry-btn').style.display = 'inline-flex';
-            
-            // Try Firebase connection in background
-            setTimeout(async () => {
-                try {
-                    const firebaseReady = await waitForFirebaseQuick();
-                    if (firebaseReady) {
-                        console.log('🔥 Firebase verbunden! Lade echte Daten...');
-                        await loadReports();
-                        
-                        // Hide retry button when real data is loaded
-                        document.getElementById('retry-btn').style.display = 'none';
-                        showMessage('✅ Echte Daten geladen! Firebase-Verbindung erfolgreich.', 'success');
-                    } else {
-                        console.log('⚠️ Firebase nicht verfügbar, bleibe im Demo-Modus');
-                        showMessage('Demo-Modus: Firebase nicht verfügbar. Zeige Beispieldaten. Sie können trotzdem alle Funktionen nutzen!', 'info');
-                    }
-                } catch (error) {
-                    console.log('⚠️ Firebase-Verbindung fehlgeschlagen, bleibe im Demo-Modus:', error.message);
-                    showMessage('Demo-Modus: Firebase-Verbindung fehlgeschlagen. Zeige Beispieldaten. Sie können trotzdem alle Funktionen nutzen!', 'info');
-                }
-            }, 1000);
+            await waitForSpyApi();
+            // loadReports() zeigt echte Daten - oder faellt SICHTBAR auf Beispieldaten zurueck
+            await loadReports();
         });
 
         // Demo data for offline mode
@@ -604,51 +585,88 @@
             };
         }
 
+        // --- Normalisierung: liest ECHTE Berichte (playerName / planet{} /
+        //     buildings[]) UND Demo-Berichte (flache Felder) und escaped alles,
+        //     damit nie [object Object] oder ungeschütztes HTML gerendert wird. ---
+        function spyEsc(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+        function spyFirst(...vals) {
+            for (const v of vals) { if (v !== undefined && v !== null && v !== '') return v; }
+            return '';
+        }
+        function spyNormKey(s) { return String(s).toLowerCase().replace(/[\s\-_]/g, ''); }
+        function spyBuildingMap(r) {
+            if (r.__bmap) return r.__bmap;
+            const m = {};
+            const src = r.buildings;
+            if (Array.isArray(src)) {
+                src.forEach(b => { if (b && b.name != null) m[spyNormKey(b.name)] = b.level; });
+            } else if (src && typeof src === 'object') {
+                Object.entries(src).forEach(([k, v]) => { m[spyNormKey(k)] = (v && v.level != null) ? v.level : v; });
+            }
+            r.__bmap = m;
+            return m;
+        }
+        function spyLevel(r, ...keys) {
+            for (const k of keys) { if (r[k] !== undefined && r[k] !== null && r[k] !== '') return r[k]; }
+            const m = spyBuildingMap(r);
+            for (const k of keys) { const nk = spyNormKey(k); if (m[nk] !== undefined && m[nk] !== null) return m[nk]; }
+            return '—';
+        }
+        function spyPlayerName(r) { return spyFirst(r.playerName, r.player && r.player.name, typeof r.player === 'string' ? r.player : '', 'Unbekannt'); }
+        function spyPlanetName(r) { return spyFirst(r.planetName, r.planet && r.planet.name, typeof r.planet === 'string' ? r.planet : '', 'Unbekannt'); }
+        function spyCoords(r) { return spyFirst(r.planetCoordinates, r.planet && r.planet.coordinates, r.coordinates, '—'); }
+        function spyAlliance(r) { return spyFirst(r.allianceName, r.alliance, '—'); }
+        function spyDate(r) {
+            if (r.datum) return r.datum;
+            const c = r.createdAt || r.timestamp;
+            if (!c) return '—';
+            try { const d = c.toDate ? c.toDate() : new Date(c); return isNaN(d) ? '—' : d.toLocaleDateString('de-DE'); } catch (e) { return '—'; }
+        }
+
         // Display reports in table
         async function displayReports(reports) {
             const tbody = document.getElementById('dataTable');
-            
-            if (reports.length === 0) {
+
+            if (!reports || reports.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="20" class="empty-state">
                             <p>Keine Berichte gefunden</p>
-                            <small style="color: var(--muted-foreground);">Firebase nicht verfügbar oder keine Daten</small>
+                            <small style="color: var(--muted-foreground);">Noch keine Spionageberichte gespeichert.</small>
                         </td>
                     </tr>
                 `;
                 return;
             }
-            
-            tbody.innerHTML = reports.map(report => `
-                <tr>
-                    <td class="player-name">${report.player}</td>
-                    <td>${report.planet}</td>
-                    <td class="coordinates">${report.coordinates}</td>
-                    <td class="alliance">${report.alliance || '—'}</td>
-                    <td class="building-value">${report.planetenzentrale || '—'}</td>
-                    <td class="building-value">${report.raumhafen || '—'}</td>
-                    <td class="building-value">${report.eisenmine || '—'}</td>
-                    <td class="building-value">${report.siliziumraffinerie || '—'}</td>
-                    <td class="building-value">${report.kohlenstoffgewinnungsanlage || '—'}</td>
-                    <td class="building-value">${report.schiffsfabrik || '—'}</td>
-                    <td class="building-value">${report.waffenfabrik || '—'}</td>
-                    <td class="building-value">${report.forschungszentrum || '—'}</td>
+
+            tbody.innerHTML = reports.map(report => {
+                const coords = spyEsc(spyCoords(report));
+                return `
+                <tr${report.__demo ? ' class="demo-row"' : ''}>
+                    <td class="player-name">${spyEsc(spyPlayerName(report))}</td>
+                    <td>${spyEsc(spyPlanetName(report))}</td>
+                    <td class="coordinates">${coords}</td>
+                    <td class="alliance">${spyEsc(spyAlliance(report))}</td>
+                    <td class="building-value">${spyEsc(spyLevel(report,'planetenzentrale','planetCenter'))}</td>
+                    <td class="building-value">${spyEsc(spyLevel(report,'raumhafen','spaceport'))}</td>
+                    <td class="building-value">${spyEsc(spyLevel(report,'eisenmine','ironMine'))}</td>
+                    <td class="building-value">${spyEsc(spyLevel(report,'siliziumraffinerie','siliconRefinery'))}</td>
+                    <td class="building-value">${spyEsc(spyLevel(report,'kohlenstoffgewinnungsanlage','carbonPlant'))}</td>
+                    <td class="building-value">${spyEsc(spyLevel(report,'schiffsfabrik','shipFactory'))}</td>
+                    <td class="building-value">${spyEsc(spyLevel(report,'waffenfabrik','weaponFactory'))}</td>
+                    <td class="building-value">${spyEsc(spyLevel(report,'forschungszentrum','researchCenter'))}</td>
                     <td class="research-value">───────</td>
-                    <td class="unit-value">${report.spionageeinheit || '—'}</td>
-                    <td class="unit-value">${report.tarneinheit || '—'}</td>
-                    <td class="unit-value">${report.invasionseinheit || '—'}</td>
-                    <td class="unit-value">${report.pluendereinheit || '—'}</td>
-                    <td class="unit-value">${report.sabotageeinheit || '—'}</td>
-                    <td>${report.datum || '—'}</td>
-                    <td>
-                        ${report.originalUrl ? 
-                            `<button class="copy-btn" onclick="copyToClipboard('${report.coordinates}')">📋</button>` : 
-                            '—'
-                        }
-                    </td>
-                </tr>
-            `).join('');
+                    <td class="unit-value">${spyEsc(spyLevel(report,'spionageeinheit','spyUnit'))}</td>
+                    <td class="unit-value">${spyEsc(spyLevel(report,'tarneinheit','stealthUnit'))}</td>
+                    <td class="unit-value">${spyEsc(spyLevel(report,'invasionseinheit','invasionUnit'))}</td>
+                    <td class="unit-value">${spyEsc(spyLevel(report,'pluendereinheit','plunderUnit'))}</td>
+                    <td class="unit-value">${spyEsc(spyLevel(report,'sabotageeinheit','sabotageUnit'))}</td>
+                    <td>${spyEsc(spyDate(report))}</td>
+                    <td>${coords !== '—' ? `<button class="copy-btn" onclick="copyToClipboard('${coords}')">📋</button>` : '—'}</td>
+                </tr>`;
+            }).join('');
         }
 
         // Display statistics (simplified)
@@ -662,10 +680,10 @@
             const playerSearch = document.getElementById('playerSearch').value.toLowerCase();
             const planetSearch = document.getElementById('planetSearch').value.toLowerCase();
 
-            filteredReports = currentReports.filter(report => 
-                report.player.toLowerCase().includes(playerSearch) ||
-                report.planet.toLowerCase().includes(planetSearch) ||
-                (report.alliance && report.alliance.toLowerCase().includes(playerSearch))
+            filteredReports = currentReports.filter(report =>
+                String(spyPlayerName(report)).toLowerCase().includes(playerSearch) ||
+                String(spyPlanetName(report)).toLowerCase().includes(planetSearch) ||
+                String(spyAlliance(report)).toLowerCase().includes(playerSearch)
             );
 
             displayReports(filteredReports);
@@ -679,66 +697,11 @@
         }
 
         function addSpyReport() {
-            const spyReportInput = document.getElementById('spyReportInput');
-            const spyReportLink = spyReportInput.value.trim();
-            
-            if (!spyReportLink) {
-                alert('Bitte geben Sie einen Spy-Bericht-Link ein!');
-                return;
-            }
-            
-            // Spy-Bericht parsen und verarbeiten
-            try {
-                console.log('🔍 Verarbeite Spy-Bericht:', spyReportLink);
-                
-                // Hier würde normalerweise der Spy-Bericht geparst werden
-                // Für jetzt fügen wir einen Demo-Bericht hinzu
-                const newReport = {
-                    id: 'spy-' + Date.now(),
-                    player: 'Neuer Spieler',
-                    planet: 'Neuer Planet',
-                    alliance: 'Neue Allianz',
-                    timestamp: new Date(),
-                    buildings: {
-                        planetCenter: Math.floor(Math.random() * 20),
-                        spaceport: Math.floor(Math.random() * 15),
-                        ironMine: Math.floor(Math.random() * 25),
-                        siliconRefinery: Math.floor(Math.random() * 20),
-                        carbonPlant: Math.floor(Math.random() * 18),
-                        shipFactory: Math.floor(Math.random() * 12),
-                        weaponFactory: Math.floor(Math.random() * 10),
-                        researchCenter: Math.floor(Math.random() * 8),
-                        research: Math.floor(Math.random() * 5)
-                    },
-                    military: {
-                        spyUnit: Math.floor(Math.random() * 15),
-                        stealthUnit: Math.floor(Math.random() * 12),
-                        invasionUnit: Math.floor(Math.random() * 20),
-                        plunderUnit: Math.floor(Math.random() * 18),
-                        sabotageUnit: Math.floor(Math.random() * 10)
-                    },
-                    source: 'Manuell hinzugefügt'
-                };
-                
-                // Bericht zur aktuellen Liste hinzufügen
-                currentReports.unshift(newReport);
-                filteredReports = [...currentReports];
-                
-                // Tabelle aktualisieren
-                displayReports(filteredReports);
-                
-                // Eingabefeld leeren
-                spyReportInput.value = '';
-                
-                // Erfolgsmeldung anzeigen
-                showStatusMessage('✅ Spy-Bericht erfolgreich hinzugefügt!', 'success');
-                
-                console.log('✅ Spy-Bericht hinzugefügt:', newReport);
-                
-            } catch (error) {
-                console.error('❌ Fehler beim Hinzufügen des Spy-Berichts:', error);
-                alert('Fehler beim Hinzufügen des Spy-Berichts: ' + error.message);
-            }
+            // Echtes Hinzufügen läuft über die Eingabe-/Parser-Seite (spy-report-input.html),
+            // die den Bericht parst und in Firestore speichert. Kein Fake-Eintrag mehr.
+            const link = (document.getElementById('spyReportInput')?.value || '').trim();
+            const target = 'spy-report-input.html' + (link ? ('?url=' + encodeURIComponent(link)) : '');
+            window.location.href = target;
         }
 
         function showStatusMessage(message, type = 'info') {
@@ -759,7 +722,7 @@
         }
 
         function addNewReport() {
-            showMessage('Neuer Bericht Funktion wird implementiert...', 'info');
+            window.location.href = 'spy-report-input.html';
         }
 
         function goToDashboard() {
@@ -788,39 +751,37 @@
             }
         }
 
+        function showDemoData(reason) {
+            currentReports = getDemoReports().map(r => ({ ...r, __demo: true }));
+            filteredReports = [...currentReports];
+            displayReports(currentReports);
+            showMessage('⚠️ ' + reason + ' — unten stehen BEISPIELDATEN (Demo, nicht echt).', 'info');
+        }
         async function loadReports() {
             try {
-                console.log('📋 Lade Spy-Reports...');
-                
                 if (window.SpyDatabaseAPI) {
                     const reports = await window.SpyDatabaseAPI.getAllianceReports();
-                    if (reports.length > 0) {
+                    if (reports && reports.length > 0) {
                         currentReports = reports;
                         filteredReports = [...currentReports];
                         await displayReports(currentReports);
                         await loadStatistics();
-                        console.log(`✅ ${currentReports.length} Spy-Reports geladen`);
+                        document.getElementById('retry-btn').style.display = 'none';
+                        showMessage(`✅ ${currentReports.length} Berichte geladen.`, 'success');
                         return;
                     }
+                    // Eingeloggt, aber keine Berichte -> ehrlich leer (kein Demo als "echt")
+                    currentReports = [];
+                    filteredReports = [];
+                    await displayReports(currentReports);
+                    document.getElementById('retry-btn').style.display = 'none';
+                    showMessage('Noch keine Spionageberichte in deiner Allianz. Über „Bericht hinzufügen" anlegen.', 'info');
+                    return;
                 }
-                
-                // Fallback to demo data
-                console.log('🔄 Keine echten Daten gefunden, zeige Demo-Daten...');
-                currentReports = getDemoReports();
-                filteredReports = [...currentReports];
-                await displayReports(currentReports);
-                currentStatistics = getDemoStatistics();
-                displayStatistics(currentStatistics);
-                showMessage('Demo-Modus: Keine echten Daten gefunden. Zeige Beispieldaten.', 'info');
-                
+                showDemoData('Spionage-Datenbank nicht verfügbar (nicht eingeloggt?)');
             } catch (error) {
                 console.error('❌ Fehler beim Laden der Spy-Reports:', error);
-                currentReports = getDemoReports();
-                filteredReports = [...currentReports];
-                await displayReports(currentReports);
-                currentStatistics = getDemoStatistics();
-                displayStatistics(currentStatistics);
-                showMessage('Demo-Modus: Fehler beim Laden. Zeige Beispieldaten.', 'info');
+                showDemoData('Berichte konnten nicht geladen werden');
             }
         }
 

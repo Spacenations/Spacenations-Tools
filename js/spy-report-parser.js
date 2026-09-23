@@ -581,7 +581,7 @@ class SpyReportParser {
             'very_high': { text: 'Sehr Hoch', color: '#9C27B0', icon: '⚫' }
         };
         
-        return levels[threatLevel] || levels['unknown'];
+        return levels[threatLevel] || { text: 'Unbekannt', color: '#9AA1AC', icon: '⚪' };
     }
 }
 
