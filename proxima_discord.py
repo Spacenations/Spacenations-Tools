@@ -655,15 +655,18 @@ def run_weekly_once():
     max_rows = _env_int("PROXIMA_DISCORD_MAX_ROWS", 30)
     try:
         state = _load_state()
-        this_week = _iso_week_id(_berlin_now())
-        already = state.get("weekly_week") == this_week
-        if not already:
-            state["message_id"] = None          # neue Nachricht -> Webhook/Ping
-            state["weekly_week"] = this_week
-            _save_state(state)
+        berlin = _berlin_now()
+        # Nur wenn der Post WIRKLICH faellig ist (Mittwoch >= 17:01 und diese Woche
+        # noch nicht gepostet) wird eine NEUE Nachricht + Wochen-Lock erzeugt. Ein
+        # zu frueher Aufruf (z. B. ein Test um 14:00) sperrt die Woche damit NICHT
+        # mehr, sondern aktualisiert nur die bestehende Nachricht.
+        if not _weekly_due(berlin, state):
+            _posted, count = _sync_once(webhook_url, api_url, max_rows, state, force=True)
+            return True, f"Kein neuer Wochen-Post faellig; Liste aktualisiert ({count} Planeten)."
+        state["message_id"] = None          # neue Nachricht -> Webhook/Ping
+        state["weekly_week"] = _iso_week_id(berlin)
+        _save_state(state)
         _posted, count = _sync_once(webhook_url, api_url, max_rows, state, force=True)
-        if already:
-            return True, f"Wochen-Post lief bereits; Liste aktualisiert ({count} Planeten)."
         return True, f"Wochen-Post gesendet ({count} Planeten, inkl. Excel)."
     except urllib.error.HTTPError as e:
         return False, f"HTTP-Fehler: {_http_error_detail(e)}"
