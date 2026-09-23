@@ -120,31 +120,6 @@ class AuthManager {
         });
     }
     
-    // Basis-Benutzerdaten aus Firebase Auth erstellen
-    createAuthBasedUserData(user) {
-        return {
-            uid: user.uid,
-            email: user.email,
-            username: user.displayName || user.email.split('@')[0],
-            isActive: true,
-            isAllianceAdmin: false,
-            isSuperAdmin: false, // Wird später aus Firestore geladen, falls verfügbar
-            systemRole: 'user',
-            role: 'user',
-            loginCount: 0,
-            alliance: null,
-            permissions: {
-                dashboard_access: true,
-                profile_edit: true,
-                admin_dashboard: false,
-                user_management: false,
-                alliance_management: false,
-                system_settings: false
-            },
-            source: 'firebase_auth_only'
-        };
-    }
-    
     // Benutzerdaten aus Firestore laden (optional)
     async loadUserData(uid) {
         if (!this.firestoreAvailable) {
@@ -264,61 +239,32 @@ class AuthManager {
             return input;
         }
         
-        // Für Benutzernamen: Fallback-Mapping (ohne Firestore)
-        const usernameToEmailMap = {
-            'daikin': 't.o@trend4media.de',
-            'admin': 't.o@trend4media.de',
-            'trend4media_admin': 't.o@trend4media.de'
-        };
-        
-        const mappedEmail = usernameToEmailMap[input.toLowerCase()];
-        if (mappedEmail) {
-            authLog.auth('Benutzername zu E-Mail gemappt:', input, '->', mappedEmail);
-            return mappedEmail;
-        }
-        
-        // Wenn es wie eine E-Mail aussieht, aber Validation fehlschlägt
+        // Kein hartcodiertes Benutzername→E-Mail-Mapping mehr: Login erfolgt
+        // über die E-Mail-Adresse. Sieht die Eingabe wie eine E-Mail aus,
+        // wird sie trotz strenger Validierung versucht.
         if (input.includes('@')) {
-            return input; // Versuche es trotzdem
+            return input;
         }
-        
+
         return null;
     }
     
-    // Super-Admin-Status prüfen (mit Fallback)
+    // Admin-Status pruefen. Quelle der Wahrheit ist Firestore (globalRole).
+    // Uebergangsweise wird isSuperAdmin===true noch akzeptiert, bis die Migration
+    // alle Konten auf globalRole umgestellt hat. KEIN E-Mail-Fallback mehr.
     async checkSuperAdminStatus(user) {
         if (!this.firestoreAvailable) {
-            // Fallback: Prüfe anhand der E-Mail
-            const adminEmails = [
-                't.o@trend4media.de',
-                'info@trend4media.de',
-                'admin@spacenations.eu'
-            ];
-            
-            const isAdmin = adminEmails.includes(user.email.toLowerCase());
-            authLog.auth('Super-Admin-Status (Fallback):', isAdmin ? 'Ja' : 'Nein');
-            return isAdmin;
+            return false;
         }
-        
         try {
             const userDoc = await this.db.collection('users').doc(user.uid).get();
-            
             if (userDoc.exists) {
                 const userData = userDoc.data();
-                return userData.isSuperAdmin === true;
+                return userData.globalRole === 'global_admin' || userData.isSuperAdmin === true;
             }
-            
             return false;
-            
         } catch (error) {
-            authLog.error('Super-Admin-Check fehlgeschlagen', error);
-            
-            // Fallback bei Berechtigungsfehlern
-            if (error.code === 'permission-denied') {
-                const adminEmails = ['t.o@trend4media.de', 'info@trend4media.de'];
-                return adminEmails.includes(user.email.toLowerCase());
-            }
-            
+            authLog.error('Admin-Check fehlgeschlagen', error);
             return false;
         }
     }
@@ -350,18 +296,12 @@ class AuthManager {
                         createdAt: window.FirebaseConfig.getServerTimestamp(),
                         lastLogin: window.FirebaseConfig.getServerTimestamp(),
                         isActive: true,
+                        globalRole: 'user',
                         isAllianceAdmin: false,
-                        isSuperAdmin: false,
-                        systemRole: 'user',
-                        role: 'user',
                         loginCount: 1,
                         permissions: {
                             dashboard_access: true,
-                            profile_edit: true,
-                            admin_dashboard: false,
-                            user_management: false,
-                            alliance_management: false,
-                            system_settings: false
+                            profile_edit: true
                         }
                     };
                     
@@ -495,35 +435,22 @@ class AuthManager {
         }
     }
     
-    // Basis-Benutzerdaten aus Firebase Auth erstellen
+    // Basis-Benutzerdaten aus Firebase Auth erstellen.
+    // SICHERHEIT: keine E-Mail-basierte Admin-Vergabe mehr. Jeder neue Nutzer ist
+    // 'user'. Admin-Rechte vergibt ausschliesslich ein bestehender Admin (globalRole).
     createAuthBasedUserData(user) {
-        // Hardcoded Admin-Liste für Fallback
-        const adminEmails = [
-            't.o@trend4media.de',
-            'info@trend4media.de',
-            'admin@spacenations.eu'
-        ];
-        
-        const isAdmin = adminEmails.includes(user.email.toLowerCase());
-        
         return {
             uid: user.uid,
             email: user.email,
             username: user.displayName || user.email.split('@')[0],
             isActive: true,
-            isAllianceAdmin: isAdmin,
-            isSuperAdmin: isAdmin, // Fallback: Admin-E-Mails sind Super-Admins
-            systemRole: isAdmin ? 'superadmin' : 'user',
-            role: isAdmin ? 'superadmin' : 'user',
+            globalRole: 'user',
+            isAllianceAdmin: false,
             loginCount: 0,
             alliance: null,
             permissions: {
                 dashboard_access: true,
-                profile_edit: true,
-                admin_dashboard: isAdmin,
-                user_management: isAdmin,
-                alliance_management: isAdmin,
-                system_settings: isAdmin
+                profile_edit: true
             },
             source: 'firebase_auth_fallback'
         };
@@ -568,11 +495,15 @@ class AuthManager {
         
         try {
             const updates = {};
-            
-            // Fehlende Felder hinzufügen
+
+            // Vereinheitlichung: fehlendes globalRole aus Alt-Feldern ableiten
+            // (idempotent - laeuft nur, solange globalRole noch fehlt). So migrieren
+            // sich bestehende Konten beim naechsten Login selbst auf das neue Modell.
+            if (!userData.hasOwnProperty('globalRole')) {
+                const wasAdmin = userData.isSuperAdmin === true || userData.systemRole === 'superadmin';
+                updates.globalRole = wasAdmin ? 'global_admin' : 'user';
+            }
             if (!userData.hasOwnProperty('isAllianceAdmin')) updates.isAllianceAdmin = false;
-            if (!userData.hasOwnProperty('isSuperAdmin')) updates.isSuperAdmin = false;
-            if (!userData.hasOwnProperty('systemRole')) updates.systemRole = userData.role || 'user';
             
             // Updates anwenden falls nötig
             if (Object.keys(updates).length > 0) {

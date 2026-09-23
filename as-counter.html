@@ -786,6 +786,10 @@ Einfach alle Berichte gemischt einfügen - der Parser sortiert automatisch!"></t
     <script src="js/theme-manager.js"></script>
 
     <script>
+        // Sicherheitsnetz: einheitliches Logger-Objekt, falls kein Logger-Skript
+        // geladen ist (verhindert 'Logger is not defined' auf dieser Seite).
+        window.Logger = window.Logger || { info(){}, debug(){}, warn(){}, error(){} };
+
         // Intelligente Berechnungslogik für AS-Counter
         function calculateReports() {
             const allReports = document.getElementById('all-reports').value;

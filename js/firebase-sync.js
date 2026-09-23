@@ -123,38 +123,26 @@ class FirebaseSync {
             }
         }
 
-        // Admin-spezifische Logik
+        // Admin-spezifische Logik. Quelle der Wahrheit ist globalRole; uebergangs-
+        // weise wird isSuperAdmin/systemRole noch akzeptiert. KEIN E-Mail-Fallback.
+        const isAdminUser = userData?.globalRole === 'global_admin' ||
+                            userData?.isSuperAdmin === true ||
+                            userData?.systemRole === 'superadmin';
+
         if (this.currentPage === 'admin-login') {
-            if (isLoggedIn && userData?.isSuperAdmin === true) {
-                console.log('🛡️ Super-Admin eingeloggt - Weiterleitung zum Admin-Dashboard');
+            if (isLoggedIn && isAdminUser) {
+                console.log('🛡️ Admin eingeloggt - Weiterleitung zum Admin-Dashboard');
                 this.redirectAfterDelay('admin-dashboard.html', 800);
             }
         }
 
         if (this.currentPage === 'admin-dashboard') {
             if (!isLoggedIn) return; // oben bereits handled
-            
-            // Verbesserte Super-Admin-Prüfung mit Fallback
-            const isSuperAdmin = userData?.isSuperAdmin === true || 
-                                userData?.systemRole === 'superadmin' ||
-                                userData?.role === 'superadmin' ||
-                                (user?.email === 't.o@trend4media.de') || // Hardcoded Fallback
-                                (user?.email === 'info@trend4media.de');
-            
-            if (pageConfig.requiresSuperAdmin && !isSuperAdmin) {
-                console.log('🚫 Kein Super-Admin - Weiterleitung zum Admin-Login', {
-                    email: user?.email,
-                    isSuperAdmin: userData?.isSuperAdmin,
-                    systemRole: userData?.systemRole,
-                    fallbackMatch: user?.email === 't.o@trend4media.de'
-                });
+
+            if (pageConfig.requiresSuperAdmin && !isAdminUser) {
+                console.log('🚫 Kein Admin - Weiterleitung zum Admin-Login');
                 this.redirectAfterDelay('admin-login.html', 1000);
                 return;
-            } else if (isSuperAdmin) {
-                console.log('✅ Super-Admin-Zugriff bestätigt für Dashboard', {
-                    email: user?.email,
-                    method: userData?.isSuperAdmin === true ? 'firestore' : 'fallback'
-                });
             }
         }
         

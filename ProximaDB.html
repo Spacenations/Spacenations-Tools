@@ -495,20 +495,20 @@
         let refreshTimerId = null;
         let backoffMs = AUTO_REFRESH_MS;
 
-        function withTimeout(promise, ms) {
+        // Genau EINE Anfrage, die nach ms abgebrochen wird (frueher wurden zwei
+        // fetches gestartet: der uebergebene und ein interner).
+        function fetchWithTimeout(ms) {
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), ms);
-            return Promise.race([
-                fetch(API_URL, { headers: { 'Accept': 'application/json' }, cache: 'no-store', signal: controller.signal }),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout nach ' + ms + ' ms')), ms))
-            ]).finally(() => clearTimeout(id));
+            return fetch(API_URL, { headers: { 'Accept': 'application/json' }, cache: 'no-store', signal: controller.signal })
+                .finally(() => clearTimeout(id));
         }
 
         async function loadData() {
             const content = document.getElementById('content');
             content.innerHTML = '<div class="loading"><p>Lade Proxima-Daten...</p></div>';
             try {
-                const response = await withTimeout(fetch(API_URL, { headers: { 'Accept': 'application/json' }, cache: 'no-store' }), REQUEST_TIMEOUT_MS);
+                const response = await fetchWithTimeout(REQUEST_TIMEOUT_MS);
                 if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 const data = await response.json();
                 displayData(data);

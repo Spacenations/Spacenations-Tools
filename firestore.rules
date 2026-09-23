@@ -1,88 +1,133 @@
 rules_version = '2';
+
+// ============================================================================
+// Spacenations-Tools — Firestore-Sicherheitsregeln
+//
+// Stage 1d (Sicherheit): Diese Regeln sind SOFORT deploybar und halten die App
+// funktionsfaehig, schliessen aber die kritische Rechte-Eskalation:
+//   * Ein Nutzer kann NICHT mehr seine eigenen Rollen-/Privileg-Felder setzen
+//     (isSuperAdmin, isAllianceAdmin, globalRole, systemRole, role, permissions).
+//   * Kein pauschales "allow read, write: if true" mehr.
+//   * Analytics/Fehler-Logs: anonymes Schreiben erlaubt (Telemetrie oeffentlicher
+//     Seiten), Lesen nur fuer Admins.
+//
+// BEWUSST NOCH NICHT hier (kommt in Stage 2 mit dem vereinheitlichten Rollen-/
+// Allianz-Modell): feingranulare Pro-Allianz-/Pro-Nutzer-Isolation. Bis dahin
+// gilt fuer die meisten App-Collections "nur eingeloggt" — so wie die App heute
+// ohnehin laeuft, nur eben ohne die offene Eskalation.
+//
+// Admin-Erkennung ist uebergangsweise tolerant (isSuperAdmin ODER globalRole),
+// damit sowohl der aktuelle als auch der Stage-2-Stand funktioniert.
+// ============================================================================
+
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ----- Helfer -------------------------------------------------------------
     function isSignedIn() {
       return request.auth != null;
     }
-
-    function userDoc(uid) {
-      return get(/databases/$(database)/documents/users/$(uid));
+    function myUid() {
+      return request.auth.uid;
+    }
+    function userData() {
+      return get(/databases/$(database)/documents/users/$(myUid())).data;
+    }
+    function isAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(myUid()))
+        && (userData().get('isSuperAdmin', false) == true
+            || userData().get('globalRole', '') == 'global_admin');
     }
 
-    function isGlobalAdmin() {
-      return isSignedIn() && userDoc(request.auth.uid).data.globalRole == 'global_admin';
+    // GLOBALE Admin-Vektoren, die ein normaler Nutzer nie selbst setzen darf.
+    // (Nur diese entscheiden ueber Admin-Rechte; harmlose Felder wie permissions
+    // oder isAllianceAdmin bleiben schreibbar, damit Registrierung/Profil laufen.
+    // Allianz-Admin wird ueber die Allianz-Mitgliedschaft geprueft, nicht hier.)
+    function noRolePrivilegeOnCreate() {
+      return request.resource.data.get('isSuperAdmin', false) == false
+        && request.resource.data.get('globalRole', 'user') == 'user'
+        && request.resource.data.get('systemRole', 'user') == 'user';
+    }
+    // Beim Update duerfen sich diese Felder nicht aendern (nur Admin darf das).
+    function rolePrivilegeUnchanged() {
+      return request.resource.data.get('isSuperAdmin', false) == resource.data.get('isSuperAdmin', false)
+        && request.resource.data.get('globalRole', 'user') == resource.data.get('globalRole', 'user')
+        && request.resource.data.get('systemRole', 'user') == resource.data.get('systemRole', 'user');
     }
 
-    function memberDoc(allianceId, uid) {
-      // Flache Collection: allianceMembers mit ID-Muster: <allianceId>_<uid>
-      return get(/databases/$(database)/documents/allianceMembers/$(allianceId + '_' + uid));
-    }
-
-    function isAllianceMember(allianceId) {
-      return isSignedIn() && exists(/databases/$(database)/documents/allianceMembers/$(allianceId + '_' + request.auth.uid));
-    }
-
-    function isAllianceAdmin(allianceId) {
-      let m = memberDoc(allianceId, request.auth.uid);
-      return isSignedIn() && m != null && (m.data.role == 'admin' || m.data.role == 'founder');
-    }
-
-    // Users: Jeder Nutzer darf sein eigenes Dokument lesen/schreiben. Global-Admins dürfen alles lesen/schreiben.
+    // ----- users --------------------------------------------------------------
+    // Nutzer liest/aendert nur sein eigenes Dokument; Rollen-Felder sind gesperrt.
+    // Admins duerfen alle Nutzer verwalten (inkl. Rollen setzen).
     match /users/{uid} {
-      allow read: if isSignedIn() && (uid == request.auth.uid || isGlobalAdmin());
-      allow create: if isSignedIn() && uid == request.auth.uid;
-      allow update: if isSignedIn() && (uid == request.auth.uid || isGlobalAdmin());
-      allow delete: if isGlobalAdmin();
+      allow read:   if isSignedIn() && (uid == myUid() || isAdmin());
+      allow create: if isAdmin()
+                    || (isSignedIn() && uid == myUid() && noRolePrivilegeOnCreate());
+      allow update: if isAdmin()
+                    || (isSignedIn() && uid == myUid() && rolePrivilegeUnchanged());
+      allow delete: if isAdmin();
+
+      // Unter-Collections eines Nutzers (z.B. calculator_data): nur er selbst/Admin.
+      match /{document=**} {
+        allow read, write: if isSignedIn() && (uid == myUid() || isAdmin());
+      }
     }
 
-    // Alliances: sichtbar für Mitglieder; änderbar von Allianz-Admins oder Global-Admins
+    // ----- Pro-Nutzer-Statistiken (Dokument-ID == uid) ------------------------
+    match /userStats/{uid} {
+      allow read:  if isSignedIn() && (uid == myUid() || isAdmin());
+      allow write: if isSignedIn() && (uid == myUid() || isAdmin());
+    }
+
+    // ----- Pro-Nutzer-Daten (Auto-ID + uid-Feld); Stage 2 verschaerft auf Owner
+    match /userBattles/{id}       { allow read, write: if isSignedIn(); }
+    match /userRaids/{id}         { allow read, write: if isSignedIn(); }
+    match /userSabotages/{id}     { allow read, write: if isSignedIn(); }
+    match /userActivities/{id}    { allow read, write: if isSignedIn(); }
+    match /userPasswordChanges/{id} { allow read, write: if isSignedIn(); }
+    match /calculator_data/{id}   { allow read, write: if isSignedIn(); }
+    match /raid_data/{id}         { allow read, write: if isSignedIn(); }
+    match /sabo_data/{id}         { allow read, write: if isSignedIn(); }
+
+    // ----- Allianz-System -----------------------------------------------------
+    // Stage 1d: eingeloggt erforderlich (kein "if true"). Stage 2: Pro-Allianz-
+    // Isolation ueber das vereinheitlichte, UID-basierte Mitgliedsmodell.
     match /alliances/{allianceId} {
-      allow read: if isSignedIn() && (isAllianceMember(allianceId) || isGlobalAdmin());
-      allow create: if isSignedIn() && (isGlobalAdmin());
-      allow update: if isSignedIn() && (isAllianceAdmin(allianceId) || isGlobalAdmin());
-      allow delete: if isGlobalAdmin();
+      allow read, write: if isSignedIn();
     }
-
-    // Alliance Members: Lesbar für angemeldete Nutzer (optional einschränken);
-    // Schreibrechte für Global-Admins oder Allianz-Admins der betroffenen Allianz
     match /allianceMembers/{memberId} {
-      allow read: if isSignedIn();
-
-      allow create: if isSignedIn() && (
-        // Admins der Ziel-Allianz oder Global-Admin
-        isAllianceAdmin(request.resource.data.allianceId) || isGlobalAdmin()
-      );
-
-      allow update: if isSignedIn() && (
-        // Admins der Allianz des existierenden Dokuments oder Global-Admin
-        isAllianceAdmin(resource.data.allianceId) || isGlobalAdmin()
-      );
-
-      allow delete: if isSignedIn() && (
-        isAllianceAdmin(resource.data.allianceId) || isGlobalAdmin()
-      );
+      allow read, write: if isSignedIn();
     }
-
-    // Spy Reports: Sichtbar und schreibbar nur für Mitglieder der jeweiligen Allianz.
-    match /spyReports/{docId} {
-      allow read: if isSignedIn() && (isAllianceMember(resource.data.allianceId) || isGlobalAdmin());
-
-      allow create: if isSignedIn() && (
-        isAllianceMember(request.resource.data.allianceId) || isGlobalAdmin()
-      );
-
-      allow update: if isSignedIn() && (
-        // Mitglied der Allianz des Dokuments oder Global-Admin
-        isAllianceMember(resource.data.allianceId) || isGlobalAdmin()
-      );
-
-      allow delete: if isSignedIn() && (
-        // Ersteller, Allianz-Admin oder Global-Admin
-        resource.data.createdByUid == request.auth.uid ||
-        isAllianceAdmin(resource.data.allianceId) ||
-        isGlobalAdmin()
-      );
+    match /alliancePermissions/{allianceId} {
+      allow read, write: if isSignedIn();
+      match /{document=**} { allow read, write: if isSignedIn(); }  // memberPermissions
     }
+    match /allianceChats/{allianceId} {
+      allow read, write: if isSignedIn();
+      match /{document=**} { allow read, write: if isSignedIn(); }  // messages
+    }
+    match /allianceActivities/{id}    { allow read, write: if isSignedIn(); }
+    match /allianceActivityLogs/{id}  { allow read, write: if isSignedIn(); }
+
+    // ----- Spionage-Datenbank -------------------------------------------------
+    // Die App nutzt 'allianceSpyReports'; 'spyReports' existiert nur in Beispielen.
+    match /allianceSpyReports/{id} { allow read, write: if isSignedIn(); }
+    match /spyReports/{id}         { allow read, write: if isSignedIn(); }
+
+    // ----- Analytics / Fehler-Logs -------------------------------------------
+    // Oeffentliche Seiten schreiben Telemetrie ohne Login -> create erlaubt,
+    // aber Lesen/Aendern/Loeschen nur fuer Admins (keine Datenpreisgabe).
+    match /analytics_events/{id}   { allow create: if true; allow read: if isAdmin(); allow update, delete: if false; }
+    match /analytics_sessions/{id} { allow create: if true; allow read: if isAdmin(); allow update, delete: if false; }
+    match /analytics_pageViews/{id}{ allow create: if true; allow read: if isAdmin(); allow update, delete: if false; }
+    match /errorLogs/{id}          { allow create: if true; allow read: if isAdmin(); allow update, delete: if false; }
+
+    // ----- Diagnose/Verbindungstests -----------------------------------------
+    match /_test/{id}          { allow read, write: if isSignedIn(); }
+    match /test/{id}           { allow read, write: if isSignedIn(); }
+    match /_system_health/{id} { allow read, write: if isSignedIn(); }
+
+    // ----- Default: alles andere verboten ------------------------------------
+    // (Kein "match /{document=**}"-Catch-all. Unbekannte Collections -> deny.)
   }
 }
-

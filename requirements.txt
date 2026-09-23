@@ -1,3 +1,2 @@
-requests==2.31.0
-schedule==1.2.0
-gunicorn==21.2.0
+# Keine externen Abhängigkeiten – die App nutzt ausschließlich die
+# Python-Standardbibliothek (app.py + proxima_discord.py).

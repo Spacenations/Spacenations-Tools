@@ -498,6 +498,12 @@
 
                             <!-- Auto-Loading Scripts - Immer als LETZTES vor </body> -->
 <script>
+    // Sicherheitsnetz: einheitliches Logger-Objekt, falls kein Logger-Skript
+    // geladen ist (verhindert 'Logger is not defined' in dieser Seite).
+    window.Logger = window.Logger || { info(){}, debug(){}, warn(){}, error(){} };
+    // Letztes Auswertungsergebnis fuer das explizite Speichern.
+    let lastCalc = null;
+
     /**
      * UNIVERSELLER Auto-Loader für alle Spacenations-Tools
      * Lädt automatisch alle benötigten Skripte auf jeder Seite
@@ -697,11 +703,11 @@
         const lostStats = parseReports(lostReports);
         updateLostDisplay(lostStats);
         
-        // Dashboard-spezifisch: Daten auch in Firebase speichern
-        if (window.firebase && firebase.auth().currentUser) {
-            saveCalculationToFirebase(destroyedStats, lostStats);
-        }
-        
+        // Ergebnis fuer explizites Speichern merken + Speichern-Button aktivieren
+        lastCalc = { destroyedStats, lostStats };
+        const saveBtn = document.getElementById('save-btn');
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 Kampf Speichern'; }
+
         Logger.info('Dashboard AS-Counter Berechnung durchgeführt', {
             destroyed: destroyedStats,
             lost: lostStats
@@ -785,15 +791,32 @@
         
         updateDestroyedDisplay(destroyedStats);
         updateLostDisplay(lostStats);
-        
+
+        lastCalc = null;
+        const saveBtn = document.getElementById('save-btn');
+        if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '💾 Kampf Speichern'; }
+
         Logger.info('Dashboard AS-Counter zurückgesetzt');
     }
     
+    // Expliziter Speichern-Button ("Kampf Speichern")
+    async function saveBattleData() {
+        const saveBtn = document.getElementById('save-btn');
+        if (!lastCalc) { alert('Bitte zuerst „Berichte auswerten".'); return; }
+        if (!window.firebase || !firebase.auth().currentUser) { alert('Bitte einloggen, um zu speichern.'); return; }
+        if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '💾 Speichere …'; }
+        const ok = await saveCalculationToFirebase(lastCalc.destroyedStats, lastCalc.lostStats);
+        if (saveBtn) {
+            saveBtn.textContent = ok ? '✅ Gespeichert' : '💾 Kampf Speichern';
+            saveBtn.disabled = ok;
+        }
+    }
+
     // Firebase-Speicherung für Dashboard
     async function saveCalculationToFirebase(destroyedStats, lostStats) {
         try {
             const user = firebase.auth().currentUser;
-            if (!user) return;
+            if (!user) return false;
             
             const db = firebase.firestore();
             const timestamp = new Date();
@@ -812,9 +835,11 @@
                 .add(calculationData);
                 
             console.log('✅ Berechnung in Firebase gespeichert');
-            
+            return true;
+
         } catch (error) {
             console.error('❌ Fehler beim Speichern in Firebase:', error);
+            return false;
         }
     }
 

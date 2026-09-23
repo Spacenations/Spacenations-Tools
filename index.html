@@ -993,15 +993,6 @@
         `;
         document.head.appendChild(style);
         
-        // Simulierte Benutzerdatenbank für Demo
-        const userDatabase = {
-            't.o@trend4media.de': { username: 'Daikin', password: '147147' }, // Korrigiert für Firebase Auth
-            'daikin@spacenations.eu': { username: 'Daikin', password: '123456' },
-            'admin@spacenations.eu': { username: 'Admin', password: 'admin123' },
-            'test@spacenations.eu': { username: 'TestUser', password: 'test123' },
-            'player@spacenations.eu': { username: 'Player', password: 'player123' }
-        };
-        
         // Login functionality
         async function handleLogin(event) {
             event.preventDefault();

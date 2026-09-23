@@ -1,6 +1,0 @@
-FIREBASE_API_KEY=AIzaSyDr4-ap_EubUn0UdP7hkEpS2jkzLIVgvyc
-FIREBASE_AUTH_DOMAIN=spacenations-tools.firebaseapp.com
-FIREBASE_PROJECT_ID=spacenations-tools
-FIREBASE_STORAGE_BUCKET=spacenations-tools.firebasestorage.app
-FIREBASE_MESSAGING_SENDER_ID=651338201276
-FIREBASE_APP_ID=1:651338201276:web:89e7d9c19dbd2611d3f8b9

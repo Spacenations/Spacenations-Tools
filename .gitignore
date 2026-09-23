@@ -73,3 +73,6 @@ jspm_packages/
 
 # Yarn Integrity file
 .yarn-integrity
+# Python bytecode
+__pycache__/
+*.pyc

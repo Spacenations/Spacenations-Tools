@@ -795,12 +795,6 @@
         <div class="header">
             <h1 class="title">🛡️ Spacenations Master Admin-Dashboard</h1>
             <div class="controls">
-                <a class="btn" href="setup-superadmin.html" target="_blank">👑 Superadmin Setup</a>
-                <a class="btn" href="sync-auth-system.html" target="_blank">🔄 Auth Sync</a>
-                <a class="btn" href="fix-alliance-data.html" target="_blank">🔧 Alliance Fix</a>
-                <a class="btn" href="analyze-user-documents.html" target="_blank">🔍 User Analyzer</a>
-                <a class="btn" href="setup-test-users.html" target="_blank">🧪 Test-Benutzer</a>
-                <a class="btn" href="debug-logs.html" target="_blank">📊 Debug Logs</a>
                 <a class="btn" href="index.html">← Zur Startseite</a>
                 <button class="btn danger" id="logout-btn">Abmelden</button>
             </div>
@@ -819,7 +813,6 @@
                     <button class="btn primary" id="refresh-btn">🔄 Aktualisieren</button>
                     <button class="btn success" id="add-user-btn">➕ Benutzer hinzufügen</button>
                     <button class="btn" id="export-users-btn">📊 Export</button>
-                    <a class="btn" href="debug-logs.html" target="_blank" style="margin-top: 8px;">📊 Debug Logs</a>
                 </div>
 
                 <h3>📈 System Status</h3>
@@ -1142,55 +1135,9 @@
             });
         }
         
-        // Hardcoded Admin-Bypass für t.o@trend4media.de
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                // Warte bis Auth bereit ist
-                await new Promise(resolve => setTimeout(resolve, 3000));
-                
-                const currentUser = window.AuthAPI?.getCurrentUser();
-                if (currentUser?.email === 't.o@trend4media.de') {
-                    console.log('🛡️ Hardcoded Admin-Bypass für t.o@trend4media.de aktiviert');
-                    
-                    // Erzwinge korrekte UserData
-                    if (window.authManager && (!window.authManager.userData || !window.authManager.userData.isSuperAdmin)) {
-                        const correctedUserData = {
-                            uid: currentUser.uid,
-                            email: currentUser.email,
-                            username: 'Daikin',
-                            isActive: true,
-                            isAllianceAdmin: true,
-                            isSuperAdmin: true, // EXPLIZIT true
-                            systemRole: 'superadmin',
-                            role: 'superadmin',
-                            alliance: 'AffenMitWaffen',
-                            allianceTag: 'AMW',
-                            permissions: {
-                                dashboard_access: true,
-                                profile_edit: true,
-                                admin_dashboard: true,
-                                user_management: true,
-                                alliance_management: true,
-                                system_settings: true
-                            },
-                            source: 'hardcoded_admin_bypass'
-                        };
-                        
-                        window.authManager.userData = correctedUserData;
-                        console.log('✅ UserData für t.o@trend4media.de korrigiert');
-                        
-                        // Zeige Bestätigung im Dashboard
-                        const header = document.querySelector('.dashboard-header h1');
-                        if (header) {
-                            header.innerHTML = '🛡️ Admin Dashboard <small style="color: #00FF88;">(Hardcoded Bypass)</small>';
-                        }
-                    }
-                }
-                
-            } catch (error) {
-                console.error('Admin bypass failed:', error);
-            }
-        });
+        // (Sicherheit) Der frühere hartcodierte Admin-Bypass für eine feste
+        // E-Mail wurde entfernt. Admin-Rechte kommen ausschliesslich aus
+        // globalRole === 'global_admin' im Firestore-Benutzerdokument.
     </script>
     <script src="js/admin-dashboard-enhanced.js"></script>
     <script src="js/global-footer-loader.js"></script>

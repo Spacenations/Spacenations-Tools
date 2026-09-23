@@ -94,7 +94,7 @@
     function renderStats(){
         const usersCount = state.users.length;
         const admins = state.users.filter(u => u.isAllianceAdmin === true).length;
-        const superAdmins = state.users.filter(u => u.isSuperAdmin === true).length;
+        const superAdmins = state.users.filter(u => u.globalRole === 'global_admin' || u.isSuperAdmin === true).length;
         
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -138,9 +138,9 @@
     // User table rendering
     function rolePills(user){
         const pills = [];
-        if (user.isSuperAdmin) pills.push('<span class="pill super">Super</span>');
+        if (user.globalRole === 'global_admin' || user.isSuperAdmin) pills.push('<span class="pill super">Super</span>');
         if (user.isAllianceAdmin) pills.push('<span class="pill admin">Alliance</span>');
-        if (!user.isAllianceAdmin && !user.isSuperAdmin) pills.push('<span class="pill user">User</span>');
+        if (!user.isAllianceAdmin && !(user.globalRole === 'global_admin' || user.isSuperAdmin)) pills.push('<span class="pill user">User</span>');
         return `<div class="role">${pills.join('')}</div>`;
     }
 
@@ -400,48 +400,43 @@
 
     // ProximaDB integration
     async function loadProximaData() {
+        // Direkt von der Spiel-API laden (das serverseitige proxima_data.json /
+        // die Python-Pipeline wurden entfernt - sie liefen in Produktion nie).
+        const PROXIMA_API = 'https://beta4.game.spacenations.eu/api/proxima';
         try {
-            // Load from proxima_data.json
-            const response = await fetch('proxima_data.json');
-            if (response.ok) {
-                const data = await response.json();
-                state.proximaData = data;
-                
-                // Calculate statistics
-                const totalSystems = data.length;
-                const lastUpdate = data.length > 0 ? data[0][3] : null; // Assuming timestamp is at index 3
-                const updateStatus = lastUpdate ? 'Aktuell' : 'Unbekannt';
-                
-                document.getElementById('proxima-total-systems').textContent = totalSystems;
-                document.getElementById('proxima-last-update').textContent = lastUpdate ? formatDate(lastUpdate) : '-';
-                document.getElementById('proxima-update-status').textContent = updateStatus;
-                
-                // Calculate next update (assuming daily updates)
-                const nextUpdate = lastUpdate ? new Date(new Date(lastUpdate).getTime() + 24 * 60 * 60 * 1000) : null;
-                document.getElementById('proxima-next-update').textContent = nextUpdate ? formatDate(nextUpdate) : '-';
-                
-                renderProximaStats();
-            } else {
-                throw new Error('ProximaDB Daten nicht verfügbar');
-            }
+            const response = await fetch(PROXIMA_API, { headers: { 'Accept': 'application/json' }, cache: 'no-store' });
+            if (!response.ok) throw new Error('ProximaDB Daten nicht verfügbar');
+            const raw = await response.json();
+            const data = (Array.isArray(raw) ? raw : []).map(p => ({
+                name: String(p.name || ''),
+                coordinates: String(p.coordinates || ''),
+                score: Number(p.score || 0),
+                deleteOn: String(p.deleteOn || '')
+            })).sort((a, b) => b.score - a.score);
+            state.proximaData = data;
+
+            document.getElementById('proxima-total-systems').textContent = data.length;
+            document.getElementById('proxima-last-update').textContent = new Date().toLocaleString('de-DE');
+            document.getElementById('proxima-update-status').textContent = 'Live';
+            document.getElementById('proxima-next-update').textContent = 'Live-Abruf';
+            renderProximaStats();
         } catch (error) {
             console.error('ProximaDB Fehler:', error);
-            document.getElementById('proxima-total-systems').textContent = 'Fehler';
-            document.getElementById('proxima-last-update').textContent = 'Fehler';
-            document.getElementById('proxima-update-status').textContent = 'Fehler';
-            document.getElementById('proxima-next-update').textContent = 'Fehler';
+            ['proxima-total-systems', 'proxima-last-update', 'proxima-update-status', 'proxima-next-update']
+                .forEach(id => { const el = document.getElementById(id); if (el) el.textContent = 'Fehler'; });
         }
     }
 
     function renderProximaStats() {
         if (!state.proximaData) return;
         
+        const d = state.proximaData;
         const stats = {
-            totalSystems: state.proximaData.length,
-            topSystem: state.proximaData.length > 0 ? state.proximaData[0][0] : 'Unbekannt',
-            topScore: state.proximaData.length > 0 ? state.proximaData[0][2] : 0,
-            averageScore: state.proximaData.length > 0 ? 
-                Math.round(state.proximaData.reduce((sum, system) => sum + system[2], 0) / state.proximaData.length) : 0
+            totalSystems: d.length,
+            topSystem: d.length > 0 ? d[0].name : 'Unbekannt',
+            topScore: d.length > 0 ? d[0].score : 0,
+            averageScore: d.length > 0 ?
+                Math.round(d.reduce((sum, s) => sum + (s.score || 0), 0) / d.length) : 0
         };
 
         document.getElementById('proxima-stats').innerHTML = `
@@ -478,7 +473,7 @@
                 email: userData.email,
                 alliance: userData.alliance || '',
                 isAllianceAdmin: userData.isAllianceAdmin || false,
-                isSuperAdmin: userData.isSuperAdmin || false,
+                globalRole: userData.isSuperAdmin ? 'global_admin' : 'user',
                 createdAt: window.FirebaseConfig.getServerTimestamp(),
                 lastLogin: null,
                 createdBy: window.AuthAPI.getCurrentUser().uid
@@ -938,9 +933,9 @@
         const doc = await ref.get();
         if (!doc.exists) return alert('Benutzer nicht gefunden');
         
-        const val = !!doc.data().isSuperAdmin;
+        const isAdminNow = doc.data().globalRole === 'global_admin' || doc.data().isSuperAdmin === true;
         await ref.update({ 
-            isSuperAdmin: !val,
+            globalRole: isAdminNow ? 'user' : 'global_admin',
             updatedAt: window.FirebaseConfig.getServerTimestamp(),
             updatedBy: me.uid
         });
@@ -1240,7 +1235,7 @@ ${state.proximaData.length > 10 ? `\n... und ${state.proximaData.length - 10} we
             const status = await window.AdminAuth.checkSuperAdminStatus(currentUser.uid);
             
             const username = status.userData?.username || currentUser?.email || 'Admin';
-            const superStatus = status.isSuperAdmin ? '<span class="pill super">Super</span>' : '<span class="pill user">User</span>';
+            const superStatus = (status.globalRole === 'global_admin' || status.isSuperAdmin) ? '<span class="pill super">Super</span>' : '<span class="pill user">User</span>';
             const lastUpdate = status.userData?.updatedAt ? 
                 `<div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px;">
                     Aktualisiert: ${formatTimestamp(status.userData.updatedAt)}
@@ -1255,7 +1250,7 @@ ${state.proximaData.length > 10 ? `\n... und ${state.proximaData.length - 10} we
             document.getElementById('system-status-mini').innerHTML = `
                 <div style="font-size: 0.8rem;">
                     <div>🟢 System Online</div>
-                    <div style="color: var(--text-secondary);">Super-Admin: ${status.isSuperAdmin ? '✅ Ja' : '❌ Nein'}</div>
+                    <div style="color: var(--text-secondary);">Super-Admin: ${(status.globalRole === 'global_admin' || status.isSuperAdmin) ? '✅ Ja' : '❌ Nein'}</div>
                     <div style="color: var(--text-secondary);">Letztes Update: ${formatTimestamp(new Date())}</div>
                 </div>
             `;
@@ -1316,7 +1311,7 @@ ${state.proximaData.length > 10 ? `\n... und ${state.proximaData.length - 10} we
                 <strong>Zugriff verweigert: Nur Super-Admins</strong><br><br>
                 <strong>Fehler:</strong> ${e.message}<br><br>
                 <strong>Lösungen:</strong><br>
-                1. Verwenden Sie das Setup-Tool: <a href="setup-super-admin.html" style="color: #ff8c42;">Setup-Tool öffnen</a><br>
+                1. Stellen Sie sicher, dass Ihr Konto Super-Admin-Rechte besitzt.<br>
                 2. Seite neu laden (F5)<br>
                 3. Browser-Extensions temporär deaktivieren<br><br>
                 <strong>Debugging:</strong> Öffnen Sie die Browser-Konsole (F12) für weitere Details.

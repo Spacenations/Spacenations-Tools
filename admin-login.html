@@ -239,10 +239,9 @@
                         type="email" 
                         id="email" 
                         class="form-input" 
-                        placeholder="E-Mail-Adresse" 
+                        placeholder="E-Mail-Adresse"
                         required
                         autocomplete="username"
-                        value="t.o@trend4media.de"
                     >
                 </div>
                 
@@ -266,11 +265,6 @@
             <div id="msg-error" class="message error"></div>
             <div id="msg-success" class="message success"></div>
             
-            <div class="tools-links">
-                <a href="debug-specific-user.html">🔍 Debug User</a>
-                <a href="test-complete-system.html">🧪 System-Test</a>
-                <a href="diagnose-database-access.html">🔧 Diagnose</a>
-            </div>
         </div>
     </div>
 
@@ -281,7 +275,7 @@
 
     <!-- FIXED System-Dateien -->
     <script src="js/firebase-config.js"></script>
-    <script src="js/auth-manager-fixed.js"></script>
+    <script src="js/auth-manager.js"></script>
     
     <script>
         // Status-Updates
@@ -313,35 +307,17 @@
             document.getElementById('msg-success').style.display = 'none';
         }
         
-        // Super-Admin-Verifikation (mit Fallback)
+        // Super-Admin-Verifikation – ausschließlich über die Firestore-Rolle
         async function verifySuperAdmin(user) {
             try {
                 console.log('🔍 Prüfe Super-Admin-Status für:', user.email);
-                
-                // Hardcoded Admin-Liste (Fallback bei Firestore-Problemen)
-                const adminEmails = [
-                    't.o@trend4media.de',
-                    'info@trend4media.de', 
-                    'admin@spacenations.eu'
-                ];
-                
-                // Prüfe hardcoded Liste zuerst
-                if (adminEmails.includes(user.email.toLowerCase())) {
-                    console.log('✅ Super-Admin-Status bestätigt (Hardcoded-Liste)');
-                    return true;
-                }
-                
-                // Versuche Firestore-Check (optional)
-                try {
-                    const isSuperAdmin = await window.AuthAPI.checkSuperAdminStatus(user);
-                    console.log('✅ Super-Admin-Status bestätigt (Firestore):', isSuperAdmin);
-                    return isSuperAdmin;
-                } catch (firestoreError) {
-                    console.warn('⚠️ Firestore-Check fehlgeschlagen, verwende Fallback:', firestoreError.message);
-                    // Fallback bereits oben geprüft
-                    return false;
-                }
-                
+
+                // Einziges Kriterium: globalRole === 'global_admin' (via AuthAPI).
+                // Keine hartcodierten E-Mail-Listen oder Fallback-Backdoors mehr.
+                const isSuperAdmin = await window.AuthAPI.checkSuperAdminStatus(user);
+                console.log('✅ Super-Admin-Status geprüft (Firestore):', isSuperAdmin);
+                return isSuperAdmin === true;
+
             } catch (error) {
                 console.error('❌ Super-Admin-Verifikation fehlgeschlagen:', error);
                 throw new Error('Berechtigung konnte nicht überprüft werden.');
@@ -415,11 +391,9 @@
                 if (errorMessage.includes('Zugriff verweigert')) {
                     errorMessage += '<br><br><strong>Hinweis:</strong> Ihr Account wurde gefunden, aber Sie haben keine Admin-Berechtigung.';
                 } else if (errorMessage.includes('AuthAPI konnte nicht initialisiert werden')) {
-                    errorMessage += '<br><br><strong>System-Problem:</strong><br>';
-                    errorMessage += '<a href="debug-specific-user.html" style="color: var(--primary); text-decoration: underline;">🔍 System-Diagnose</a>';
+                    errorMessage += '<br><br><strong>System-Problem:</strong> Bitte die Seite neu laden (F5).';
                 } else if (errorMessage.includes('Kein Account') || errorMessage.includes('user-not-found')) {
-                    errorMessage += '<br><br><strong>Benutzer-Problem:</strong><br>';
-                    errorMessage += '<a href="debug-specific-user.html" style="color: var(--primary); text-decoration: underline;">🔍 Benutzer-Debug</a>';
+                    errorMessage += '<br><br><strong>Benutzer-Problem:</strong> Bitte E-Mail und Passwort prüfen.';
                 }
                 
                 showError(errorMessage);
@@ -457,7 +431,7 @@
                             const currentUser = window.AuthAPI.getCurrentUser();
                             const userData = window.AuthAPI.getUserData();
                             
-                            if (userData?.isSuperAdmin || currentUser.email === 't.o@trend4media.de') {
+                            if (userData?.globalRole === 'global_admin' || userData?.isSuperAdmin === true) {
                                 updateStatus('Bereits als Admin angemeldet', 'success');
                                 showSuccess(`Bereits angemeldet als ${userData?.username || currentUser.email}. Weiterleitung...`);
                                 
