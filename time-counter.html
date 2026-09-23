@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time-Counter – Spacenations Tools</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316181D'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='white' stroke-width='2'/%3E%3Cpath d='M16 11.5V16l3 2' stroke='%2300D68F' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+    <style>
+        .tool-main { padding-bottom: 72px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+        @media (max-width: 860px){ .grid-2 { grid-template-columns: 1fr; } }
+        .card h2 { font-size: 1.05rem; margin: 0 0 14px; color: var(--text-primary); }
+        .field { margin-bottom: 14px; }
+        .field label { display:block; font-size:.85rem; color: var(--text-secondary); margin-bottom:6px; font-weight:600; }
+        .field input, .field select {
+            width:100%; font: inherit; padding:10px 12px; border-radius:10px;
+            border:1px solid var(--line-strong); background: var(--card); color: var(--text-primary);
+        }
+        .field input:focus, .field select:focus { outline:none; border-color: var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+        .two { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+        .btn-row { display:flex; gap:10px; margin-top:4px; }
+        .result-big { font-size: 2.2rem; font-weight: 700; color: var(--accent-strong); font-variant-numeric: tabular-nums; }
+        .result-sub { color: var(--text-secondary); margin-top: 2px; }
+        .detail-list { margin-top: 18px; border-top: 1px solid var(--line-soft); }
+        .detail-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line-soft); font-size:.94rem; }
+        .detail-row .k { color: var(--text-secondary); }
+        .detail-row .v { font-weight:600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="wrap">
+            <a href="index.html" class="wordmark">
+                <span class="mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 1.8"/>
+                    </svg>
+                </span>
+                <span><strong>Spacenations</strong><span class="thin"> Tools</span></span>
+            </a>
+            <nav class="header-auth">
+                <a href="index.html" class="btn btn-ghost btn-sm">Alle Tools</a>
+                <a href="https://beta4.game.spacenations.eu/" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Zum Spiel <span class="ext">↗</span></a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="wrap tool-main">
+        <div class="page-head">
+            <span class="tool-icon tint-blue">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 1.8"/></svg>
+            </span>
+            <div>
+                <h1>Time-Counter</h1>
+                <p>Aktions-Dauer nach Stufen berechnen.</p>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h2>Zeit-Berechnung</h2>
+                <div class="field">
+                    <label for="action-type">Aktionstyp</label>
+                    <select id="action-type">
+                        <option value="1800">🔍 Spionage</option>
+                        <option value="7200">🌍 Kolonisation</option>
+                        <option value="5400">♻️ Recycling</option>
+                        <option value="3600">💰 Plünderung</option>
+                        <option value="86400">⚔️ Invasion</option>
+                        <option value="7200">💣 Sabotage</option>
+                    </select>
+                </div>
+                <div class="two">
+                    <div class="field"><label for="attacker-level">Stufe Angreifer (a)</label><input type="number" id="attacker-level" min="0" value="0" step="1"></div>
+                    <div class="field"><label for="defender-level">Stufe Verteidiger (v)</label><input type="number" id="defender-level" min="0" value="0" step="1"></div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-accent btn-md" onclick="calculateDuration()">Dauer berechnen</button>
+                    <button class="btn btn-outline btn-md" onclick="clearAll()">Zurücksetzen</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Ergebnis</h2>
+                <div class="result-big" id="result-formatted">–</div>
+                <div class="result-sub"><span id="result-seconds">–</span> Sekunden</div>
+                <div class="detail-list">
+                    <div class="detail-row"><span class="k">Aktion</span><span class="v" id="result-action">–</span></div>
+                    <div class="detail-row"><span class="k">Stufe Angreifer (a)</span><span class="v" id="result-attacker">–</span></div>
+                    <div class="detail-row"><span class="k">Stufe Verteidiger (v)</span><span class="v" id="result-defender">–</span></div>
+                    <div class="detail-row"><span class="k">Basiszeit</span><span class="v" id="result-basetime">–</span></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Rechenlogik unveraendert aus dem urspruenglichen Time-Counter uebernommen.
+        const actionNames = {
+            '1800': 'Spionage',
+            '7200': 'Kolonisation / Sabotage',
+            '5400': 'Recycling',
+            '3600': 'Plünderung',
+            '86400': 'Invasion'
+        };
+
+        function formatTime(seconds) {
+            const days = Math.floor(seconds / 86400);
+            const hours = Math.floor((seconds % 86400) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            const parts = [];
+            if (days > 0) parts.push(`${days}d`);
+            if (hours > 0) parts.push(`${hours}h`);
+            if (minutes > 0) parts.push(`${minutes}m`);
+            if (secs > 0 || parts.length === 0) parts.push(`${secs}s`);
+            return parts.join(' ');
+        }
+
+        function calculateDuration() {
+            const baseTime = parseFloat(document.getElementById('action-type').value);
+            const attackerLevel = parseInt(document.getElementById('attacker-level').value) || 0;
+            const defenderLevel = parseInt(document.getElementById('defender-level').value) || 0;
+
+            // Formel: Dauer = 0.91^a * 1.11^v * Basiszeit
+            const duration = Math.pow(0.91, attackerLevel) * Math.pow(1.11, defenderLevel) * baseTime;
+
+            document.getElementById('result-formatted').textContent = formatTime(duration);
+            document.getElementById('result-seconds').textContent = duration.toFixed(2);
+            document.getElementById('result-action').textContent = actionNames[baseTime] || 'Unbekannt';
+            document.getElementById('result-attacker').textContent = attackerLevel;
+            document.getElementById('result-defender').textContent = defenderLevel;
+            document.getElementById('result-basetime').textContent = baseTime + ' Sekunden';
+        }
+
+        function clearAll() {
+            document.getElementById('action-type').selectedIndex = 0;
+            document.getElementById('attacker-level').value = 0;
+            document.getElementById('defender-level').value = 0;
+            calculateDuration();
+        }
+
+        ['action-type', 'attacker-level', 'defender-level'].forEach(id => {
+            const el = document.getElementById(id);
+            el.addEventListener('input', calculateDuration);
+            el.addEventListener('change', calculateDuration);
+        });
+        document.addEventListener('DOMContentLoaded', calculateDuration);
+    </script>
+    <script src="js/global-footer-loader.js"></script>
+</body>
+</html>
