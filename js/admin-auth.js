@@ -62,19 +62,14 @@
             
             const userData = doc.data();
             console.log('📊 Benutzerdaten aus Firestore:', userData);
-            console.log('🔍 isSuperAdmin Wert:', userData.isSuperAdmin, 'Typ:', typeof userData.isSuperAdmin);
-            
-            // Check if isSuperAdmin is explicitly true
-            if (userData && userData.isSuperAdmin === true) {
-                console.log('✅ Super-Admin Status bestätigt');
+            // Admin-Erkennung: globalRole ist die Quelle der Wahrheit;
+            // uebergangsweise wird isSuperAdmin===true noch akzeptiert.
+            if (userData && (userData.globalRole === 'global_admin' || userData.isSuperAdmin === true)) {
+                console.log('✅ Admin-Status bestätigt');
                 return true;
             }
 
-            // If user document exists but no Super Admin rights, show detailed error
-            console.log('❌ Keine Super-Admin Berechtigung gefunden');
-            console.log('🔧 Benutzerdokument vorhanden, aber isSuperAdmin nicht true');
-            console.log('📋 Verfügbare Felder:', Object.keys(userData));
-            
+            console.log('❌ Keine Admin-Berechtigung gefunden');
             alert('Super-Admin-Zugriff verweigert.');
             throw new Error('Zugriff verweigert: Nur Super-Admins');
         }
@@ -95,9 +90,9 @@
                 }
 
                 const userData = doc.data();
-                return { 
-                    isSuperAdmin: userData.isSuperAdmin === true, 
-                    userData: userData 
+                return {
+                    isSuperAdmin: userData.globalRole === 'global_admin' || userData.isSuperAdmin === true,
+                    userData: userData
                 };
             } catch (error) {
                 console.error('Fehler beim Prüfen des Super-Admin Status:', error);
@@ -106,16 +101,16 @@
         }
 
         // Helper function to set Super Admin status
-        async setSuperAdminStatus(uid, isSuperAdmin = true) {
+        async setSuperAdminStatus(uid, makeAdmin = true) {
             try {
                 const db = window.FirebaseConfig.getDB();
                 await db.collection('users').doc(uid).update({
-                    isSuperAdmin: isSuperAdmin,
+                    globalRole: makeAdmin ? 'global_admin' : 'user',
                     updatedAt: window.FirebaseConfig.getServerTimestamp(),
                     updatedBy: this.currentUser ? this.currentUser.uid : 'system'
                 });
-                
-                console.log(`✅ Super-Admin Status für ${uid} auf ${isSuperAdmin} gesetzt`);
+
+                console.log(`✅ Admin-Status für ${uid} auf ${makeAdmin} gesetzt`);
                 return { success: true };
             } catch (error) {
                 console.error('Fehler beim Setzen des Super-Admin Status:', error);

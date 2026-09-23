@@ -1136,55 +1136,9 @@
             });
         }
         
-        // Hardcoded Admin-Bypass für t.o@trend4media.de
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                // Warte bis Auth bereit ist
-                await new Promise(resolve => setTimeout(resolve, 3000));
-                
-                const currentUser = window.AuthAPI?.getCurrentUser();
-                if (currentUser?.email === 't.o@trend4media.de') {
-                    console.log('🛡️ Hardcoded Admin-Bypass für t.o@trend4media.de aktiviert');
-                    
-                    // Erzwinge korrekte UserData
-                    if (window.authManager && (!window.authManager.userData || !window.authManager.userData.isSuperAdmin)) {
-                        const correctedUserData = {
-                            uid: currentUser.uid,
-                            email: currentUser.email,
-                            username: 'Daikin',
-                            isActive: true,
-                            isAllianceAdmin: true,
-                            isSuperAdmin: true, // EXPLIZIT true
-                            systemRole: 'superadmin',
-                            role: 'superadmin',
-                            alliance: 'AffenMitWaffen',
-                            allianceTag: 'AMW',
-                            permissions: {
-                                dashboard_access: true,
-                                profile_edit: true,
-                                admin_dashboard: true,
-                                user_management: true,
-                                alliance_management: true,
-                                system_settings: true
-                            },
-                            source: 'hardcoded_admin_bypass'
-                        };
-                        
-                        window.authManager.userData = correctedUserData;
-                        console.log('✅ UserData für t.o@trend4media.de korrigiert');
-                        
-                        // Zeige Bestätigung im Dashboard
-                        const header = document.querySelector('.dashboard-header h1');
-                        if (header) {
-                            header.innerHTML = '🛡️ Admin Dashboard <small style="color: #00FF88;">(Hardcoded Bypass)</small>';
-                        }
-                    }
-                }
-                
-            } catch (error) {
-                console.error('Admin bypass failed:', error);
-            }
-        });
+        // (Sicherheit) Der frühere hartcodierte Admin-Bypass für eine feste
+        // E-Mail wurde entfernt. Admin-Rechte kommen ausschliesslich aus
+        // globalRole === 'global_admin' im Firestore-Benutzerdokument.
     </script>
     <script src="js/admin-dashboard-enhanced.js"></script>
     <script src="js/global-footer-loader.js"></script>
