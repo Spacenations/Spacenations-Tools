@@ -40,23 +40,20 @@ service cloud.firestore {
             || userData().get('globalRole', '') == 'global_admin');
     }
 
-    // Rollen-/Privileg-Felder, die ein normaler Nutzer nie selbst setzen darf.
+    // GLOBALE Admin-Vektoren, die ein normaler Nutzer nie selbst setzen darf.
+    // (Nur diese entscheiden ueber Admin-Rechte; harmlose Felder wie permissions
+    // oder isAllianceAdmin bleiben schreibbar, damit Registrierung/Profil laufen.
+    // Allianz-Admin wird ueber die Allianz-Mitgliedschaft geprueft, nicht hier.)
     function noRolePrivilegeOnCreate() {
       return request.resource.data.get('isSuperAdmin', false) == false
-        && request.resource.data.get('isAllianceAdmin', false) == false
         && request.resource.data.get('globalRole', 'user') == 'user'
-        && request.resource.data.get('systemRole', 'user') == 'user'
-        && request.resource.data.get('role', 'user') == 'user'
-        && request.resource.data.get('permissions', {}) == {};
+        && request.resource.data.get('systemRole', 'user') == 'user';
     }
     // Beim Update duerfen sich diese Felder nicht aendern (nur Admin darf das).
     function rolePrivilegeUnchanged() {
       return request.resource.data.get('isSuperAdmin', false) == resource.data.get('isSuperAdmin', false)
-        && request.resource.data.get('isAllianceAdmin', false) == resource.data.get('isAllianceAdmin', false)
         && request.resource.data.get('globalRole', 'user') == resource.data.get('globalRole', 'user')
-        && request.resource.data.get('systemRole', 'user') == resource.data.get('systemRole', 'user')
-        && request.resource.data.get('role', 'user') == resource.data.get('role', 'user')
-        && request.resource.data.get('permissions', {}) == resource.data.get('permissions', {});
+        && request.resource.data.get('systemRole', 'user') == resource.data.get('systemRole', 'user');
     }
 
     // ----- users --------------------------------------------------------------

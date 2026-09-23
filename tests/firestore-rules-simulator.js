@@ -51,6 +51,17 @@ const { setDoc, updateDoc, doc, collection, getDoc, getDocs, addDoc } = require(
   await must('user darf eigenes displayName aendern',
     updateDoc(doc(user, 'users/user-1'), { displayName: 'Neuer Name' }), true);
 
+  // --- Registrierung: Default-Dokument (inkl. permissions-Objekt) muss klappen ---
+  const reg = testEnv.authenticatedContext('reg-1').firestore();
+  await must('Registrierung mit Default-permissions ist erlaubt',
+    setDoc(doc(reg, 'users/reg-1'), {
+      username: 'Reg', isSuperAdmin: false, systemRole: 'user', role: 'user',
+      permissions: { dashboard_access: true, admin_dashboard: false },
+    }), true);
+  const esc = testEnv.authenticatedContext('esc-1').firestore();
+  await must('Anlegen mit isSuperAdmin=true wird abgelehnt',
+    setDoc(doc(esc, 'users/esc-1'), { username: 'Esc', isSuperAdmin: true }), false);
+
   // --- Admin darf Rollen verwalten ---
   await must('admin darf einem Nutzer eine Rolle setzen',
     updateDoc(doc(admin, 'users/user-1'), { globalRole: 'global_admin' }), true);
