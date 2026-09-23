@@ -94,7 +94,7 @@
     function renderStats(){
         const usersCount = state.users.length;
         const admins = state.users.filter(u => u.isAllianceAdmin === true).length;
-        const superAdmins = state.users.filter(u => u.isSuperAdmin === true).length;
+        const superAdmins = state.users.filter(u => u.globalRole === 'global_admin' || u.isSuperAdmin === true).length;
         
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -138,9 +138,9 @@
     // User table rendering
     function rolePills(user){
         const pills = [];
-        if (user.isSuperAdmin) pills.push('<span class="pill super">Super</span>');
+        if (user.globalRole === 'global_admin' || user.isSuperAdmin) pills.push('<span class="pill super">Super</span>');
         if (user.isAllianceAdmin) pills.push('<span class="pill admin">Alliance</span>');
-        if (!user.isAllianceAdmin && !user.isSuperAdmin) pills.push('<span class="pill user">User</span>');
+        if (!user.isAllianceAdmin && !(user.globalRole === 'global_admin' || user.isSuperAdmin)) pills.push('<span class="pill user">User</span>');
         return `<div class="role">${pills.join('')}</div>`;
     }
 
@@ -478,7 +478,7 @@
                 email: userData.email,
                 alliance: userData.alliance || '',
                 isAllianceAdmin: userData.isAllianceAdmin || false,
-                isSuperAdmin: userData.isSuperAdmin || false,
+                globalRole: userData.isSuperAdmin ? 'global_admin' : 'user',
                 createdAt: window.FirebaseConfig.getServerTimestamp(),
                 lastLogin: null,
                 createdBy: window.AuthAPI.getCurrentUser().uid
@@ -938,9 +938,9 @@
         const doc = await ref.get();
         if (!doc.exists) return alert('Benutzer nicht gefunden');
         
-        const val = !!doc.data().isSuperAdmin;
+        const isAdminNow = doc.data().globalRole === 'global_admin' || doc.data().isSuperAdmin === true;
         await ref.update({ 
-            isSuperAdmin: !val,
+            globalRole: isAdminNow ? 'user' : 'global_admin',
             updatedAt: window.FirebaseConfig.getServerTimestamp(),
             updatedBy: me.uid
         });
@@ -1240,7 +1240,7 @@ ${state.proximaData.length > 10 ? `\n... und ${state.proximaData.length - 10} we
             const status = await window.AdminAuth.checkSuperAdminStatus(currentUser.uid);
             
             const username = status.userData?.username || currentUser?.email || 'Admin';
-            const superStatus = status.isSuperAdmin ? '<span class="pill super">Super</span>' : '<span class="pill user">User</span>';
+            const superStatus = (status.globalRole === 'global_admin' || status.isSuperAdmin) ? '<span class="pill super">Super</span>' : '<span class="pill user">User</span>';
             const lastUpdate = status.userData?.updatedAt ? 
                 `<div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px;">
                     Aktualisiert: ${formatTimestamp(status.userData.updatedAt)}
@@ -1255,7 +1255,7 @@ ${state.proximaData.length > 10 ? `\n... und ${state.proximaData.length - 10} we
             document.getElementById('system-status-mini').innerHTML = `
                 <div style="font-size: 0.8rem;">
                     <div>🟢 System Online</div>
-                    <div style="color: var(--text-secondary);">Super-Admin: ${status.isSuperAdmin ? '✅ Ja' : '❌ Nein'}</div>
+                    <div style="color: var(--text-secondary);">Super-Admin: ${(status.globalRole === 'global_admin' || status.isSuperAdmin) ? '✅ Ja' : '❌ Nein'}</div>
                     <div style="color: var(--text-secondary);">Letztes Update: ${formatTimestamp(new Date())}</div>
                 </div>
             `;
