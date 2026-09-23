@@ -3,638 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sabo-Counter - Spacenations Tools</title>
-    
-    <!-- Modern Fonts -->
+    <title>Sabo Counter – Spacenations Tools</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316181D'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='white' stroke-width='2'/%3E%3Cellipse cx='16' cy='16' rx='12' ry='4.4' fill='none' stroke='%2300D68F' stroke-width='1.6' transform='rotate(-20 16 16)'/%3E%3C/svg%3E">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+
     <style>
-        :root {
-            /* Razer Color Scheme with Purple for Sabo */
-            --razer-green: #00FF88;
-            --razer-purple: #8B5CF6;
-            --razer-purple-dark: #7C3AED;
-            --razer-purple-light: #A78BFA;
-            --razer-black: #0A0A0A;
-            --razer-dark: #111111;
-            --razer-gray: #1A1A1A;
-            --razer-gray-light: #2A2A2A;
-            --razer-white: #FFFFFF;
-            --razer-silver: #C0C0C0;
-            --razer-red: #FF4444;
-            
-            --text-primary: var(--razer-white);
-            --text-secondary: var(--razer-silver);
-            --text-accent: var(--razer-purple);
-            
-            --bg-primary: var(--razer-black);
-            --bg-secondary: var(--razer-dark);
-            --bg-tertiary: var(--razer-gray);
-            --bg-card: var(--razer-gray-light);
-            
-            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
-            --glow-purple: 0 0 20px rgba(139, 92, 246, 0.5);
-            --glow-purple-strong: 0 0 30px rgba(139, 92, 246, 0.8);
-            --glow-red: 0 0 20px rgba(255, 68, 68, 0.5);
-            
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            --font-gaming: 'Orbitron', monospace;
-            
-            /* Compatibility variables */
-            --sabo-color: var(--razer-purple);
-            --bg-gradient: linear-gradient(45deg, var(--razer-black) 0%, var(--razer-dark) 100%);
-            --bg-panel: var(--bg-secondary);
-            --border-primary: rgba(139, 92, 246, 0.2);
-            --border-shadow: var(--glow-purple);
-            --input-bg: var(--bg-tertiary);
-            --input-border: rgba(139, 92, 246, 0.3);
-            --card-bg: var(--bg-card);
-            --card-border: rgba(139, 92, 246, 0.2);
-            --accent-secondary: #4a90e2;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: var(--font-primary);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            padding: 20px 20px 0 20px;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* Animated Background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
-                linear-gradient(45deg, var(--razer-black) 0%, var(--razer-dark) 100%);
-            z-index: -1;
-            animation: backgroundPulse 8s ease-in-out infinite;
-        }
-        
-        @keyframes backgroundPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: var(--bg-panel);
-            border: 1px solid var(--border-primary);
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(10px);
-            flex: 1;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--razer-purple), var(--razer-purple-light));
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            position: relative;
-        }
-        
-        .back-button {
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
-            color: var(--razer-green);
-            border: 2px solid var(--razer-green);
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: var(--font-gaming);
-        }
-        
-        .back-button:hover {
-            background: var(--razer-green);
-            color: var(--razer-black);
-            transform: translateY(-50%) translateY(-2px);
-            box-shadow: var(--glow-green);
-        }
-        
-        .header h1 {
-            font-family: var(--font-gaming);
-            font-size: 2.5rem;
-            color: var(--sabo-color);
-            text-shadow: var(--glow-purple);
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-            animation: titleGlow 4s ease-in-out infinite;
-        }
-        
-        @keyframes titleGlow {
-            0%, 100% { 
-                filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.3));
-            }
-            50% { 
-                filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.6));
-            }
-        }
-        
-        .header .subtitle {
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            font-weight: 400;
-        }
-        
-        /* Input und Summary Sections */
+        /* Seitenspezifisch: Eingabe + Gebäudeliste, Statistik-Karten, Detail-Tabelle */
+        .tool-main { padding-bottom: 64px; }
+
         .input-summary-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
+            gap: 14px;
+            margin-top: 22px;
         }
-        
-        .input-section {
-            background: var(--bg-panel);
-            border: 2px solid var(--sabo-color);
-            border-radius: 12px;
-            padding: 30px;
-            transition: all 0.3s ease;
-        }
-        
-        .input-section:hover {
-            border-color: var(--razer-purple-light);
-            box-shadow: var(--glow-purple);
-        }
-        
-        .input-section h2 {
-            color: var(--sabo-color);
-            margin-bottom: 15px;
-            text-align: center;
-            text-shadow: 0 0 5px rgba(139, 92, 246, 0.5);
-            font-family: var(--font-gaming);
-            font-size: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .summary-section {
-            background: var(--bg-panel);
-            border: 2px solid var(--accent-secondary);
-            border-radius: 12px;
-            padding: 30px;
-            transition: all 0.3s ease;
-        }
-        
-        .summary-section:hover {
-            border-color: var(--razer-green);
-            box-shadow: var(--glow-green);
-        }
-        
-        .summary-section h2 {
-            color: var(--accent-secondary);
-            margin-bottom: 15px;
-            text-align: center;
-            text-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
-            font-family: var(--font-gaming);
-            font-size: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .summary-content {
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-        
-        .reports-count {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .reports-count .count-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--sabo-color);
+
+        .input-section label {
             display: block;
-            font-family: var(--font-gaming);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
         }
-        
+
+        .input-section textarea {
+            width: 100%;
+            height: 340px;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: #FBFBFC;
+            color: var(--text-primary);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12.5px;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .input-section textarea:hover { border-color: var(--line-strong); }
+
+        .input-section textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 168, 120, 0.14);
+        }
+
+        .input-section textarea::placeholder { color: var(--text-tertiary); }
+
+        .result-head {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .result-head .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #DE8500;
+        }
+
+        /* Zähler + Gebäudeliste in der Auswertungs-Karte */
+        .reports-count {
+            background: #F7F8FA;
+            border: 1px solid var(--line-soft);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .reports-count .count-number {
+            font-size: 24px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
         .reports-count .count-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 5px;
+            font-size: 12.5px;
+            color: var(--text-tertiary);
         }
-        
+
         .building-list {
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            background: var(--card-bg);
+            border: 1px solid var(--line-soft);
+            border-radius: 12px;
             overflow: hidden;
         }
-        
+
         .building-list-header {
-            background: var(--razer-purple);
-            color: var(--text-primary);
-            padding: 12px;
+            background: #F2F4F6;
+            color: var(--text-secondary);
+            padding: 9px 14px;
             font-weight: 600;
-            text-align: center;
-            font-family: var(--font-gaming);
+            font-size: 11.5px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
-        
+
         .building-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 16px;
-            border-bottom: 1px solid var(--card-border);
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-        
-        .building-item:hover {
-            background: rgba(139, 92, 246, 0.1);
-        }
-        
-        .building-item:last-child {
-            border-bottom: none;
-        }
-        
-        .building-item .name {
-            color: var(--text-primary);
-            font-weight: 500;
-            flex: 1;
-            font-size: 0.85rem;
-        }
-        
-        .building-item .levels {
-            color: var(--sabo-color);
-            font-weight: bold;
-            min-width: 50px;
-            text-align: right;
-            font-size: 1rem;
-            font-family: var(--font-gaming);
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 15px;
-            color: var(--text-primary);
-            font-weight: 600;
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        textarea {
-            width: 100%;
-            height: 250px;
-            background: var(--input-bg);
-            border: 2px solid var(--input-border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            padding: 16px;
-            font-family: 'Courier New', monospace;
+            padding: 7px 14px;
+            border-bottom: 1px solid var(--line-soft);
             font-size: 13px;
-            resize: vertical;
-            transition: all 0.3s ease;
         }
-        
-        textarea:focus {
-            outline: none;
-            border-color: var(--sabo-color);
-            box-shadow: var(--glow-purple);
+
+        .building-item:last-child { border-bottom: none; }
+
+        .building-item .name { color: var(--text-secondary); }
+
+        .building-item .levels {
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            min-width: 40px;
+            text-align: right;
         }
-        
+
         .button-section {
             display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-bottom: 30px;
+            gap: 10px;
+            margin: 20px 0 28px;
             flex-wrap: wrap;
         }
-        
-        .calculate-btn, .clear-btn {
-            padding: 16px 32px;
-            border: 2px solid var(--sabo-color);
-            border-radius: 8px;
-            font-family: var(--font-gaming);
-            font-weight: 700;
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .calculate-btn {
-            background: var(--sabo-color);
-            color: var(--razer-white);
-        }
-        
-        .calculate-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.6s ease;
-        }
-        
-        .calculate-btn:hover::before {
-            left: 100%;
-        }
-        
-        .calculate-btn:hover {
-            background: var(--razer-purple-light);
-            transform: translateY(-2px);
-            box-shadow: var(--glow-purple-strong);
-        }
-        
-        .clear-btn {
-            background: transparent;
-            color: var(--text-secondary);
-            border-color: var(--text-secondary);
-        }
-        
-        .clear-btn:hover {
-            background: var(--razer-red);
-            color: var(--razer-white);
-            border-color: var(--razer-red);
-            transform: translateY(-2px);
-            box-shadow: var(--glow-red);
-        }
-        
+
         .results {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
+            gap: 14px;
         }
-        
-        .result-box {
-            background: var(--card-bg);
-            border: 2px solid var(--card-border);
-            border-radius: 12px;
-            padding: 30px;
-            transition: all 0.3s ease;
-        }
-        
-        .result-box:hover {
-            border-color: var(--sabo-color);
-            transform: translateY(-4px);
-            box-shadow: var(--glow-purple);
-        }
-        
-        .result-box h2 {
-            font-family: var(--font-gaming);
-            color: var(--sabo-color);
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        .stat-line {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
-        }
-        
-        .stat-name {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        
-        .stat-value {
-            font-family: var(--font-gaming);
-            font-weight: 800;
-            color: var(--sabo-color);
-            font-size: 1.2rem;
-        }
-        
-        .total-line {
-            border-bottom: 2px solid var(--sabo-color);
-            margin-top: 10px;
-            padding-top: 15px;
-        }
-        
-        .total-line .stat-value {
-            font-size: 1.4rem;
-            text-shadow: var(--glow-purple);
-        }
-        
-        .building-details {
-            grid-column: span 2;
-            background: var(--bg-tertiary);
-            border: 2px solid rgba(0, 255, 136, 0.2);
-            border-radius: 12px;
-            padding: 30px;
-        }
-        
-        .building-details h2 {
-            font-family: var(--font-gaming);
-            color: var(--razer-green);
-            margin-bottom: 20px;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
+
+        /* Detail-Tabelle über volle Breite */
+        .building-details { grid-column: span 2; }
+
         .details-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-top: 4px;
         }
-        
+
         .details-table th,
         .details-table td {
-            padding: 12px 16px;
+            padding: 10px 14px;
             text-align: left;
-            border-bottom: 1px solid var(--card-border);
+            border-bottom: 1px solid var(--line-soft);
+            font-size: 13.5px;
         }
-        
+
         .details-table th {
-            background: var(--card-bg);
-            color: var(--text-primary);
+            color: var(--text-tertiary);
             font-weight: 600;
-            text-align: center;
-            font-family: var(--font-gaming);
+            font-size: 11.5px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.9rem;
+            letter-spacing: 0.5px;
         }
-        
-        .details-table td {
-            color: var(--text-secondary);
-        }
-        
-        .details-table .building-name {
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-        
-        .details-table .levels-destroyed {
-            color: var(--sabo-color);
-            font-weight: bold;
-            text-align: center;
-            font-family: var(--font-gaming);
-        }
-        
+
+        .details-table th:not(:first-child),
+        .details-table td:not(:first-child) { text-align: right; }
+
+        .details-table tr:last-child td { border-bottom: none; }
+
+        .details-table .building-name { color: var(--text-primary); font-weight: 500; }
+
+        .details-table .levels-destroyed,
         .details-table .points-earned {
-            color: #f59e0b;
-            font-weight: bold;
-            text-align: center;
-            font-family: var(--font-gaming);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
         }
-        
-        /* Footer */
-        .footer {
-            background: var(--razer-black);
-            border-top: 1px solid rgba(139, 92, 246, 0.2);
-            padding: 40px 0;
-            margin-top: 40px;
-            text-align: center;
-        }
-        
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 32px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-        }
-        
-        .footer-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .footer-link::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--razer-purple);
-            transition: width 0.3s ease;
-        }
-        
-        .footer-link:hover {
-            color: var(--razer-purple);
-        }
-        
-        .footer-link:hover::after {
-            width: 100%;
-        }
-        
-        .footer-bottom {
-            color: rgba(192, 192, 192, 0.6);
-            font-size: 14px;
-        }
-        
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .input-summary-section {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .results {
-                grid-template-columns: 1fr;
-            }
-            
-            .building-details {
-                grid-column: span 1;
-            }
-            
-            .button-section {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .calculate-btn, .clear-btn {
-                width: 100%;
-                max-width: 300px;
-            }
-            
-            .back-button {
-                position: static;
-                transform: none;
-                margin-bottom: 20px;
-            }
-            
-            .header {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 20px;
-            }
+
+        @media (max-width: 860px) {
+            .input-summary-section { grid-template-columns: 1fr; }
+            .results { grid-template-columns: 1fr; }
+            .building-details { grid-column: span 1; }
+            .button-section .btn { flex: 1; }
+            .details-table { display: block; overflow-x: auto; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <a href="index.html" class="back-button">← Zurück zur Hauptseite</a>
-            <h1>💥 SABO-COUNTER</h1>
-            <div class="subtitle">Sabotage-Berichte auswerten und Gebäudeschäden analysieren</div>
+    <header class="header">
+        <div class="wrap">
+            <a href="index.html" class="wordmark">
+                <span class="mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="4.4"/>
+                        <ellipse cx="12" cy="12" rx="9" ry="3.2" transform="rotate(-20 12 12)" opacity="0.55"/>
+                    </svg>
+                </span>
+                <span><strong>Spacenations</strong><span class="thin"> Tools</span></span>
+            </a>
+
+            <nav class="header-auth">
+                <a href="index.html" class="btn btn-ghost btn-sm">Alle Tools</a>
+                <a href="https://beta4.game.spacenations.eu/" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Zum Spiel <span class="ext">↗</span></a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="wrap tool-main">
+        <div class="page-head">
+            <span class="tool-icon tint-amber">
+                <svg viewBox="0 0 24 24"><path d="M13.2 2.6L4.8 13.4h6l-1.9 8 8.4-10.8h-6l1.9-8z"/></svg>
+            </span>
+            <div>
+                <h1>Sabo Counter</h1>
+                <p>Sabotage-Berichte auswerten und Gebäudeschäden analysieren.</p>
+            </div>
         </div>
 
         <div class="input-summary-section">
-            <div class="input-section">
-                <h2>💥 Sabotage-Berichte</h2>
-                <label for="sabo-reports">Fügen Sie hier Ihre Sabotage-Berichte ein:</label>
+            <div class="card input-section">
+                <div class="result-head"><span class="dot"></span>Sabotage-Berichte</div>
+                <label for="sabo-reports">Berichte hier einfügen</label>
                 <textarea id="sabo-reports" placeholder="Sabotage-Berichte hier einfügen...
 
 Beispiel:
@@ -645,15 +236,15 @@ Eisenmine: 7 Stufen zerstört
 
 Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
             </div>
-            
-            <div class="summary-section">
-                <h2>📊 Auswertung der Berichte</h2>
+
+            <div class="card summary-section">
+                <div class="result-head"><span class="dot"></span>Auswertung der Berichte</div>
                 <div class="summary-content">
                     <div class="reports-count">
                         <span class="count-number" id="reports-evaluated">0</span>
                         <div class="count-label">Berichte ausgewertet</div>
                     </div>
-                    
+
                     <div class="building-list" id="summary-building-list">
                         <div class="building-list-header">Gebäude</div>
                         <div class="building-item">
@@ -716,55 +307,55 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                 </div>
             </div>
         </div>
-        
+
         <div class="button-section">
-            <button class="calculate-btn" onclick="calculateSabotage()">💥 Sabotagen Auswerten</button>
-            <button class="clear-btn" onclick="clearAll()">🗑️ Alles Löschen</button>
+            <button class="btn btn-accent btn-md" onclick="calculateSabotage()">Sabotagen auswerten</button>
+            <button class="btn btn-outline btn-md" onclick="clearAll()">Alles löschen</button>
         </div>
 
         <div class="results">
-            <div class="result-box">
-                <h2>💥 Sabotage-Statistiken</h2>
+            <div class="card result-box">
+                <div class="result-head"><span class="dot"></span>Sabotage-Statistiken</div>
                 <div id="sabo-stats">
                     <div class="stat-line">
-                        <span class="stat-name">Anzahl Sabotagen:</span>
+                        <span class="stat-name">Anzahl Sabotagen</span>
                         <span class="stat-value" id="sabo-count">0</span>
                     </div>
                     <div class="stat-line">
-                        <span class="stat-name">Gebäudestufen zerstört:</span>
+                        <span class="stat-name">Gebäudestufen zerstört</span>
                         <span class="stat-value" id="total-levels">0</span>
                     </div>
                     <div class="stat-line total-line">
-                        <span class="stat-name">Gesamtpunkte:</span>
+                        <span class="stat-name">Gesamtpunkte</span>
                         <span class="stat-value" id="total-points">0</span>
                     </div>
                     <div class="stat-line">
-                        <span class="stat-name">Ø Punkte pro Sabo:</span>
+                        <span class="stat-name">Ø Punkte pro Sabo</span>
                         <span class="stat-value" id="average-points">0</span>
                     </div>
                 </div>
             </div>
-            
-            <div class="result-box">
-                <h2>🏢 Gebäude-Übersicht</h2>
+
+            <div class="card result-box">
+                <div class="result-head"><span class="dot"></span>Gebäude-Übersicht</div>
                 <div id="building-summary">
                     <div class="stat-line">
-                        <span class="stat-name">Verschiedene Gebäudetypen:</span>
+                        <span class="stat-name">Verschiedene Gebäudetypen</span>
                         <span class="stat-value" id="building-types">0</span>
                     </div>
                     <div class="stat-line">
-                        <span class="stat-name">Meist getroffenes Gebäude:</span>
+                        <span class="stat-name">Meist getroffenes Gebäude</span>
                         <span class="stat-value" id="most-hit-building">-</span>
                     </div>
                     <div class="stat-line">
-                        <span class="stat-name">Wertvollstes Ziel:</span>
+                        <span class="stat-name">Wertvollstes Ziel</span>
                         <span class="stat-value" id="most-valuable-building">-</span>
                     </div>
                 </div>
             </div>
 
-            <div class="building-details" id="building-details" style="display: none;">
-                <h2>📋 Detaillierte Gebäude-Aufschlüsselung</h2>
+            <div class="card building-details" id="building-details" style="display: none;">
+                <div class="result-head"><span class="dot"></span>Detaillierte Gebäude-Aufschlüsselung</div>
                 <table class="details-table">
                     <thead>
                         <tr>
@@ -780,19 +371,7 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                 </table>
             </div>
         </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="footer global-footer">
-        <div class="footer-links">
-            <a href="index.html" class="footer-link">Home</a>
-            <a href="as-counter.html" class="footer-link">AS Counter</a>
-            <a href="battle-counter.html" class="footer-link">Battle Counter</a>
-            <a href="raid-counter.html" class="footer-link">Raid Counter</a>
-        </div>
-        
-        <p class="footer-bottom">&copy; 2025 Spacenations Tools. Built for gamers, by gamers.</p>
-    </footer>
+    </main>
 
     <script>
         // Gebäude-Punkte-System (aus sabo-counter.js)
@@ -821,12 +400,12 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
         // Gebäudename normalisieren (für bessere Erkennung)
         function normalizeBuilding(buildingName) {
             const name = buildingName.trim();
-            
+
             // Exakte Matches zuerst
             if (Object.prototype.hasOwnProperty.call(BUILDING_POINTS, name)) {
                 return name;
             }
-            
+
             // Fuzzy Matching für häufige Varianten
             const variations = {
                 'eismine': 'Eisenmine',
@@ -836,19 +415,19 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                 'pz': 'Planetenzentrale',
                 'rh': 'Raumhafen'
             };
-            
+
             const lowerName = name.toLowerCase();
             if (variations[lowerName]) {
                 return variations[lowerName];
             }
-            
+
             // Partial matching
             for (const key of Object.keys(BUILDING_POINTS)) {
                 if (key.toLowerCase().includes(lowerName) || lowerName.includes(key.toLowerCase())) {
                     return key;
                 }
             }
-            
+
             return name; // Rückgabe des ursprünglichen Namens wenn nichts gefunden
         }
 
@@ -856,7 +435,7 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
         function parseBuildingLine(line) {
             // Entferne führende Symbole und Leerzeichen
             line = line.replace(/^[•\-*+\s]+/, '').trim();
-            
+
             // Verschiedene Formate versuchen:
             // Format 1: "Gebäudename 5" oder "Gebäudename: 5"
             let match = line.match(/^(.+?)[:\s]+(\d+)$/);
@@ -866,8 +445,8 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                     levels: parseInt(match[2])
                 };
             }
-            
-            // Format 2: "5 Gebäudename" 
+
+            // Format 2: "5 Gebäudename"
             match = line.match(/^(\d+)\s+(.+)$/);
             if (match) {
                 return {
@@ -875,7 +454,7 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                     levels: parseInt(match[1])
                 };
             }
-            
+
             // Format 3: "Gebäudename (5)" oder "Gebäudename [5]"
             match = line.match(/^(.+?)\s*[([]]\s*(\d+)\s*[)\]]$/);
             if (match) {
@@ -884,7 +463,7 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                     levels: parseInt(match[2])
                 };
             }
-            
+
             // Format 4: Nur Gebäudename (0 Stufen angenommen)
             if (line.length > 0 && !/\d/.test(line)) {
                 return {
@@ -892,7 +471,7 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                     levels: 0
                 };
             }
-            
+
             // Nichts gefunden
             return {
                 name: '',
@@ -903,36 +482,36 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
         // HAUPTFUNKTION: Sabotage-Berechnung (aus sabo-counter.js)
         function calculateSabotage() {
             console.log('💥 Starte Sabotage-Berechnung...');
-            
+
             const saboText = document.getElementById('sabo-reports').value;
-            
+
             if (!saboText.trim()) {
                 alert('Bitte fügen Sie Sabotage-Berichte ein!');
                 return;
             }
-            
+
             // Initialisiere Gebäude-Zähler und Statistiken
             const buildings = {};
             let saboCount = 0;
             let totalLevels = 0;
             let totalPoints = 0;
-            
+
             const lines = saboText.split('\n');
             let inSabotageReport = false;
             let inBuildingList = false;
             let currentSabotage = null;
-            
+
             console.log('📋 Verarbeite', lines.length, 'Zeilen...');
-            
+
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (!line) continue;
-                
+
                 // Erkenne Sabotage-Start (verschiedene Varianten)
-                if (line.includes('sabotierte erfolgreich') || 
+                if (line.includes('sabotierte erfolgreich') ||
                     line.includes('Sabotage erfolgreich') ||
                     line.includes('Sabotage-Aktion erfolgreich')) {
-                    
+
                     saboCount++;
                     inSabotageReport = true;
                     inBuildingList = false;
@@ -941,29 +520,29 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                         totalLevels: 0,
                         totalPoints: 0
                     };
-                    
+
                     console.log(`🎯 Sabotage #${saboCount} erkannt:`, line);
                     continue;
                 }
-                
+
                 // Erkenne Gebäude-Liste-Start
                 if (inSabotageReport && (
                     line.includes('Gebäude') && line.includes('Stufen') ||
                     line.includes('Zerstört') ||
                     line.includes('Beschädigt'))) {
-                    
+
                     inBuildingList = true;
                     console.log('🏢 Gebäude-Liste erkannt');
                     continue;
                 }
-                
+
                 // Parse Gebäude-Zeilen wenn in Gebäude-Liste
                 if (inBuildingList && line.length > 0) {
                     const buildingData = parseBuildingLine(line);
-                    
+
                     if (buildingData.name && buildingData.levels > 0) {
                         const normalizedName = normalizeBuilding(buildingData.name);
-                        
+
                         if (Object.prototype.hasOwnProperty.call(BUILDING_POINTS, normalizedName)) {
                             // Gültiges Gebäude gefunden
                             if (!buildings[normalizedName]) {
@@ -972,13 +551,13 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                             buildings[normalizedName] += buildingData.levels;
                             totalLevels += buildingData.levels;
                             totalPoints += buildingData.levels * BUILDING_POINTS[normalizedName];
-                            
+
                             console.log(`✅ ${normalizedName}: ${buildingData.levels} Stufen (${buildingData.levels * BUILDING_POINTS[normalizedName]} Punkte)`);
                         } else {
                             console.warn('⚠️ Unbekanntes Gebäude:', buildingData.name);
                         }
                     }
-                    
+
                     // Beende Gebäude-Liste bei leerer Zeile oder neuem Sabotage-Bericht
                     if (line.length === 0 || line.includes('sabotierte erfolgreich')) {
                         inBuildingList = false;
@@ -987,10 +566,10 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                     }
                 }
             }
-            
+
             // Berechne Durchschnitt
             const averagePoints = saboCount > 0 ? Math.round(totalPoints / saboCount) : 0;
-            
+
             console.log('📊 Berechnung abgeschlossen:', {
                 saboCount,
                 totalLevels,
@@ -998,13 +577,13 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                 averagePoints,
                 buildings
             });
-            
+
             // Update UI
             updateSabotageStats(saboCount, totalLevels, totalPoints, averagePoints);
             updateBuildingOverview(buildings);
             updateSummaryBuildingList(buildings);
             updateBuildingDetailsTable(buildings);
-            
+
             console.log('✅ Sabotage-Berechnung erfolgreich abgeschlossen!');
         }
 
@@ -1016,7 +595,7 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                 'total-points': formatNumber(totalPoints),
                 'average-points': formatNumber(averagePoints)
             };
-            
+
             for (const [id, value] of Object.entries(elements)) {
                 const element = document.getElementById(id);
                 if (element) element.textContent = value;
@@ -1027,7 +606,7 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
             const buildingTypes = Object.keys(buildings).length;
             const buildingTypesElement = document.getElementById('building-types');
             if (buildingTypesElement) buildingTypesElement.textContent = buildingTypes;
-            
+
             // Meistgetroffenes Gebäude
             let mostHitBuilding = '-';
             let mostHitCount = 0;
@@ -1039,7 +618,7 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
             }
             const mostHitElement = document.getElementById('most-hit-building');
             if (mostHitElement) mostHitElement.textContent = mostHitBuilding;
-            
+
             // Wertvollstes Ziel (nach Gesamtpunkten)
             let mostValuableBuilding = '-';
             let mostValuablePoints = 0;
@@ -1061,7 +640,7 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
             if (reportsEvaluated && saboCount) {
                 reportsEvaluated.textContent = saboCount.textContent;
             }
-            
+
             // Alle Gebäude-IDs definieren
             const buildingIds = {
                 'Planetenzentrale': 'levels-planetenzentrale',
@@ -1079,7 +658,7 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                 'Waffenfabrik': 'levels-waffenfabrik',
                 'Forschungszentrum': 'levels-forschungszentrum'
             };
-            
+
             // Alle Gebäude auf 0 setzen
             Object.values(buildingIds).forEach(id => {
                 const element = document.getElementById(id);
@@ -1087,7 +666,7 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                     element.textContent = '0';
                 }
             });
-            
+
             // Aktualisiere mit den tatsächlichen Werten
             for (const [building, levels] of Object.entries(buildings)) {
                 const id = buildingIds[building];
@@ -1103,27 +682,27 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
         function updateBuildingDetailsTable(buildings) {
             const tableBody = document.getElementById('building-details-body');
             const detailsSection = document.getElementById('building-details');
-            
+
             if (Object.keys(buildings).length === 0) {
                 if (detailsSection) detailsSection.style.display = 'none';
                 return;
             }
-            
+
             if (!tableBody) return;
-            
+
             let tableHTML = '';
-            
+
             // Sortiere Gebäude nach Gesamtpunkten (absteigend)
             const sortedBuildings = Object.entries(buildings).sort((a, b) => {
                 const pointsA = a[1] * BUILDING_POINTS[a[0]];
                 const pointsB = b[1] * BUILDING_POINTS[b[0]];
                 return pointsB - pointsA;
             });
-            
+
             for (const [building, levels] of sortedBuildings) {
                 const pointsPerLevel = BUILDING_POINTS[building];
                 const totalPoints = levels * pointsPerLevel;
-                
+
                 tableHTML += `
                     <tr>
                         <td class="building-name">${building}</td>
@@ -1133,7 +712,7 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                     </tr>
                 `;
             }
-            
+
             tableBody.innerHTML = tableHTML;
             if (detailsSection) detailsSection.style.display = 'block';
         }
@@ -1141,14 +720,14 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
         function clearAll() {
             const saboReports = document.getElementById('sabo-reports');
             if (saboReports) saboReports.value = '';
-            
+
             // Reset alle Statistik-Werte auf 0
             const statsElements = ['sabo-count', 'total-levels', 'total-points', 'average-points'];
             statsElements.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) element.textContent = '0';
             });
-            
+
             // Reset Gebäude-Übersicht
             const overviewElements = {
                 'building-types': '0',
@@ -1156,12 +735,12 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                 'most-valuable-building': '-',
                 'reports-evaluated': '0'
             };
-            
+
             for (const [id, value] of Object.entries(overviewElements)) {
                 const element = document.getElementById(id);
                 if (element) element.textContent = value;
             }
-            
+
             // Alle Gebäude-Level auf 0 setzen
             const buildingIds = [
                 'levels-planetenzentrale', 'levels-raumhafen', 'levels-wohngebäude', 'levels-solarpark',
@@ -1169,16 +748,16 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                 'levels-bohrturm', 'levels-chemiefabrik', 'levels-recyclinganlage', 'levels-rohstofflager',
                 'levels-schiffsfabrik', 'levels-waffenfabrik', 'levels-forschungszentrum'
             ];
-            
+
             buildingIds.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) element.textContent = '0';
             });
-            
+
             // Hide building details table
             const buildingDetails = document.getElementById('building-details');
             if (buildingDetails) buildingDetails.style.display = 'none';
-            
+
             console.log('🗑️ Sabo-Counter zurückgesetzt');
         }
 
@@ -1189,7 +768,7 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                 e.preventDefault();
                 calculateSabotage();
             }
-            
+
             // Strg+Delete = Alles löschen
             if (e.ctrlKey && e.key === 'Delete') {
                 e.preventDefault();
@@ -1202,7 +781,7 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
         console.log('💥 Sabo-Counter geladen');
         console.log('💡 Keyboard-Shortcuts: Strg+Enter (Berechnen), Strg+Delete (Löschen)');
     </script>
-    
+
     <!-- Global Footer Loader -->
     <script src="js/global-footer-loader.js"></script>
 </body>

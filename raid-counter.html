@@ -3,414 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raid-Counter - Spacenations Tools</title>
-    
-    <!-- Modern Fonts -->
+    <title>Raid Counter – Spacenations Tools</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316181D'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='white' stroke-width='2'/%3E%3Cellipse cx='16' cy='16' rx='12' ry='4.4' fill='none' stroke='%2300D68F' stroke-width='1.6' transform='rotate(-20 16 16)'/%3E%3C/svg%3E">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+
     <style>
-        :root {
-            /* Razer Color Scheme */
-            --razer-green: #00FF88;
-            --razer-green-dark: #00CC6A;
-            --razer-green-light: #44FF99;
-            --razer-orange: #FF9900;
-            --razer-orange-light: #FFAA44;
-            --razer-black: #0A0A0A;
-            --razer-dark: #111111;
-            --razer-gray: #1A1A1A;
-            --razer-gray-light: #2A2A2A;
-            --razer-white: #FFFFFF;
-            --razer-silver: #C0C0C0;
-            
-            --text-primary: var(--razer-white);
-            --text-secondary: var(--razer-silver);
-            --text-accent: var(--razer-orange);
-            
-            --bg-primary: var(--razer-black);
-            --bg-secondary: var(--razer-dark);
-            --bg-tertiary: var(--razer-gray);
-            --bg-card: var(--razer-gray-light);
-            
-            --glow-orange: 0 0 20px rgba(255, 153, 0, 0.5);
-            --glow-orange-strong: 0 0 30px rgba(255, 153, 0, 0.8);
-            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
-            
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            --font-gaming: 'Orbitron', monospace;
-            
-            /* Compatibility variables */
-            --raid-color: var(--razer-orange);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: var(--font-primary);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            padding: 20px 20px 0 20px;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* Animated Background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(255, 153, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
-                linear-gradient(45deg, var(--razer-black) 0%, var(--razer-dark) 100%);
-            z-index: -1;
-            animation: backgroundPulse 8s ease-in-out infinite;
-        }
-        
-        @keyframes backgroundPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: var(--bg-secondary);
-            border: 2px solid var(--razer-green);
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: var(--shadow-dark), var(--glow-green);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            flex: 1;
-        }
-        
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--razer-orange), var(--razer-orange-light));
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            position: relative;
-        }
-        
-        .back-button {
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
-            color: var(--razer-green);
-            border: 2px solid var(--razer-green);
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: var(--font-gaming);
-        }
-        
-        .back-button:hover {
-            background: var(--razer-green);
-            color: var(--razer-black);
-            transform: translateY(-50%) translateY(-2px);
-            box-shadow: var(--glow-green);
-        }
-        
-        .header h1 {
-            font-family: var(--font-gaming);
-            font-size: 2.5rem;
-            color: var(--razer-green);
-            text-shadow: var(--glow-green);
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-            animation: titleGlow 4s ease-in-out infinite;
-        }
-        
-        @keyframes titleGlow {
-            0%, 100% { 
-                filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.3));
-            }
-            50% { 
-                filter: drop-shadow(0 0 30px rgba(0, 255, 136, 0.6));
-            }
-        }
-        
-        .header .subtitle {
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            font-weight: 400;
-        }
-        
-        .input-box {
-            background: var(--bg-tertiary);
-            border: 2px solid rgba(255, 153, 0, 0.2);
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 30px;
-            transition: all 0.3s ease;
-        }
-        
-        .input-box:hover {
-            border-color: var(--razer-orange);
-            box-shadow: var(--glow-orange);
-        }
-        
-        label {
+        /* Seitenspezifisch: Raid-Eingabe, zwei Ergebnis-Karten, KPI-Übersicht */
+        .tool-main { padding-bottom: 64px; }
+
+        .input-card { margin-top: 22px; }
+
+        .input-card label {
             display: block;
-            margin-bottom: 15px;
-            color: var(--text-primary);
+            font-size: 13px;
             font-weight: 600;
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            margin-bottom: 8px;
         }
-        
-        textarea {
+
+        .input-card textarea {
             width: 100%;
             height: 200px;
-            background: var(--bg-card);
-            border: 2px solid rgba(255, 153, 0, 0.3);
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: #FBFBFC;
             color: var(--text-primary);
-            padding: 16px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12.5px;
+            line-height: 1.5;
             resize: vertical;
-            transition: all 0.3s ease;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
-        
-        textarea:focus {
+
+        .input-card textarea:hover { border-color: var(--line-strong); }
+
+        .input-card textarea:focus {
             outline: none;
-            border-color: var(--razer-orange);
-            box-shadow: var(--glow-orange);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 168, 120, 0.14);
         }
-        
+
+        .input-card textarea::placeholder { color: var(--text-tertiary); }
+
         .button-section {
             display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-bottom: 30px;
+            gap: 10px;
+            margin: 20px 0 28px;
             flex-wrap: wrap;
         }
-        
-        .calculate-btn, .clear-btn {
-            padding: 16px 32px;
-            border: 2px solid var(--razer-green);
-            border-radius: 8px;
-            font-family: var(--font-gaming);
-            font-weight: 700;
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .calculate-btn {
-            background: var(--razer-green);
-            color: var(--razer-black);
-        }
-        
-        .calculate-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.6s ease;
-        }
-        
-        .calculate-btn:hover::before {
-            left: 100%;
-        }
-        
-        .calculate-btn:hover {
-            background: var(--razer-green-light);
-            transform: translateY(-2px);
-            box-shadow: var(--glow-green);
-        }
-        
-        .clear-btn {
-            background: transparent;
-            color: var(--text-secondary);
-            border-color: var(--text-secondary);
-        }
-        
-        .clear-btn:hover {
-            background: #FF4444;
-            color: var(--razer-white);
-            border-color: #FF4444;
-            transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
-        }
-        
+
         .results {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
+            gap: 14px;
         }
-        
-        .result-box {
-            background: var(--bg-card);
-            border: 2px solid rgba(255, 153, 0, 0.2);
-            border-radius: 12px;
-            padding: 30px;
-            transition: all 0.3s ease;
-        }
-        
-        .result-box:hover {
-            border-color: var(--razer-green);
-            transform: translateY(-4px);
-            box-shadow: var(--glow-green);
-        }
-        
-        .result-box h2 {
-            font-family: var(--font-gaming);
-            color: var(--razer-green);
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        .stat-line {
+
+        .result-head {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 153, 0, 0.1);
-        }
-        
-        .stat-name {
+            gap: 9px;
+            font-size: 14px;
             font-weight: 600;
-            color: var(--text-primary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            margin-bottom: 10px;
         }
-        
-        .stat-value {
-            font-family: var(--font-gaming);
-            font-weight: 800;
-            color: var(--razer-orange);
-            font-size: 1.2rem;
+
+        .result-head .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #8B5CF6;
         }
-        
+
+        /* KPI-Übersicht über volle Breite */
         .raid-summary {
             grid-column: span 2;
-            background: var(--bg-tertiary);
-            border: 2px solid rgba(0, 255, 136, 0.2);
-            border-radius: 12px;
-            padding: 30px;
-            text-align: center;
         }
-        
-        .raid-summary h2 {
-            font-family: var(--font-gaming);
-            color: var(--razer-green);
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
+
         .summary-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-top: 4px;
         }
-        
+
         .summary-stat {
-            background: var(--bg-card);
-            border-radius: 8px;
-            padding: 20px;
-            border: 1px solid rgba(0, 255, 136, 0.2);
+            background: #F7F8FA;
+            border: 1px solid var(--line-soft);
+            border-radius: 12px;
+            padding: 16px 18px;
         }
-        
+
         .summary-stat .value {
-            font-family: var(--font-gaming);
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--razer-green);
             display: block;
-            margin-bottom: 8px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 3px;
         }
-        
+
         .summary-stat .label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 12px;
+            color: var(--text-tertiary);
         }
-        
-        
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .results {
-                grid-template-columns: 1fr;
-            }
-            
-            .raid-summary {
-                grid-column: span 1;
-            }
-            
-            .button-section {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .calculate-btn, .clear-btn {
-                width: 100%;
-                max-width: 300px;
-            }
+
+        @media (max-width: 720px) {
+            .results { grid-template-columns: 1fr; }
+            .raid-summary { grid-column: span 1; }
+            .button-section .btn { flex: 1; }
         }
     </style>
 </head>
 <body>
-    <!-- Back Button -->
-    <div class="container">
-        <div class="header">
-            <a href="index.html" class="back-button">← Zurück zur Hauptseite</a>
-            <h1>RAID-COUNTER</h1>
-            <div class="subtitle">Raid-Berichte auswerten und Rohstoffe berechnen</div>
+    <header class="header">
+        <div class="wrap">
+            <a href="index.html" class="wordmark">
+                <span class="mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="4.4"/>
+                        <ellipse cx="12" cy="12" rx="9" ry="3.2" transform="rotate(-20 12 12)" opacity="0.55"/>
+                    </svg>
+                </span>
+                <span><strong>Spacenations</strong><span class="thin"> Tools</span></span>
+            </a>
+
+            <nav class="header-auth">
+                <a href="index.html" class="btn btn-ghost btn-sm">Alle Tools</a>
+                <a href="https://beta4.game.spacenations.eu/" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Zum Spiel <span class="ext">↗</span></a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="wrap tool-main">
+        <div class="page-head">
+            <span class="tool-icon tint-violet">
+                <svg viewBox="0 0 24 24"><path d="M5.5 21V3.8"/><path d="M5.5 4.5h12.2l-3 4 3 4H5.5"/></svg>
+            </span>
+            <div>
+                <h1>Raid Counter</h1>
+                <p>Raid-Berichte auswerten und geplünderte Rohstoffe berechnen.</p>
+            </div>
         </div>
 
-        <!-- Input Section -->
-        <div class="input-box">
-            <label for="raid-reports">Fügen Sie hier Ihre Raid-Berichte ein:</label>
+        <div class="card input-card">
+            <label for="raid-reports">Raid-Berichte hier einfügen</label>
             <textarea id="raid-reports" placeholder="Raid-Berichte hier einfügen...
 
 Beispiel:
@@ -421,67 +163,67 @@ Sie haben erfolgreich geplündert:
 
 Oder fügen Sie mehrere Raids ein..."></textarea>
         </div>
-        
+
         <div class="button-section">
-            <button class="calculate-btn" onclick="calculateRaids()">Raids Auswerten</button>
-            <button class="clear-btn" onclick="clearAll()">Alles Löschen</button>
+            <button class="btn btn-accent btn-md" onclick="calculateRaids()">Raids auswerten</button>
+            <button class="btn btn-outline btn-md" onclick="clearAll()">Alles löschen</button>
         </div>
 
         <div class="results">
-            <div class="result-box">
-                <h2>Geplünderte Rohstoffe - Gesamt</h2>
+            <div class="card result-box">
+                <div class="result-head"><span class="dot"></span>Geplünderte Rohstoffe – Gesamt</div>
                 <div id="raid-stats">
                     <div class="stat-line">
-                        <span class="stat-name">Eisen:</span>
+                        <span class="stat-name">Eisen</span>
                         <span class="stat-value" id="total-iron">0</span>
                     </div>
                     <div class="stat-line">
-                        <span class="stat-name">Silizium:</span>
+                        <span class="stat-name">Silizium</span>
                         <span class="stat-value" id="total-silicon">0</span>
                     </div>
                     <div class="stat-line">
-                        <span class="stat-name">Kohlenstoff:</span>
+                        <span class="stat-name">Kohlenstoff</span>
                         <span class="stat-value" id="total-carbon">0</span>
                     </div>
                     <div class="stat-line">
-                        <span class="stat-name">Wasser:</span>
+                        <span class="stat-name">Wasser</span>
                         <span class="stat-value" id="total-water">0</span>
                     </div>
                     <div class="stat-line">
-                        <span class="stat-name">Sauerstoff:</span>
+                        <span class="stat-name">Sauerstoff</span>
                         <span class="stat-value" id="total-oxygen">0</span>
                     </div>
                     <div class="stat-line">
-                        <span class="stat-name">Wasserstoff:</span>
+                        <span class="stat-name">Wasserstoff</span>
                         <span class="stat-value" id="total-hydrogen">0</span>
                     </div>
                 </div>
             </div>
 
-            <div class="result-box">
-                <h2>Raid-Statistiken</h2>
+            <div class="card result-box">
+                <div class="result-head"><span class="dot"></span>Raid-Statistiken</div>
                 <div id="raid-summary">
                     <div class="stat-line">
-                        <span class="stat-name">Anzahl Raids:</span>
+                        <span class="stat-name">Anzahl Raids</span>
                         <span class="stat-value" id="raid-count">0</span>
                     </div>
                     <div class="stat-line">
-                        <span class="stat-name">Erfolgreiche Raids:</span>
+                        <span class="stat-name">Erfolgreiche Raids</span>
                         <span class="stat-value" id="successful-raids">0</span>
                     </div>
                     <div class="stat-line">
-                        <span class="stat-name">Erfolgsrate:</span>
+                        <span class="stat-name">Erfolgsrate</span>
                         <span class="stat-value" id="success-rate">0%</span>
                     </div>
                     <div class="stat-line">
-                        <span class="stat-name">Durchschnitt pro Raid:</span>
+                        <span class="stat-name">Durchschnitt pro Raid</span>
                         <span class="stat-value" id="avg-per-raid">0</span>
                     </div>
                 </div>
             </div>
 
-            <div class="raid-summary">
-                <h2>Gesamtübersicht</h2>
+            <div class="card raid-summary">
+                <div class="result-head"><span class="dot"></span>Gesamtübersicht</div>
                 <div class="summary-stats">
                     <div class="summary-stat">
                         <span class="value" id="total-resources">0</span>
@@ -498,7 +240,7 @@ Oder fügen Sie mehrere Raids ein..."></textarea>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
         // Hilfsfunktion für Zahlenformatierung
@@ -509,7 +251,7 @@ Oder fügen Sie mehrere Raids ein..."></textarea>
         // Raid-Berechnung (aus Dashboard übernommen, ohne Login-Requirement)
         function calculateRaids() {
             const raidText = document.getElementById('raid-reports').value;
-            
+
             // Initialisiere Rohstoff-Zähler
             const resources = {
                 iron: 0,
@@ -519,20 +261,20 @@ Oder fügen Sie mehrere Raids ein..."></textarea>
                 oxygen: 0,
                 hydrogen: 0
             };
-            
+
             let raidCount = 0;
             let successfulRaids = 0;
             let currentRaidHasLoot = false;
             let bestRaid = 0;
             let raidValues = [];
-            
+
             const lines = raidText.split('\n');
-            
+
             for (let line of lines) {
                 line = line.trim();
-                
+
                 if (!line) continue;
-                
+
                 // Erkenne Raid-Beginn
                 if (line.includes('Raid') || line.includes('geplündert') || line.includes('erfolgreich')) {
                     if (currentRaidHasLoot) {
@@ -542,7 +284,7 @@ Oder fügen Sie mehrere Raids ein..."></textarea>
                     currentRaidHasLoot = false;
                     continue;
                 }
-                
+
                 // Extrahiere Rohstoffe mit verschiedenen Formaten
                 const resourcePatterns = [
                     // Standard Format: "1.234.567 Eisen"
@@ -552,7 +294,7 @@ Oder fügen Sie mehrere Raids ein..."></textarea>
                     /([0-9.]+)\s*(Wasser|Water)/i,
                     /([0-9.]+)\s*(Sauerstoff|Oxygen)/i,
                     /([0-9.]+)\s*(Wasserstoff|Hydrogen)/i,
-                    
+
                     // Alternative Formate
                     /(Eisen|Iron):\s*([0-9.]+)/i,
                     /(Silizium|Silicon):\s*([0-9.]+)/i,
@@ -561,14 +303,14 @@ Oder fügen Sie mehrere Raids ein..."></textarea>
                     /(Sauerstoff|Oxygen):\s*([0-9.]+)/i,
                     /(Wasserstoff|Hydrogen):\s*([0-9.]+)/i
                 ];
-                
+
                 let raidValue = 0;
-                
+
                 resourcePatterns.forEach((pattern, index) => {
                     const match = line.match(pattern);
                     if (match) {
                         let value, resource;
-                        
+
                         if (index < 6) {
                             // Format: "1.234.567 Eisen"
                             value = parseFloat(match[1].replace(/\./g, '')) || 0;
@@ -578,7 +320,7 @@ Oder fügen Sie mehrere Raids ein..."></textarea>
                             resource = match[1].toLowerCase();
                             value = parseFloat(match[2].replace(/\./g, '')) || 0;
                         }
-                        
+
                         // Zuordnung zu Rohstoff-Typ
                         if (resource.includes('eisen') || resource.includes('iron')) {
                             resources.iron += value;
@@ -599,22 +341,22 @@ Oder fügen Sie mehrere Raids ein..."></textarea>
                             resources.hydrogen += value;
                             raidValue += value;
                         }
-                        
+
                         currentRaidHasLoot = true;
                     }
                 });
-                
+
                 if (raidValue > 0) {
                     raidValues.push(raidValue);
                     bestRaid = Math.max(bestRaid, raidValue);
                 }
             }
-            
+
             // Letzten Raid berücksichtigen
             if (currentRaidHasLoot) {
                 successfulRaids++;
             }
-            
+
             // Ergebnisse anzeigen
             document.getElementById('total-iron').textContent = formatNumber(resources.iron);
             document.getElementById('total-silicon').textContent = formatNumber(resources.silicon);
@@ -622,25 +364,25 @@ Oder fügen Sie mehrere Raids ein..."></textarea>
             document.getElementById('total-water').textContent = formatNumber(resources.water);
             document.getElementById('total-oxygen').textContent = formatNumber(resources.oxygen);
             document.getElementById('total-hydrogen').textContent = formatNumber(resources.hydrogen);
-            
+
             // Raid-Statistiken
             document.getElementById('raid-count').textContent = raidCount;
             document.getElementById('successful-raids').textContent = successfulRaids;
-            
+
             const successRate = raidCount > 0 ? Math.round((successfulRaids / raidCount) * 100) : 0;
             document.getElementById('success-rate').textContent = successRate + '%';
-            
+
             const totalResources = resources.iron + resources.silicon + resources.carbon + resources.water + resources.oxygen + resources.hydrogen;
             const avgPerRaid = successfulRaids > 0 ? Math.round(totalResources / successfulRaids) : 0;
             document.getElementById('avg-per-raid').textContent = formatNumber(avgPerRaid);
-            
+
             // Gesamtübersicht
             document.getElementById('total-resources').textContent = formatNumber(totalResources);
             document.getElementById('best-raid').textContent = formatNumber(bestRaid);
-            
+
             const efficiency = raidCount > 0 ? Math.round((totalResources / (raidCount * 1000000)) * 100) : 0;
             document.getElementById('efficiency').textContent = efficiency + '%';
-            
+
             console.log('Raid-Auswertung abgeschlossen:', {
                 totalResources,
                 raidCount,
@@ -651,15 +393,19 @@ Oder fügen Sie mehrere Raids ein..."></textarea>
 
         function clearAll() {
             document.getElementById('raid-reports').value = '';
-            
+
             // Reset alle Werte
             document.querySelectorAll('.stat-value').forEach(element => {
                 element.textContent = '0';
             });
-            
+
+            document.querySelectorAll('.summary-stat .value').forEach(element => {
+                element.textContent = '0';
+            });
+
             document.getElementById('success-rate').textContent = '0%';
             document.getElementById('efficiency').textContent = '0%';
-            
+
             console.log('Alle Daten gelöscht');
         }
 
@@ -672,7 +418,7 @@ Oder fügen Sie mehrere Raids ein..."></textarea>
             }
         });
     </script>
-    
+
     <!-- Global Footer Loader -->
     <script src="js/global-footer-loader.js"></script>
 </body>

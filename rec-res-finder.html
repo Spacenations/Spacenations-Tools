@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rec-Res-Finder – Spacenations Tools</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316181D'/%3E%3Cpath d='M11 9.5l2.6 4.4-2.2 1.3-2.6-4.4z' fill='%2300D68F'/%3E%3Cpath d='M20.5 13l.4 5.1-2.5.1-.4-5.1z' fill='%2334D399'/%3E%3Cpath d='M12.5 20.5l4.9-1 .5 2.5-4.9 1z' fill='%2300A878'/%3E%3C/svg%3E">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+
+    <style>
+        /* Seitenspezifisch: Fundort-Tabelle + KPI-Zeile + Scanner-Panel */
+        .tool-main { padding-bottom: 64px; }
+
+        .page-head { flex-wrap: wrap; }
+        .page-head .head-actions { margin-left: auto; }
+
+        /* KPI-Zeile */
+        .kpi-card { margin-top: 22px; padding: 0; overflow: hidden; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1px;
+            background: var(--line-soft);
+        }
+        .stat { background: var(--card); padding: 18px 22px; }
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 3px;
+        }
+        .stat-number.good { color: var(--accent-strong); }
+        .stat-number.warn { color: #B26A00; }
+        .stat-number.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 20px; }
+        .stat-label { font-size: 12px; color: var(--text-tertiary); }
+
+        /* Import-Banner (eigene Liste geladen) */
+        .import-banner {
+            margin-top: 16px; display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; flex-wrap: wrap;
+            background: var(--accent-soft); border: 1px solid rgba(0, 168, 120, 0.25);
+            border-radius: 12px; padding: 10px 16px; font-size: 13.5px; color: var(--text-secondary);
+        }
+        .import-banner b { color: var(--text-primary); }
+
+        /* Fundorte-Karte */
+        .data-card { margin-top: 18px; padding: 0; overflow: hidden; }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: flex-end;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--line-soft);
+        }
+        .field { display: flex; flex-direction: column; gap: 4px; }
+        .field span {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+            color: var(--text-tertiary); font-weight: 600;
+        }
+        .field.grow { flex: 1; min-width: 180px; }
+        select, input[type=search] {
+            font: inherit; font-size: 14px; color: var(--text-primary); background: var(--card);
+            border: 1px solid var(--line); border-radius: 9px; padding: 8px 11px;
+        }
+        select:focus, input[type=search]:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+        input[type=search] { width: 100%; }
+        .toolbar-actions { display: flex; gap: 8px; margin-left: auto; align-self: flex-end; }
+
+        .table-container { padding: 4px 24px 8px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 11px 12px; text-align: left; border-bottom: 1px solid var(--line-soft); font-size: 13.5px; white-space: nowrap; }
+        th {
+            color: var(--text-tertiary); font-weight: 600; font-size: 11.5px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            position: sticky; top: 0; background: var(--card); cursor: pointer; user-select: none;
+        }
+        th[data-k]:hover { color: var(--accent-strong); }
+        th .ar { opacity: 0.4; font-size: 0.85em; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #FAFBFC; }
+        td.coord { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 600; font-variant-numeric: tabular-nums; }
+        td.num { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+        td a { color: var(--accent-strong); text-decoration: none; font-weight: 500; }
+        td a:hover { text-decoration: underline; }
+
+        .chip {
+            display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px;
+            border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap;
+        }
+        .chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; }
+        .chip.free { background: var(--accent-soft); color: var(--accent-strong); }
+        .chip.free::before { background: var(--accent); }
+        .chip.inh { background: rgba(178, 106, 0, 0.10); color: #B26A00; }
+        .chip.inh::before { background: #B26A00; }
+
+        .empty { padding: 40px 14px; color: var(--text-tertiary); text-align: center; }
+
+        .data-footer {
+            padding: 13px 24px; border-top: 1px solid var(--line-soft);
+            font-size: 12.5px; color: var(--text-tertiary);
+            display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+        }
+        .data-footer b { color: var(--text-secondary); }
+
+        /* Scanner-Karte */
+        .scanner-card { margin-top: 26px; }
+        .scanner-card > p.lead { color: var(--text-secondary); margin: 2px 0 18px; max-width: 66ch; font-size: 14px; }
+        .callout {
+            display: flex; gap: 10px; align-items: flex-start;
+            background: var(--accent-soft); border: 1px solid rgba(0,168,120,0.20);
+            border-radius: 11px; padding: 13px 15px; margin: 0 0 18px; font-size: 13.5px; color: var(--text-secondary);
+        }
+        .callout b { color: var(--text-primary); }
+        ol.steps { margin: 0; padding-left: 0; list-style: none; counter-reset: s; }
+        ol.steps li {
+            counter-increment: s; position: relative; padding: 9px 0 9px 40px;
+            border-bottom: 1px dashed var(--line); font-size: 14px; color: var(--text-secondary);
+        }
+        ol.steps li:last-child { border-bottom: none; }
+        ol.steps li b { color: var(--text-primary); }
+        ol.steps li::before {
+            content: counter(s); position: absolute; left: 0; top: 7px; width: 26px; height: 26px;
+            display: grid; place-items: center; border-radius: 8px;
+            background: var(--accent-soft); color: var(--accent-strong);
+            font-family: ui-monospace, Consolas, monospace; font-weight: 700; font-size: 13px;
+        }
+        kbd {
+            font-family: ui-monospace, Consolas, monospace; font-size: 0.82em; background: #F2F4F6;
+            border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px;
+        }
+        .codebox { position: relative; margin-top: 16px; }
+        .codebox textarea {
+            width: 100%; height: 140px; resize: vertical;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px; line-height: 1.5; color: var(--text-secondary);
+            background: #F7F8FA; border: 1px solid var(--line); border-radius: 10px; padding: 12px; white-space: pre;
+        }
+        .codebar { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+        .note { font-size: 13px; color: var(--text-tertiary); }
+        .note code { font-family: ui-monospace, Consolas, monospace; background: #F2F4F6; padding: 1px 6px; border-radius: 5px; }
+
+        .tool-foot {
+            margin-top: 30px; color: var(--text-tertiary); font-size: 12.5px; line-height: 1.7;
+            border-top: 1px solid var(--line-soft); padding-top: 16px;
+        }
+
+        .toast {
+            position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px);
+            background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 10px;
+            font-weight: 600; font-size: 14px; opacity: 0; pointer-events: none;
+            transition: 0.25s; box-shadow: var(--shadow-lg); z-index: 50;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 720px) {
+            .page-head .head-actions { margin-left: 0; width: 100%; }
+            .toolbar { padding: 14px 14px; }
+            .toolbar-actions { width: 100%; margin-left: 0; }
+            .table-container { padding: 4px 12px 8px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="wrap">
+            <a href="index.html" class="wordmark">
+                <span class="mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="4.4"/>
+                        <ellipse cx="12" cy="12" rx="9" ry="3.2" transform="rotate(-20 12 12)" opacity="0.55"/>
+                    </svg>
+                </span>
+                <span><strong>Spacenations</strong><span class="thin"> Tools</span></span>
+            </a>
+
+            <nav class="header-auth">
+                <a href="index.html" class="btn btn-ghost btn-sm">Alle Tools</a>
+                <a href="https://beta4.game.spacenations.eu/" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Zum Spiel <span class="ext">↗</span></a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="wrap tool-main">
+        <div class="page-head">
+            <span class="tool-icon tint-green">
+                <svg viewBox="0 0 24 24"><path d="M7 19H4.8a1.83 1.83 0 0 1-1.57-2.66L7.2 9.5"/><path d="M11 19h8.2a1.83 1.83 0 0 0 1.55-2.66l-1.22-2.12"/><path d="m14 16-3 3 3 3"/><path d="M8.29 13.6 7.2 9.5l-4.1 1.1"/><path d="m9.34 5.81 1.1-1.89a1.83 1.83 0 0 1 3.09-.03l3.94 6.84"/><path d="m13.38 9.63 4.1 1.1 1.1-4.1"/></svg>
+            </span>
+            <div>
+                <h1>Rec-Res-Finder</h1>
+                <p>Meteoriten-Felder mit Recycling-Rohstoffen – aus einem Komplett-Scan aller Galaxien. Für alle Spieler gleich, gilt fürs ganze Team.</p>
+            </div>
+            <div class="head-actions">
+                <input type="file" id="fileCsv" accept=".csv,text/csv" hidden>
+                <button class="btn btn-solid btn-sm" id="btnImport">CSV importieren</button>
+                <a href="#scanner" class="btn btn-outline btn-sm">Neu scannen</a>
+            </div>
+        </div>
+
+        <div class="import-banner" id="importBanner" hidden>
+            <span id="importInfo"></span>
+            <button class="btn btn-ghost btn-sm" id="btnReset">Auf Standard-Snapshot zurücksetzen</button>
+        </div>
+
+        <div class="card kpi-card">
+            <div class="stats">
+                <div class="stat"><div class="stat-number" id="sTotal">–</div><div class="stat-label">Felder gesamt</div></div>
+                <div class="stat"><div class="stat-number good" id="sFree">–</div><div class="stat-label">frei</div></div>
+                <div class="stat"><div class="stat-number warn" id="sInh">–</div><div class="stat-label">bewohnt</div></div>
+                <div class="stat"><div class="stat-number" id="sGal">–</div><div class="stat-label">Galaxien</div></div>
+                <div class="stat"><div class="stat-number mono" id="sSnap">02.08.26</div><div class="stat-label">Snapshot</div></div>
+            </div>
+        </div>
+
+        <div class="card data-card">
+            <div class="toolbar">
+                <label class="field"><span>Galaxie</span>
+                    <select id="fGal"><option value="">alle</option></select></label>
+                <label class="field"><span>Status</span>
+                    <select id="fInh"><option value="">alle</option><option value="0">frei</option><option value="1">bewohnt</option></select></label>
+                <label class="field grow"><span>Suche</span>
+                    <input type="search" id="fSearch" placeholder="Koordinate oder Besitzer…"></label>
+                <div class="toolbar-actions">
+                    <button class="btn btn-outline btn-sm" id="btnCopy">Tabelle kopieren</button>
+                    <button class="btn btn-solid btn-sm" id="btnCsv">CSV herunterladen</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead><tr>
+                        <th data-k="c">Koordinaten <span class="ar">↕</span></th>
+                        <th data-k="g">Galaxie <span class="ar">↕</span></th>
+                        <th data-k="s">System <span class="ar">↕</span></th>
+                        <th data-k="p">Pos <span class="ar">↕</span></th>
+                        <th data-k="i">Status <span class="ar">↕</span></th>
+                        <th data-k="o">Besitzer <span class="ar">↕</span></th>
+                        <th>System</th>
+                    </tr></thead>
+                    <tbody id="tb"></tbody>
+                </table>
+            </div>
+
+            <div class="data-footer">
+                <span><b id="cShown">0</b> Fundorte angezeigt</span>
+                <span>Klick auf einen Spaltenkopf sortiert · <b>öffnen ↗</b> springt ins Spiel (dort eingeloggt sein)</span>
+            </div>
+        </div>
+
+        <section class="card scanner-card" id="scanner">
+            <h2 style="margin:0 0 2px;font-size:18px;">Liste aktualisieren</h2>
+            <p class="lead">Diese Meteoriten sind <b>temporär</b> – sie erscheinen und verschwinden wieder. Für einen frischen Stand scannt eine Person neu und teilt die Liste.</p>
+
+            <div class="callout">
+                <div aria-hidden="true">⏱️</div>
+                <div>Ein kompletter Scan aller 8 Galaxien dauert nur <b>wenige Minuten</b> und läuft entspannt im Hintergrund. Du musst dafür in deinem eigenen Account <b>eingeloggt</b> sein.</div>
+            </div>
+
+            <ol class="steps">
+                <li>Im Spiel einloggen (irgendeine Seite genügt).</li>
+                <li><kbd>F12</kbd> drücken → Reiter <b>Konsole</b> öffnen.</li>
+                <li>Skript unten mit <b>Kopieren</b> holen, in die Konsole einfügen (<kbd>Strg</kbd>+<kbd>V</kbd>), <kbd>Enter</kbd>. <span class="note">Warnung? Einmal <code>allow pasting</code> tippen.</span></li>
+                <li>Panel oben links → <b>Scan starten</b>. Am Ende <b>CSV</b> oder <b>Kopieren</b> – und die Liste hier ins Team teilen.</li>
+            </ol>
+
+            <div class="codebox">
+                <textarea id="scriptOut" readonly spellcheck="false" aria-label="Scanner-Skript"></textarea>
+                <div class="codebar">
+                    <button class="btn btn-solid btn-sm" id="btnScript">Skript kopieren</button>
+                    <a id="bmk" class="note" href="#" title="In die Lesezeichenleiste ziehen">↳ oder als Lesezeichen ziehen: <b>Rec-Res-Scan</b></a>
+                    <span class="note">(Lesezeichen funktioniert, falls das Spiel es zulässt – sonst Konsole nutzen.)</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="tool-foot">
+            Inoffizielles Community-Tool von Spielern für Spieler – nicht mit den Machern von Spacenations verbunden.
+            Angezeigte Daten sind ein Schnappschuss vom Scan-Zeitpunkt und im Spiel für alle sichtbar.
+            Das Scanner-Skript läuft ausschließlich lokal in deinem Browser und deiner eigenen Sitzung; es sendet keine Daten an Dritte.
+        </div>
+    </main>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="text/plain" id="scannerSrc">/* Rec-Res-Scanner fuer Spacenations (beta4) - in die Browser-Konsole (F12) einfuegen. */
+(function () {
+  'use strict';
+  if (window.__recRes) { window.__recRes.show(); return; }
+  var LS_KEY = 'recResScannerState_v2';
+  var ORIGIN = location.origin;
+  var DEFAULT_GALAXIES = '555,556,565,566,655,656,665,666';
+  var state = { running:false, paused:false, stop:false, results:[], scanned:0, total:0, current:'' };
+  function inertiaVersion(){ try { return JSON.parse(document.getElementById('app').getAttribute('data-page')).version || ''; } catch(e){ return ''; } }
+  function ownerOf(colony){ if(!colony) return ''; if(typeof colony==='string') return colony; return colony.playerName || colony.name || (colony.player && (colony.player.name||colony.player.username)) || ''; }
+  async function fetchSystem(galaxy, system){
+    var res = await fetch(ORIGIN + '/universe/' + galaxy + ':' + system, { method:'GET', credentials:'same-origin',
+      headers:{ 'X-Inertia':'true', 'X-Inertia-Version':inertiaVersion(), 'X-Requested-With':'XMLHttpRequest', 'Accept':'text/html, application/xhtml+xml' } });
+    if (res.headers.get('x-inertia') !== 'true' || /\/login/.test(res.url)) throw new Error('NOT_LOGGED_IN');
+    if (res.status === 409) throw new Error('VERSION_CHANGED');
+    if (!res.ok) throw new Error('HTTP_' + res.status);
+    return (await res.json()).props || {};
+  }
+  function hitsInSystem(props, galaxy, system){
+    var out = []; var planets = props.planets || [];
+    for (var i=0;i<planets.length;i++){ var pl=planets[i];
+      if (pl && pl.hasTempRecyclingRes === true){ out.push({ coordinates: galaxy+':'+system+':'+pl.number, galaxy:galaxy, system:system, position:pl.number, owner:ownerOf(pl.colony), inhabited:!!pl.colony }); } }
+    return out;
+  }
+  var save = function(){ try{ localStorage.setItem(LS_KEY, JSON.stringify({results:state.results})); }catch(e){} };
+  var load = function(){ try{ var d=JSON.parse(localStorage.getItem(LS_KEY)||'null'); if(d&&d.results&&d.results.length) state.results=d.results; }catch(e){} };
+  var sleep = function(ms){ return new Promise(function(r){ setTimeout(r,ms); }); };
+  var $ = function(id){ return document.getElementById(id); };
+  var box = document.createElement('div'); box.id='recResPanel';
+  box.innerHTML = '<style>'
+    + '#recResPanel{position:fixed;top:10px;left:10px;z-index:2147483647;width:440px;max-height:92vh;display:flex;flex-direction:column;background:#0b1230;color:#dfe6ff;border:1px solid #3a4a8a;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.6);font:13px/1.4 Segoe UI,Arial,sans-serif}'
+    + '#recResPanel *{box-sizing:border-box}'
+    + '#rrHead{cursor:move;padding:8px 12px;background:#16205a;border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:space-between;font-weight:700}'
+    + '#rrHead .x{cursor:pointer;background:#2a366e;border:none;color:#fff;border-radius:6px;padding:2px 8px}'
+    + '#rrBody{padding:10px 12px;overflow:auto}'
+    + '#recResPanel label{display:block;font-size:11px;opacity:.8;margin:6px 0 2px}'
+    + '#recResPanel input{width:100%;background:#0a0f28;border:1px solid #35407a;color:#fff;border-radius:6px;padding:5px 7px}'
+    + '.rw{display:flex;gap:8px}.rw>div{flex:1}'
+    + '.bs{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}'
+    + '#recResPanel button.b{cursor:pointer;border:none;border-radius:6px;padding:6px 10px;font-weight:600;color:#fff}'
+    + '.go{background:#2f9e57}.pa{background:#b7791f}.st{background:#b03636}.te{background:#3355bb}.ex{background:#37507e}.cl{background:#4a2a2a}'
+    + '#pgw{height:8px;background:#0a0f28;border-radius:5px;overflow:hidden;margin:6px 0}#pg{height:100%;width:0;background:#4f7cff}'
+    + '#stt{font-size:12px;margin:4px 0;min-height:16px}#cnt{font-weight:700;color:#7fe0a0}'
+    + '#tw{max-height:250px;overflow:auto;border:1px solid #26305e;border-radius:6px;margin-top:6px}'
+    + 'table.t{border-collapse:collapse;width:100%;font-size:12px}table.t th,table.t td{border-bottom:1px solid #26305e;padding:3px 6px;text-align:left;white-space:nowrap}table.t th{position:sticky;top:0;background:#16205a}'
+    + '#lg{margin-top:6px;max-height:90px;overflow:auto;font:11px/1.3 Consolas,monospace;background:#070b1e;border-radius:6px;padding:6px;color:#9fb0e6;white-space:pre-wrap}'
+    + '</style>'
+    + '<div id="rrHead"><span>Rec-Res-Scanner</span><button class="x" id="hide">-</button></div>'
+    + '<div id="rrBody">'
+    + '<label>Galaxien (mit Komma)</label><input id="gal" value="' + DEFAULT_GALAXIES + '">'
+    + '<div class="rw"><div><label>System von</label><input id="sf" type="number" value="1"></div><div><label>System bis</label><input id="sto" type="number" value="999"></div></div>'
+    + '<div class="rw"><div><label>Parallel (1-8)</label><input id="cc" type="number" value="3" min="1" max="8"></div><div><label>Pause (ms)</label><input id="dl" type="number" value="250"></div></div>'
+    + '<div class="bs"><button class="b te" id="test">Test (1 System)</button><button class="b go" id="start">Scan starten</button><button class="b pa" id="pause" disabled>Pause</button><button class="b st" id="stop" disabled>Stop</button></div>'
+    + '<div id="pgw"><div id="pg"></div></div><div id="stt">Bereit.</div>'
+    + '<div>Treffer: <span id="cnt">0</span><button class="b ex" id="csv" style="float:right">CSV</button><button class="b ex" id="copy" style="float:right;margin-right:6px">Kopieren</button><button class="b cl" id="clear" style="float:right;margin-right:6px">Leeren</button></div>'
+    + '<div id="tw"><table class="t"><thead><tr><th>Koordinaten</th><th>Pos</th><th>Status</th><th>Besitzer</th></tr></thead><tbody id="tbb"></tbody></table></div>'
+    + '<div id="lg"></div></div>';
+  document.body.appendChild(box);
+  (function(){ var h=$('rrHead'),sx,sy,ox,oy,on=false; h.addEventListener('mousedown',function(e){on=true;sx=e.clientX;sy=e.clientY;var r=box.getBoundingClientRect();ox=r.left;oy=r.top;e.preventDefault();}); window.addEventListener('mousemove',function(e){if(!on)return;box.style.left=(ox+e.clientX-sx)+'px';box.style.top=(oy+e.clientY-sy)+'px';box.style.right='auto';}); window.addEventListener('mouseup',function(){on=false;}); })();
+  function log(m){ var el=$('lg'); el.textContent += '['+new Date().toTimeString().slice(0,8)+'] '+m+'\n'; el.scrollTop=el.scrollHeight; }
+  function stat(m){ $('stt').textContent=m; }
+  function prog(){ $('pg').style.width=(state.total?Math.round(state.scanned/state.total*100):0)+'%'; }
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  function rows(){ $('tbb').innerHTML = state.results.map(function(r){ return '<tr><td>'+r.coordinates+'</td><td>'+r.position+'</td><td>'+(r.inhabited?'bewohnt':'frei')+'</td><td>'+esc(r.owner)+'</td></tr>'; }).join(''); $('cnt').textContent=state.results.length; }
+  function addHits(hits){ for(var i=0;i<hits.length;i++){ var h=hits[i]; var dup=false; for(var j=0;j<state.results.length;j++){ if(state.results[j].coordinates===h.coordinates){dup=true;break;} } if(!dup) state.results.push(h); } rows(); save(); }
+  load(); rows(); if(state.results.length) log(state.results.length+' gespeicherte Treffer geladen.');
+  function gals(){ return $('gal').value.split(',').map(function(s){return parseInt(s.trim(),10);}).filter(function(n){return !isNaN(n);}); }
+  function sorted(){ return state.results.slice().sort(function(a,b){ return a.galaxy-b.galaxy || a.system-b.system || a.position-b.position; }); }
+  async function runTest(){ var g=gals()[0]||655; var s=Number($('sf').value)||457; stat('Test: System '+g+':'+s+' ...'); try{ var props=await fetchSystem(g,s); var pc=(props.planets||[]).length; var h=hitsInSystem(props,g,s); log('System '+g+':'+s+': '+pc+' Planeten, '+h.length+' Treffer.'); if(h.length){addHits(h);stat('Test OK - '+h.length+' Treffer in '+g+':'+s+'.');} else stat('Test OK - Verbindung steht, in '+g+':'+s+' kein Rec-Res.'); }catch(e){ err(e); } }
+  async function runScan(){
+    var gg=gals(); var sFrom=Number($('sf').value), sTo=Number($('sto').value);
+    var conc=Math.min(8,Math.max(1,Number($('cc').value)||1)); var delay=Math.max(0,Number($('dl').value)||0);
+    if(!gg.length || sFrom>sTo){ stat('Bitte gueltige Galaxien und System-Bereich angeben.'); return; }
+    state.running=true;state.paused=false;state.stop=false; state.total=gg.length*(sTo-sFrom+1); state.scanned=0; toggle(true);
+    log('Scan: ['+gg.join(', ')+'], System '+sFrom+'-'+sTo+', '+conc+' parallel, '+delay+'ms. ('+state.total+' Systeme)');
+    try{
+      for(var gi=0; gi<gg.length && !state.stop; gi++){ var g=gg[gi]; var q=[]; for(var s=sFrom;s<=sTo;s++) q.push(s); var idx=0;
+        async function worker(){ while(idx<q.length && !state.stop){ while(state.paused && !state.stop) await sleep(300); var s=q[idx++]; state.current=g+':'+s;
+          try{ var props=await fetchSystem(g,s); var h=hitsInSystem(props,g,s); if(h.length){ addHits(h); log('Treffer '+g+':'+s+' ('+h.length+')'); } }
+          catch(e){ if(e.message==='NOT_LOGGED_IN'||e.message==='VERSION_CHANGED'){ state.stop=true; throw e; } }
+          state.scanned++; prog(); stat('Scanne '+state.current+'  ('+state.scanned+'/'+state.total+') - Treffer: '+state.results.length); if(delay) await sleep(delay); } }
+        var pool=[]; for(var w=0;w<conc;w++) pool.push(worker()); await Promise.all(pool);
+      }
+      if(state.stop){ stat('Gestoppt. Treffer gesamt: '+state.results.length+'.'); } else { stat('Fertig! '+state.scanned+' Systeme, '+state.results.length+' Treffer.'); }
+    }catch(e){ err(e); }
+    state.running=false; toggle(false); prog();
+  }
+  function err(e){ if(e.message==='NOT_LOGGED_IN'){ stat('Nicht eingeloggt / Session abgelaufen. Bitte neu einloggen.'); } else if(e.message==='VERSION_CHANGED'){ stat('Spiel-Version geaendert. Seite neu laden (F5), Skript erneut einfuegen.'); } else { stat('Fehler: '+e.message); } }
+  function toggle(sc){ $('start').disabled=sc; $('test').disabled=sc; $('pause').disabled=!sc; $('stop').disabled=!sc; $('pause').textContent='Pause'; }
+  function toCSV(){ var head=['Koordinaten','Galaxie','System','Position','Bewohnt','Besitzer']; var rs=sorted().map(function(r){return [r.coordinates,r.galaxy,r.system,r.position,r.inhabited?'ja':'nein',r.owner];}); var q=function(v){return '"'+String(v).replace(/"/g,'""')+'"';}; return '﻿'+[head].concat(rs).map(function(row){return row.map(q).join(';');}).join('\r\n'); }
+  function dl(name,text){ var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8;'})); a.download=name; a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);},1000); }
+  $('test').onclick=runTest; $('start').onclick=runScan;
+  $('pause').onclick=function(){ state.paused=!state.paused; $('pause').textContent=state.paused?'Weiter':'Pause'; stat(state.paused?'Pausiert.':'Fortgesetzt ...'); };
+  $('stop').onclick=function(){ state.stop=true; stat('Stoppe ...'); };
+  $('csv').onclick=function(){ if(!state.results.length) return stat('Keine Treffer.'); dl('rec-res_'+new Date().toISOString().slice(0,10)+'.csv', toCSV()); };
+  $('copy').onclick=async function(){ if(!state.results.length) return stat('Keine Treffer.'); var t='Koordinaten\tPos\tStatus\tBesitzer\n'+sorted().map(function(r){return r.coordinates+'\t'+r.position+'\t'+(r.inhabited?'bewohnt':'frei')+'\t'+r.owner;}).join('\n'); try{ await navigator.clipboard.writeText(t); stat('In Zwischenablage kopiert.'); }catch(e){ stat('Kopieren fehlgeschlagen - nutze CSV.'); } };
+  $('clear').onclick=function(){ if(!confirm('Alle Treffer loeschen?')) return; state.results=[]; save(); rows(); stat('Geleert.'); };
+  $('hide').onclick=function(){ $('rrBody').style.display = $('rrBody').style.display==='none'?'block':'none'; };
+  window.__recRes={ show:function(){ box.style.display='flex'; $('rrBody').style.display='block'; }, hide:function(){ box.style.display='none'; }, state:state };
+  log('Bereit. "Scan starten" fuer alle 8 Galaxien.');
+})();</script>
+
+    <script>
+        const DEFAULT_DATA = [{"c":"555:132:1","g":555,"s":132,"p":1,"i":0,"o":""},{"c":"555:145:1","g":555,"s":145,"p":1,"i":0,"o":""},{"c":"555:195:5","g":555,"s":195,"p":5,"i":0,"o":""},{"c":"555:195:9","g":555,"s":195,"p":9,"i":0,"o":""},{"c":"555:241:7","g":555,"s":241,"p":7,"i":0,"o":""},{"c":"555:255:9","g":555,"s":255,"p":9,"i":0,"o":""},{"c":"555:277:1","g":555,"s":277,"p":1,"i":0,"o":""},{"c":"555:283:7","g":555,"s":283,"p":7,"i":0,"o":""},{"c":"555:458:4","g":555,"s":458,"p":4,"i":0,"o":""},{"c":"555:523:1","g":555,"s":523,"p":1,"i":0,"o":""},{"c":"555:555:2","g":555,"s":555,"p":2,"i":0,"o":""},{"c":"555:565:3","g":555,"s":565,"p":3,"i":0,"o":""},{"c":"555:636:6","g":555,"s":636,"p":6,"i":0,"o":""},{"c":"555:661:6","g":555,"s":661,"p":6,"i":0,"o":""},{"c":"555:712:2","g":555,"s":712,"p":2,"i":0,"o":""},{"c":"555:786:4","g":555,"s":786,"p":4,"i":0,"o":""},{"c":"555:793:9","g":555,"s":793,"p":9,"i":0,"o":""},{"c":"555:859:3","g":555,"s":859,"p":3,"i":0,"o":""},{"c":"555:916:9","g":555,"s":916,"p":9,"i":0,"o":""},{"c":"555:951:4","g":555,"s":951,"p":4,"i":0,"o":""},{"c":"556:143:9","g":556,"s":143,"p":9,"i":0,"o":""},{"c":"556:198:8","g":556,"s":198,"p":8,"i":0,"o":""},{"c":"556:251:6","g":556,"s":251,"p":6,"i":0,"o":""},{"c":"556:318:5","g":556,"s":318,"p":5,"i":0,"o":""},{"c":"556:338:6","g":556,"s":338,"p":6,"i":0,"o":""},{"c":"556:339:1","g":556,"s":339,"p":1,"i":0,"o":""},{"c":"556:345:5","g":556,"s":345,"p":5,"i":0,"o":""},{"c":"556:522:9","g":556,"s":522,"p":9,"i":0,"o":""},{"c":"556:547:5","g":556,"s":547,"p":5,"i":0,"o":""},{"c":"556:551:5","g":556,"s":551,"p":5,"i":0,"o":""},{"c":"556:571:3","g":556,"s":571,"p":3,"i":0,"o":""},{"c":"556:656:1","g":556,"s":656,"p":1,"i":0,"o":""},{"c":"556:671:2","g":556,"s":671,"p":2,"i":0,"o":""},{"c":"556:678:9","g":556,"s":678,"p":9,"i":0,"o":""},{"c":"556:831:7","g":556,"s":831,"p":7,"i":0,"o":""},{"c":"556:838:8","g":556,"s":838,"p":8,"i":0,"o":""},{"c":"556:885:5","g":556,"s":885,"p":5,"i":0,"o":""},{"c":"556:917:5","g":556,"s":917,"p":5,"i":0,"o":""},{"c":"556:929:3","g":556,"s":929,"p":3,"i":0,"o":""},{"c":"556:957:9","g":556,"s":957,"p":9,"i":0,"o":""},{"c":"565:131:1","g":565,"s":131,"p":1,"i":0,"o":""},{"c":"565:143:6","g":565,"s":143,"p":6,"i":0,"o":""},{"c":"565:222:3","g":565,"s":222,"p":3,"i":0,"o":""},{"c":"565:243:1","g":565,"s":243,"p":1,"i":0,"o":""},{"c":"565:375:6","g":565,"s":375,"p":6,"i":0,"o":""},{"c":"565:385:2","g":565,"s":385,"p":2,"i":0,"o":""},{"c":"565:424:6","g":565,"s":424,"p":6,"i":0,"o":""},{"c":"565:459:4","g":565,"s":459,"p":4,"i":0,"o":""},{"c":"565:467:5","g":565,"s":467,"p":5,"i":0,"o":""},{"c":"565:535:5","g":565,"s":535,"p":5,"i":0,"o":""},{"c":"565:546:7","g":565,"s":546,"p":7,"i":0,"o":""},{"c":"565:765:3","g":565,"s":765,"p":3,"i":0,"o":""},{"c":"565:774:7","g":565,"s":774,"p":7,"i":0,"o":""},{"c":"565:796:3","g":565,"s":796,"p":3,"i":0,"o":""},{"c":"565:816:7","g":565,"s":816,"p":7,"i":0,"o":""},{"c":"565:856:1","g":565,"s":856,"p":1,"i":0,"o":""},{"c":"565:859:2","g":565,"s":859,"p":2,"i":0,"o":""},{"c":"565:859:5","g":565,"s":859,"p":5,"i":0,"o":""},{"c":"565:921:7","g":565,"s":921,"p":7,"i":0,"o":""},{"c":"565:964:7","g":565,"s":964,"p":7,"i":0,"o":""},{"c":"566:112:7","g":566,"s":112,"p":7,"i":0,"o":""},{"c":"566:124:7","g":566,"s":124,"p":7,"i":0,"o":""},{"c":"566:129:1","g":566,"s":129,"p":1,"i":0,"o":""},{"c":"566:157:9","g":566,"s":157,"p":9,"i":0,"o":""},{"c":"566:178:4","g":566,"s":178,"p":4,"i":0,"o":""},{"c":"566:267:6","g":566,"s":267,"p":6,"i":0,"o":""},{"c":"566:286:4","g":566,"s":286,"p":4,"i":0,"o":""},{"c":"566:448:8","g":566,"s":448,"p":8,"i":0,"o":""},{"c":"566:457:2","g":566,"s":457,"p":2,"i":0,"o":""},{"c":"566:514:3","g":566,"s":514,"p":3,"i":0,"o":""},{"c":"566:537:3","g":566,"s":537,"p":3,"i":0,"o":""},{"c":"566:539:1","g":566,"s":539,"p":1,"i":0,"o":""},{"c":"566:547:1","g":566,"s":547,"p":1,"i":0,"o":""},{"c":"566:549:9","g":566,"s":549,"p":9,"i":0,"o":""},{"c":"566:572:9","g":566,"s":572,"p":9,"i":0,"o":""},{"c":"566:654:7","g":566,"s":654,"p":7,"i":0,"o":""},{"c":"566:689:1","g":566,"s":689,"p":1,"i":0,"o":""},{"c":"566:728:9","g":566,"s":728,"p":9,"i":0,"o":""},{"c":"566:875:2","g":566,"s":875,"p":2,"i":0,"o":""},{"c":"566:883:5","g":566,"s":883,"p":5,"i":0,"o":""},{"c":"655:126:7","g":655,"s":126,"p":7,"i":0,"o":""},{"c":"655:134:3","g":655,"s":134,"p":3,"i":0,"o":""},{"c":"655:139:3","g":655,"s":139,"p":3,"i":0,"o":""},{"c":"655:163:1","g":655,"s":163,"p":1,"i":0,"o":""},{"c":"655:163:9","g":655,"s":163,"p":9,"i":1,"o":"Proxima 0-91"},{"c":"655:262:2","g":655,"s":262,"p":2,"i":0,"o":""},{"c":"655:284:7","g":655,"s":284,"p":7,"i":0,"o":""},{"c":"655:293:9","g":655,"s":293,"p":9,"i":0,"o":""},{"c":"655:298:6","g":655,"s":298,"p":6,"i":0,"o":""},{"c":"655:334:9","g":655,"s":334,"p":9,"i":0,"o":""},{"c":"655:416:2","g":655,"s":416,"p":2,"i":0,"o":""},{"c":"655:451:3","g":655,"s":451,"p":3,"i":0,"o":""},{"c":"655:457:1","g":655,"s":457,"p":1,"i":0,"o":""},{"c":"655:582:9","g":655,"s":582,"p":9,"i":0,"o":""},{"c":"655:683:8","g":655,"s":683,"p":8,"i":0,"o":""},{"c":"655:763:2","g":655,"s":763,"p":2,"i":0,"o":""},{"c":"655:856:1","g":655,"s":856,"p":1,"i":0,"o":""},{"c":"655:942:6","g":655,"s":942,"p":6,"i":0,"o":""},{"c":"655:986:7","g":655,"s":986,"p":7,"i":0,"o":""},{"c":"656:142:5","g":656,"s":142,"p":5,"i":0,"o":""},{"c":"656:271:2","g":656,"s":271,"p":2,"i":0,"o":""},{"c":"656:277:7","g":656,"s":277,"p":7,"i":0,"o":""},{"c":"656:318:9","g":656,"s":318,"p":9,"i":0,"o":""},{"c":"656:327:7","g":656,"s":327,"p":7,"i":0,"o":""},{"c":"656:342:8","g":656,"s":342,"p":8,"i":0,"o":""},{"c":"656:384:8","g":656,"s":384,"p":8,"i":0,"o":""},{"c":"656:387:8","g":656,"s":387,"p":8,"i":0,"o":""},{"c":"656:433:5","g":656,"s":433,"p":5,"i":0,"o":""},{"c":"656:555:8","g":656,"s":555,"p":8,"i":0,"o":""},{"c":"656:562:6","g":656,"s":562,"p":6,"i":0,"o":""},{"c":"656:716:9","g":656,"s":716,"p":9,"i":0,"o":""},{"c":"656:735:3","g":656,"s":735,"p":3,"i":0,"o":""},{"c":"656:828:3","g":656,"s":828,"p":3,"i":0,"o":""},{"c":"656:829:9","g":656,"s":829,"p":9,"i":0,"o":""},{"c":"656:855:2","g":656,"s":855,"p":2,"i":0,"o":""},{"c":"656:873:8","g":656,"s":873,"p":8,"i":0,"o":""},{"c":"656:965:5","g":656,"s":965,"p":5,"i":0,"o":""},{"c":"656:979:4","g":656,"s":979,"p":4,"i":0,"o":""},{"c":"665:156:6","g":665,"s":156,"p":6,"i":0,"o":""},{"c":"665:232:3","g":665,"s":232,"p":3,"i":0,"o":""},{"c":"665:239:3","g":665,"s":239,"p":3,"i":0,"o":""},{"c":"665:239:4","g":665,"s":239,"p":4,"i":0,"o":""},{"c":"665:241:2","g":665,"s":241,"p":2,"i":0,"o":""},{"c":"665:242:7","g":665,"s":242,"p":7,"i":0,"o":""},{"c":"665:258:5","g":665,"s":258,"p":5,"i":0,"o":""},{"c":"665:318:5","g":665,"s":318,"p":5,"i":0,"o":""},{"c":"665:351:3","g":665,"s":351,"p":3,"i":0,"o":""},{"c":"665:386:6","g":665,"s":386,"p":6,"i":0,"o":""},{"c":"665:446:3","g":665,"s":446,"p":3,"i":0,"o":""},{"c":"665:482:6","g":665,"s":482,"p":6,"i":0,"o":""},{"c":"665:492:2","g":665,"s":492,"p":2,"i":0,"o":""},{"c":"665:531:6","g":665,"s":531,"p":6,"i":0,"o":""},{"c":"665:553:4","g":665,"s":553,"p":4,"i":0,"o":""},{"c":"665:665:5","g":665,"s":665,"p":5,"i":0,"o":""},{"c":"665:735:1","g":665,"s":735,"p":1,"i":0,"o":""},{"c":"665:764:8","g":665,"s":764,"p":8,"i":0,"o":""},{"c":"665:856:7","g":665,"s":856,"p":7,"i":0,"o":""},{"c":"665:899:2","g":665,"s":899,"p":2,"i":0,"o":""},{"c":"666:169:9","g":666,"s":169,"p":9,"i":0,"o":""},{"c":"666:283:3","g":666,"s":283,"p":3,"i":0,"o":""},{"c":"666:314:8","g":666,"s":314,"p":8,"i":0,"o":""},{"c":"666:333:2","g":666,"s":333,"p":2,"i":0,"o":""},{"c":"666:345:7","g":666,"s":345,"p":7,"i":0,"o":""},{"c":"666:487:5","g":666,"s":487,"p":5,"i":0,"o":""},{"c":"666:492:6","g":666,"s":492,"p":6,"i":0,"o":""},{"c":"666:535:6","g":666,"s":535,"p":6,"i":0,"o":""},{"c":"666:538:8","g":666,"s":538,"p":8,"i":0,"o":""},{"c":"666:599:9","g":666,"s":599,"p":9,"i":0,"o":""},{"c":"666:692:9","g":666,"s":692,"p":9,"i":0,"o":""},{"c":"666:696:9","g":666,"s":696,"p":9,"i":0,"o":""},{"c":"666:827:7","g":666,"s":827,"p":7,"i":0,"o":""},{"c":"666:889:9","g":666,"s":889,"p":9,"i":0,"o":""},{"c":"666:931:1","g":666,"s":931,"p":1,"i":0,"o":""},{"c":"666:936:9","g":666,"s":936,"p":9,"i":0,"o":""},{"c":"666:961:6","g":666,"s":961,"p":6,"i":0,"o":""},{"c":"666:964:9","g":666,"s":964,"p":9,"i":0,"o":""},{"c":"666:976:8","g":666,"s":976,"p":8,"i":0,"o":""}];
+        const BASE = "https://beta4.game.spacenations.eu/universe/";
+        const $ = s => document.querySelector(s);
+        const LS_KEY = "recResFieldsImport_v1";
+        const DEFAULT_SNAPSHOT = "02.08.26";
+        let DATA = DEFAULT_DATA;
+        let sortKey = "c", sortDir = 1, view = DATA.slice();
+
+        function setKpis() {
+            $("#sTotal").textContent = DATA.length;
+            $("#sFree").textContent = DATA.filter(d => !d.i).length;
+            $("#sInh").textContent = DATA.filter(d => d.i).length;
+            $("#sGal").textContent = new Set(DATA.map(d => d.g)).size;
+        }
+        function fillGalaxyFilter() {
+            const cur = $("#fGal").value;
+            $("#fGal").innerHTML = '<option value="">alle</option>';
+            [...new Set(DATA.map(d => d.g))].sort((a, b) => a - b).forEach(g => {
+                const o = document.createElement("option"); o.value = g; o.textContent = g; $("#fGal").appendChild(o);
+            });
+            if ([...$("#fGal").options].some(o => o.value === cur)) $("#fGal").value = cur;
+        }
+        function rebuild() { fillGalaxyFilter(); setKpis(); apply(); }
+
+        function apply() {
+            const g = $("#fGal").value, inh = $("#fInh").value, q = $("#fSearch").value.toLowerCase().trim();
+            view = DATA.filter(d =>
+                (g === "" || String(d.g) === g) &&
+                (inh === "" || String(d.i) === inh) &&
+                (q === "" || d.c.includes(q) || (d.o || "").toLowerCase().includes(q))
+            );
+            view.sort((a, b) => { const x = a[sortKey], y = b[sortKey]; return (x > y ? 1 : x < y ? -1 : 0) * sortDir; });
+            render();
+        }
+        function render() {
+            const tb = $("#tb");
+            if (!view.length) {
+                tb.innerHTML = `<tr><td colspan="7" class="empty">Keine Treffer für diese Filter.</td></tr>`;
+                $("#cShown").textContent = 0; return;
+            }
+            tb.innerHTML = view.map(d => {
+                const sys = `${d.g}:${d.s}`;
+                const chip = d.i ? `<span class="chip inh">bewohnt</span>` : `<span class="chip free">frei</span>`;
+                return `<tr>
+                    <td class="coord">${d.c}</td>
+                    <td class="num">${d.g}</td><td class="num">${d.s}</td><td class="num">${d.p}</td>
+                    <td>${chip}</td><td>${d.o ? escapeHtml(d.o) : '<span class="num">—</span>'}</td>
+                    <td><a href="${BASE}${sys}" target="_blank" rel="noopener">öffnen ↗</a></td></tr>`;
+            }).join("");
+            $("#cShown").textContent = view.length;
+        }
+        function escapeHtml(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+        document.querySelectorAll("th[data-k]").forEach(th => {
+            th.addEventListener("click", () => { const k = th.dataset.k; if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = 1; } apply(); });
+        });
+        $("#fGal").onchange = apply; $("#fInh").onchange = apply; $("#fSearch").oninput = apply;
+
+        let toastT;
+        function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 1800); }
+
+        $("#btnCsv").onclick = () => {
+            const head = ["Koordinaten", "Galaxie", "System", "Position", "Bewohnt", "Besitzer"];
+            const rows = view.map(d => [d.c, d.g, d.s, d.p, d.i ? "ja" : "nein", d.o]);
+            const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+            const csv = "﻿" + [head, ...rows].map(r => r.map(q).join(";")).join("\r\n");
+            const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = "rec-res-felder.csv"; a.click();
+            toast("CSV heruntergeladen");
+        };
+        $("#btnCopy").onclick = async () => {
+            const txt = "Koordinaten\tGalaxie\tSystem\tPosition\tStatus\tBesitzer\n" + view.map(d => `${d.c}\t${d.g}\t${d.s}\t${d.p}\t${d.i ? "bewohnt" : "frei"}\t${d.o}`).join("\n");
+            try { await navigator.clipboard.writeText(txt); toast(view.length + " Zeilen kopiert"); } catch (e) { toast("Kopieren nicht möglich – nutze CSV"); }
+        };
+
+        // Scanner-Skript in die Textbox + Kopieren + Bookmarklet
+        const SRC = document.getElementById("scannerSrc").textContent;
+        $("#scriptOut").value = SRC;
+        $("#btnScript").onclick = async () => {
+            try { await navigator.clipboard.writeText(SRC); toast("Skript kopiert – jetzt in die Konsole einfügen"); }
+            catch (e) { $("#scriptOut").focus(); $("#scriptOut").select(); toast("Bitte manuell kopieren (Strg+C)"); }
+        };
+        try { $("#bmk").href = "javascript:" + encodeURIComponent(SRC); } catch (e) {}
+        $("#bmk").addEventListener("click", e => { e.preventDefault(); toast("Nicht klicken – in die Lesezeichenleiste ziehen"); });
+
+        // ---- CSV-Import (eigene, frische Liste laden – nur im Browser gespeichert) ----
+        function parseCSV(text) {
+            text = String(text).replace(/^﻿/, "").replace(/\r\n?/g, "\n");
+            const lines = text.split("\n").filter(l => l.trim() !== "");
+            if (!lines.length) return [];
+            const delim = lines[0].includes(";") ? ";" : lines[0].includes("\t") ? "\t" : ",";
+            const splitLine = line => {
+                const out = []; let cur = "", q = false;
+                for (let i = 0; i < line.length; i++) {
+                    const ch = line[i];
+                    if (q) { if (ch === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
+                    else { if (ch === '"') q = true; else if (ch === delim) { out.push(cur); cur = ""; } else cur += ch; }
+                }
+                out.push(cur); return out.map(s => s.trim());
+            };
+            const rowsRaw = lines.map(splitLine);
+            const head = rowsRaw[0].map(s => s.toLowerCase());
+            const isHeader = head.some(h => h.includes("koord") || h.includes("galax") || h.includes("besitz") || h.includes("bewohnt") || h.includes("status"));
+            let idx = { c: 0, g: 1, s: 2, p: 3, i: 4, o: 5 }, dataRows = rowsRaw;
+            if (isHeader) {
+                const find = (...keys) => head.findIndex(h => keys.some(k => h.includes(k)));
+                idx = { c: find("koord"), g: find("galax"), s: find("system"), p: find("pos"),
+                        i: find("bewohnt") !== -1 ? find("bewohnt") : find("status"),
+                        o: find("besitz") !== -1 ? find("besitz") : find("owner") };
+                dataRows = rowsRaw.slice(1);
+            }
+            const out = [], seen = new Set();
+            for (const cells of dataRows) {
+                let c = idx.c >= 0 ? (cells[idx.c] || "") : "";
+                let g = idx.g >= 0 ? cells[idx.g] : "", sy = idx.s >= 0 ? cells[idx.s] : "", p = idx.p >= 0 ? cells[idx.p] : "";
+                if ((!g || !sy || !p) && /^\s*\d+:\d+:\d+/.test(c)) { const parts = c.split(":"); g = g || parts[0]; sy = sy || parts[1]; p = p || parts[2]; }
+                if (!c && g && sy && p) c = g + ":" + sy + ":" + p;
+                if (!/^\d+:\d+:\d+$/.test(c) || seen.has(c)) continue;
+                seen.add(c);
+                const st = (idx.i >= 0 ? (cells[idx.i] || "") : "").toLowerCase();
+                const owner = idx.o >= 0 ? (cells[idx.o] || "") : "";
+                const inh = /^(ja|1|true|bewohnt|wahr)$/.test(st) || (st === "" && owner.trim() !== "") ? 1 : 0;
+                out.push({ c, g: parseInt(g, 10) || 0, s: parseInt(sy, 10) || 0, p: parseInt(p, 10) || 0, i: inh, o: owner });
+            }
+            return out;
+        }
+        function fmtToday() { const d = new Date(), z = n => String(n).padStart(2, "0"); return z(d.getDate()) + "." + z(d.getMonth() + 1) + "." + String(d.getFullYear()).slice(2); }
+        function showBanner(label, n) {
+            $("#sSnap").textContent = label;
+            $("#importInfo").innerHTML = `<b>Eigene Liste aktiv</b> – Stand ${label} · ${n} Felder · nur in diesem Browser gespeichert`;
+            $("#importBanner").hidden = false;
+        }
+        function applyImport(rows, label) {
+            DATA = rows; sortKey = "c"; sortDir = 1;
+            try { localStorage.setItem(LS_KEY, JSON.stringify({ date: label, data: rows })); } catch (e) {}
+            showBanner(label, rows.length); rebuild();
+        }
+        $("#btnImport").onclick = () => $("#fileCsv").click();
+        $("#fileCsv").onchange = e => {
+            const file = e.target.files && e.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                const rows = parseCSV(reader.result);
+                if (!rows.length) { toast("CSV enthält keine gültigen Felder – Format prüfen."); return; }
+                let label = fmtToday(); const m = /(\d{4})-(\d{2})-(\d{2})/.exec(file.name || "");
+                if (m) label = m[3] + "." + m[2] + "." + m[1].slice(2);
+                applyImport(rows, label);
+                toast(rows.length + " Felder importiert");
+            };
+            reader.onerror = () => toast("Datei konnte nicht gelesen werden.");
+            reader.readAsText(file, "utf-8");
+            e.target.value = "";
+        };
+        $("#btnReset").onclick = () => {
+            try { localStorage.removeItem(LS_KEY); } catch (e) {}
+            DATA = DEFAULT_DATA; sortKey = "c"; sortDir = 1;
+            $("#importBanner").hidden = true; $("#sSnap").textContent = DEFAULT_SNAPSHOT;
+            rebuild(); toast("Zurück zum Standard-Snapshot");
+        };
+        // Beim Laden: zuvor importierte Liste wiederherstellen, sonst Standard-Snapshot
+        (function () {
+            try {
+                const d = JSON.parse(localStorage.getItem(LS_KEY) || "null");
+                if (d && Array.isArray(d.data) && d.data.length) { DATA = d.data; showBanner(d.date || "importiert", d.data.length); }
+            } catch (e) {}
+        })();
+
+        rebuild();
+    </script>
+</body>
+</html>

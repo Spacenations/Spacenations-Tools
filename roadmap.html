@@ -3,38 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roadmap - Spacenations Tools</title>
+    <title>Roadmap – Spacenations Tools</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/theme-variables.css">
-    <link rel="stylesheet" href="css/content-page.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+    <style>
+        .legal { max-width: 820px; margin: 0 auto; padding: 36px 20px 88px; }
+        .legal h1 { font-size: clamp(1.6rem,4vw,2.1rem); margin: 0 0 6px; color: var(--text-primary); letter-spacing: -0.01em; }
+        .legal .lead { color: var(--text-secondary); margin: 0 0 26px; }
+        .todo { display:inline-block; background: var(--accent-soft); border:1px solid var(--accent); color: var(--accent-strong); padding:0 8px; border-radius:6px; font-size:.78rem; font-weight:600; }
+        .notice { background: var(--card); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:12px; padding:14px 16px; margin:0 0 26px; color: var(--text-secondary); font-size:.92rem; box-shadow: var(--shadow-sm); }
+        .entry { background: var(--card); border:1px solid var(--line); border-radius:14px; box-shadow: var(--shadow-sm); padding:20px 22px; margin-bottom:14px; }
+        .entry h2 { font-size:1rem; margin:0 0 6px; color: var(--text-primary); }
+        .entry p { margin:0; color: var(--text-secondary); }
+    </style>
 </head>
 <body>
-    <header class="page-header">
-        <a class="home" href="index.html">← Startseite</a>
-        <span class="brand">SPACENATIONS TOOLS</span>
+    <header class="header">
+        <div class="wrap">
+            <a href="index.html" class="wordmark"><span><strong>Spacenations</strong><span class="thin"> Tools</span></span></a>
+            <nav class="header-auth"><a href="index.html" class="btn btn-ghost btn-sm">Alle Tools</a></nav>
+        </div>
     </header>
-    <main class="content">
+    <main class="legal">
         <h1>Roadmap</h1>
         <p class="lead">Geplante Ideen und nächste Schritte.</p>
-
-        <div class="notice">
-            <strong>Hinweis:</strong> Platzhalter – hier die tatsächlich geplanten Punkte
-            eintragen (<span class="todo">BITTE AUSFÜLLEN</span>). Die folgenden Einträge
-            sind nur Beispiele.
-        </div>
-
-        <dl class="entries">
-            <dt>Als Nächstes</dt>
-            <dd><span class="todo">BITTE AUSFÜLLEN</span></dd>
-
-            <dt>Später</dt>
-            <dd><span class="todo">BITTE AUSFÜLLEN</span></dd>
-
-            <dt>Ideen</dt>
-            <dd><span class="todo">BITTE AUSFÜLLEN</span></dd>
-        </dl>
+        <div class="notice"><strong>Hinweis:</strong> Platzhalter – hier die tatsächlich geplanten Punkte eintragen (<span class="todo">BITTE AUSFÜLLEN</span>).</div>
+        <div class="entry"><h2>Als Nächstes</h2><p><span class="todo">BITTE AUSFÜLLEN</span></p></div>
+        <div class="entry"><h2>Später</h2><p><span class="todo">BITTE AUSFÜLLEN</span></p></div>
+        <div class="entry"><h2>Ideen</h2><p><span class="todo">BITTE AUSFÜLLEN</span></p></div>
     </main>
     <script src="js/global-footer-loader.js"></script>
 </body>

@@ -3,280 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Spacenations Tools (FIXED)</title>
+    <title>Admin-Login – Spacenations Tools</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316181D'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='white' stroke-width='2'/%3E%3Cellipse cx='16' cy='16' rx='12' ry='4.4' fill='none' stroke='%2300D68F' stroke-width='1.6' transform='rotate(-20 16 16)'/%3E%3C/svg%3E">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+
     <style>
-        :root {
-            --primary: #00FF88;
-            --primary-dark: #00CC6A;
-            --bg-dark: #0A0A0A;
-            --bg-card: #111111;
-            --border: rgba(0, 255, 136, 0.2);
-            --text-primary: #FFFFFF;
-            --text-secondary: #C0C0C0;
-            --error: #FF4444;
-            --success: #00FF88;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-primary);
-            min-height: 100vh;
+        /* Seitenspezifisch: zentrierte Admin-Login-Karte */
+        .auth-main {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            position: relative;
+            padding: 56px 18px 80px;
         }
-        
-        .login-container {
+
+        .auth-card {
             width: 100%;
-            max-width: 400px;
-            padding: 20px;
+            max-width: 420px;
+            padding: 36px 32px 32px;
         }
-        
-        .login-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 48px 32px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+
+        .auth-head {
+            margin-bottom: 22px;
         }
-        
-        .login-header {
+
+        .auth-head h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 6px;
+        }
+
+        .auth-head p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .form-group { margin-bottom: 16px; }
+
+        .login-button { width: 100%; margin-top: 10px; }
+
+        /* System-Status-Zeile - JS setzt status-info info|success|error */
+        .status-info {
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 18px;
+            font-size: 12.5px;
+            font-weight: 500;
             text-align: center;
-            margin-bottom: 40px;
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.22);
+            color: #2563EB;
         }
-        
-        .login-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
+
+        .status-info.success {
+            background: var(--accent-soft);
+            border-color: rgba(0, 168, 120, 0.3);
+            color: var(--accent-strong);
         }
-        
-        .login-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
+
+        .status-info.error {
+            background: var(--danger-soft);
+            border-color: rgba(217, 48, 37, 0.25);
+            color: var(--danger);
         }
-        
-        .login-subtitle {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-        
-        .form-group {
-            margin-bottom: 24px;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: rgba(0, 255, 136, 0.05);
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
-        }
-        
-        .form-input::placeholder {
-            color: rgba(192, 192, 192, 0.4);
-        }
-        
-        .login-button {
-            width: 100%;
-            padding: 16px;
-            background: var(--primary);
-            color: var(--bg-dark);
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 32px;
-        }
-        
-        .login-button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 255, 136, 0.3);
-        }
-        
-        .login-button:active {
-            transform: translateY(0);
-        }
-        
-        .login-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
+
+        /* Meldungen */
         .message {
-            margin-top: 20px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 14px;
+            margin-top: 16px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 500;
             text-align: center;
             display: none;
         }
-        
+
         .message.error {
-            background: rgba(255, 68, 68, 0.1);
-            border: 1px solid rgba(255, 68, 68, 0.3);
-            color: var(--error);
+            background: var(--danger-soft);
+            border: 1px solid rgba(217, 48, 37, 0.25);
+            color: var(--danger);
         }
-        
+
         .message.success {
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            color: var(--success);
+            background: var(--accent-soft);
+            border: 1px solid rgba(0, 168, 120, 0.3);
+            color: var(--accent-strong);
         }
-        
-        .back-link {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .back-link:hover {
-            color: var(--primary);
-            transform: translateX(-4px);
-        }
-        
-        .status-info {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 20px;
-            font-size: 12px;
-            color: #3b82f6;
-            text-align: center;
-        }
-        
+
+        /* Interne Diagnose-Links */
         .tools-links {
-            margin-top: 24px;
+            margin-top: 22px;
+            padding-top: 20px;
+            border-top: 1px solid var(--line-soft);
             text-align: center;
         }
-        
+
         .tools-links a {
             display: inline-block;
             color: var(--text-secondary);
             text-decoration: none;
             font-size: 12px;
-            margin: 4px 8px;
-            padding: 8px 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            transition: all 0.3s ease;
+            font-weight: 500;
+            margin: 3px 4px;
+            padding: 6px 12px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            transition: border-color 0.15s ease, color 0.15s ease;
         }
-        
+
         .tools-links a:hover {
-            color: var(--primary);
-            border-color: var(--primary);
-            background: rgba(0, 255, 136, 0.05);
+            color: var(--text-primary);
+            border-color: var(--line-strong);
+        }
+
+        @media (max-width: 540px) {
+            .auth-card { padding: 28px 20px 24px; }
         }
     </style>
 </head>
 <body>
-    <a href="index.html" class="back-link">
-        <span>←</span>
-        <span>Zurück</span>
-    </a>
-    
-    <div class="login-container">
-        <div class="login-card">
-            <div class="login-header">
-                <div class="login-icon">🔐</div>
-                <h1 class="login-title">Admin Login</h1>
-                <p class="login-subtitle">FIXED - Firestore-unabhängig</p>
+    <header class="header">
+        <div class="wrap">
+            <a href="index.html" class="wordmark">
+                <span class="mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="4.4"/>
+                        <ellipse cx="12" cy="12" rx="9" ry="3.2" transform="rotate(-20 12 12)" opacity="0.55"/>
+                    </svg>
+                </span>
+                <span><strong>Spacenations</strong><span class="thin"> Tools</span></span>
+            </a>
+
+            <nav class="header-auth">
+                <a href="index.html" class="btn btn-ghost btn-sm">Zur Übersicht</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="auth-main">
+        <div class="card auth-card">
+            <div class="auth-head">
+                <h1>Admin-Login</h1>
+                <p>Nur für Administratoren.</p>
             </div>
-            
+
             <div id="status-info" class="status-info">
                 Initialisiere System...
             </div>
-            
+
             <form id="admin-login-form">
-                <div class="form-group">
-                    <label class="form-label" for="email">E-Mail</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        class="form-input" 
+                <div class="form-group field">
+                    <label for="email">E-Mail</label>
+                    <input
+                        type="email"
+                        id="email"
                         placeholder="E-Mail-Adresse"
                         required
                         autocomplete="username"
                     >
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="password">Passwort</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        class="form-input" 
-                        placeholder="••••••••" 
+
+                <div class="form-group field">
+                    <label for="password">Passwort</label>
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="••••••••"
                         required
                         autocomplete="current-password"
                     >
                 </div>
-                
-                <button type="submit" class="login-button" id="login-btn">
+
+                <button type="submit" class="btn btn-solid btn-md login-button" id="login-btn">
                     Anmelden
                 </button>
             </form>
-            
+
             <div id="msg-error" class="message error"></div>
             <div id="msg-success" class="message success"></div>
-            
+
         </div>
-    </div>
+    </main>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-    <!-- FIXED System-Dateien -->
     <script src="js/firebase-config.js"></script>
     <script src="js/auth-manager.js"></script>
-    
+
     <script>
         // Status-Updates
         function updateStatus(message, type = 'info') {
@@ -284,7 +206,7 @@
             statusEl.textContent = message;
             statusEl.className = `status-info ${type}`;
         }
-        
+
         // Message-Funktionen
         function showError(msg) {
             const errorEl = document.getElementById('msg-error');
@@ -293,7 +215,7 @@
             errorEl.style.display = 'block';
             successEl.style.display = 'none';
         }
-        
+
         function showSuccess(msg) {
             const errorEl = document.getElementById('msg-error');
             const successEl = document.getElementById('msg-success');
@@ -301,140 +223,136 @@
             successEl.style.display = 'block';
             errorEl.style.display = 'none';
         }
-        
+
         function hideMessages() {
             document.getElementById('msg-error').style.display = 'none';
             document.getElementById('msg-success').style.display = 'none';
         }
-        
-        // Super-Admin-Verifikation – ausschließlich über die Firestore-Rolle
+
+        // Super-Admin-Verifikation ausschließlich über Firestore (globalRole), kein Hardcoded-Fallback.
         async function verifySuperAdmin(user) {
             try {
                 console.log('🔍 Prüfe Super-Admin-Status für:', user.email);
-
-                // Einziges Kriterium: globalRole === 'global_admin' (via AuthAPI).
-                // Keine hartcodierten E-Mail-Listen oder Fallback-Backdoors mehr.
                 const isSuperAdmin = await window.AuthAPI.checkSuperAdminStatus(user);
-                console.log('✅ Super-Admin-Status geprüft (Firestore):', isSuperAdmin);
-                return isSuperAdmin === true;
-
+                console.log('Super-Admin-Status (Firestore):', isSuperAdmin);
+                return isSuperAdmin;
             } catch (error) {
                 console.error('❌ Super-Admin-Verifikation fehlgeschlagen:', error);
                 throw new Error('Berechtigung konnte nicht überprüft werden.');
             }
         }
-        
+
         // Login-Form Handler
         document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             hideMessages();
-            
+
             const button = document.getElementById('login-btn');
             const originalText = button.textContent;
-            
+
             // Button deaktivieren
             button.disabled = true;
             button.textContent = 'Anmeldung läuft...';
-            
+
             try {
                 // Warten bis AuthAPI bereit ist
                 updateStatus('Warte auf AuthAPI...', 'info');
                 const authReady = await window.AuthAPI.waitForInit();
-                
+
                 if (!authReady) {
                     throw new Error('AuthAPI konnte nicht initialisiert werden');
                 }
-                
+
                 updateStatus('Firebase bereit - Anmeldung läuft...', 'info');
-                
+
                 // Form-Daten holen
                 const email = document.getElementById('email').value.trim();
                 const password = document.getElementById('password').value;
-                
+
                 if (!email || !password) {
                     throw new Error('Bitte füllen Sie alle Felder aus');
                 }
-                
+
                 // Login-Versuch (DIREKT mit Firebase Auth)
                 const result = await window.AuthAPI.login(email, password);
-                
+
                 if (!result.success) {
                     throw new Error(result.error || 'Anmeldung fehlgeschlagen');
                 }
-                
+
                 updateStatus('Anmeldung erfolgreich - Prüfe Berechtigung...', 'success');
                 showSuccess('Anmeldung erfolgreich. Prüfe Berechtigung...');
-                
+
                 // Super-Admin-Status prüfen (mit Fallback)
                 const isAuthorized = await verifySuperAdmin(result.user);
-                
+
                 if (!isAuthorized) {
                     // Nicht berechtigt - ABER NICHT AUSLOGGEN
                     throw new Error('Zugriff verweigert. Nur für Super-Admins.');
                 }
-                
+
                 // Erfolgreich - Weiterleitung
                 updateStatus('Berechtigung bestätigt. Weiterleitung...', 'success');
                 showSuccess('Berechtigung bestätigt. Weiterleitung zum Admin-Dashboard...');
-                
+
                 setTimeout(() => {
                     window.location.href = 'admin-dashboard.html';
                 }, 1500);
-                
+
             } catch (error) {
                 console.error('Admin-Login Fehler:', error);
                 updateStatus('Anmeldung fehlgeschlagen', 'error');
-                
+
                 let errorMessage = error.message || 'Ein Fehler ist aufgetreten';
-                
+
                 // Spezielle Behandlung für verschiedene Fehlertypen
                 if (errorMessage.includes('Zugriff verweigert')) {
                     errorMessage += '<br><br><strong>Hinweis:</strong> Ihr Account wurde gefunden, aber Sie haben keine Admin-Berechtigung.';
                 } else if (errorMessage.includes('AuthAPI konnte nicht initialisiert werden')) {
-                    errorMessage += '<br><br><strong>System-Problem:</strong> Bitte die Seite neu laden (F5).';
+                    errorMessage += '<br><br><strong>System-Problem:</strong> Bitte später erneut versuchen.';
                 } else if (errorMessage.includes('Kein Account') || errorMessage.includes('user-not-found')) {
-                    errorMessage += '<br><br><strong>Benutzer-Problem:</strong> Bitte E-Mail und Passwort prüfen.';
+                    errorMessage += '<br><br><strong>Benutzer-Problem:</strong> Kein Admin-Account gefunden.';
                 }
-                
+
                 showError(errorMessage);
-                
+
             } finally {
                 // Button wieder aktivieren
                 button.disabled = false;
                 button.textContent = originalText;
             }
         });
-        
+
         // Initialisierung beim Laden
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 updateStatus('Initialisiere Firebase...', 'info');
-                
+
                 // Warten bis Firebase bereit ist
                 const firebaseReady = await window.FirebaseConfig.waitForReadyWithTimeout(10000);
-                
+
                 if (firebaseReady) {
                     updateStatus('Firebase bereit...', 'info');
-                    
+
                     // Warten bis AuthAPI bereit ist
                     const authReady = await window.AuthAPI.waitForInit();
-                    
+
                     if (authReady) {
                         const firestoreStatus = window.AuthAPI.getFirestoreStatus();
                         updateStatus(
-                            `System bereit. Firestore: ${firestoreStatus ? 'Verfügbar' : 'Fallback-Modus'}`, 
+                            `System bereit. Firestore: ${firestoreStatus ? 'Verfügbar' : 'Fallback-Modus'}`,
                             'success'
                         );
-                        
+
                         // Prüfe ob bereits angemeldet
                         if (window.AuthAPI.isLoggedIn()) {
                             const currentUser = window.AuthAPI.getCurrentUser();
                             const userData = window.AuthAPI.getUserData();
-                            
-                            if (userData?.globalRole === 'global_admin' || userData?.isSuperAdmin === true) {
+
+                            if (userData?.globalRole === 'global_admin') {
                                 updateStatus('Bereits als Admin angemeldet', 'success');
                                 showSuccess(`Bereits angemeldet als ${userData?.username || currentUser.email}. Weiterleitung...`);
-                                
+
                                 setTimeout(() => {
                                     window.location.href = 'admin-dashboard.html';
                                 }, 2000);
@@ -443,23 +361,23 @@
                                 showError('Sie sind angemeldet, haben aber keine Admin-Berechtigung.');
                             }
                         }
-                        
+
                     } else {
                         updateStatus('AuthAPI-Initialisierung fehlgeschlagen', 'error');
                         showError('Auth-System konnte nicht initialisiert werden.');
                     }
-                    
+
                 } else {
                     updateStatus('Firebase-Initialisierung fehlgeschlagen', 'error');
                     showError('Firebase konnte nicht initialisiert werden.');
                 }
-                
+
             } catch (error) {
                 console.error('Initialisierung fehlgeschlagen:', error);
                 updateStatus('Initialisierung fehlgeschlagen', 'error');
                 showError('System-Initialisierung fehlgeschlagen: ' + error.message);
             }
-            
+
             // Focus auf E-Mail-Feld
             setTimeout(() => {
                 document.getElementById('email').focus();

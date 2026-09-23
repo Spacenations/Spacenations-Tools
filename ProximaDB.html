@@ -3,482 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProximaDB - Spacenations Tools</title>
-    
-    <!-- Modern Fonts -->
+    <title>ProximaDB – Spacenations Tools</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316181D'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='white' stroke-width='2'/%3E%3Cellipse cx='16' cy='16' rx='12' ry='4.4' fill='none' stroke='%2300D68F' stroke-width='1.6' transform='rotate(-20 16 16)'/%3E%3C/svg%3E">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+
     <style>
-        :root {
-            /* Razer Color Scheme */
-            --razer-green: #00FF88;
-            --razer-green-dark: #00CC6A;
-            --razer-green-light: #44FF99;
-            --razer-black: #0A0A0A;
-            --razer-dark: #111111;
-            --razer-gray: #1A1A1A;
-            --razer-gray-light: #2A2A2A;
-            --razer-white: #FFFFFF;
-            --razer-silver: #C0C0C0;
-            
-            --text-primary: var(--razer-white);
-            --text-secondary: var(--razer-silver);
-            --text-accent: var(--razer-green);
-            
-            --bg-primary: var(--razer-black);
-            --bg-secondary: var(--razer-dark);
-            --bg-tertiary: var(--razer-gray);
-            --bg-card: var(--razer-gray-light);
-            
-            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
-            --glow-green-strong: 0 0 30px rgba(0, 255, 136, 0.8);
-            --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.6);
-            
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            --font-gaming: 'Orbitron', monospace;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        body {
-            font-family: var(--font-primary);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-        
-        /* Animated Background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
-                linear-gradient(45deg, var(--razer-black) 0%, var(--razer-dark) 100%);
-            z-index: -1;
-            animation: backgroundPulse 8s ease-in-out infinite;
-        }
-        
-        @keyframes backgroundPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        
-        /* Header Navigation */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
-            transition: all 0.3s ease;
-        }
-        
-        .nav {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 80px;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            text-decoration: none;
-            color: var(--text-primary);
-            font-family: var(--font-gaming);
-            font-weight: 700;
-            font-size: 28px;
-            transition: all 0.3s ease;
-        }
-        
-        .logo:hover {
-            color: var(--razer-green);
-            text-shadow: var(--glow-green);
-            transform: scale(1.05);
-        }
-        
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--razer-black);
-            font-weight: 800;
-            font-size: 18px;
-            box-shadow: var(--glow-green);
-            animation: logoGlow 3s ease-in-out infinite;
-        }
-        
-        @keyframes logoGlow {
-            0%, 100% { box-shadow: var(--glow-green); }
-            50% { box-shadow: var(--glow-green-strong); }
-        }
-        
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 14px 28px;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            font-family: var(--font-gaming);
-            font-weight: 600;
-            font-size: 16px;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.6s ease;
-        }
-        
-        .btn:hover::before {
-            left: 100%;
-        }
-        
-        .btn-primary {
-            background: var(--razer-green);
-            color: var(--razer-black);
-            border-color: var(--razer-green);
-            box-shadow: var(--glow-green);
-        }
-        
-        .btn-primary:hover {
-            background: var(--razer-green-light);
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: var(--glow-green-strong);
-        }
-        
-        .btn-secondary {
-            background: transparent;
-            color: var(--razer-green);
-            border-color: var(--razer-green);
-        }
-        
-        .btn-secondary:hover {
-            background: var(--razer-green);
-            color: var(--razer-black);
-            transform: translateY(-2px);
-            box-shadow: var(--glow-green);
-        }
-        
-        /* Main Content */
-        .main-content {
-            margin-top: 80px;
-            padding: 40px 32px;
-            min-height: calc(100vh - 80px);
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: var(--bg-secondary);
-            border-radius: 15px;
-            border: 1px solid rgba(0, 255, 136, 0.2);
-            box-shadow: var(--shadow-dark);
-            overflow: hidden;
-        }
-        
-        .page-header {
-            background: linear-gradient(135deg, var(--razer-green) 0%, var(--razer-green-dark) 100%);
-            color: var(--razer-black);
-            padding: 40px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .page-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            pointer-events: none;
-        }
-        
-        .page-header h1 {
-            font-family: var(--font-gaming);
-            font-size: clamp(32px, 5vw, 48px);
-            font-weight: 900;
-            margin-bottom: 16px;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .page-header p {
-            font-size: 18px;
-            font-weight: 500;
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
-        }
-        
+        /* Seitenspezifisch: Live-Daten-Tabelle mit KPI-Zeile */
+        .tool-main { padding-bottom: 64px; }
+
+        .page-head { flex-wrap: wrap; }
+        .page-head .head-actions { margin-left: auto; }
+
+        .data-card { margin-top: 22px; padding: 0; overflow: hidden; }
+
         .loading {
             text-align: center;
-            padding: 80px 40px;
-            font-size: 18px;
-            color: var(--text-secondary);
-        }
-        
-        .error {
-            text-align: center;
-            padding: 80px 40px;
-            color: #ff6b6b;
-            background: rgba(255, 107, 107, 0.1);
-            margin: 20px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 107, 107, 0.3);
-        }
-        
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            padding: 32px;
-            background: var(--bg-tertiary);
-            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
-        }
-        
-        .stat {
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-family: var(--font-gaming);
-            font-size: 2.5em;
-            font-weight: 800;
-            color: var(--razer-green);
-            margin-bottom: 8px;
-            text-shadow: var(--glow-green);
-        }
-        
-        .stat-label {
-            color: var(--text-secondary);
+            padding: 64px 24px;
             font-size: 14px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            color: var(--text-secondary);
         }
-        
+
+        .error {
+            margin: 24px;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(217, 48, 37, 0.25);
+            background: var(--danger-soft);
+            color: var(--danger);
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .error h3 { font-size: 15px; margin-bottom: 8px; }
+        .error p { margin-bottom: 6px; }
+        .error .refresh-btn { margin-top: 12px; }
+
+        /* KPI-Zeile */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1px;
+            background: var(--line-soft);
+            border-bottom: 1px solid var(--line-soft);
+        }
+
+        .stat {
+            background: var(--card);
+            padding: 20px 24px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 3px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        /* Tabelle */
         .table-container {
-            padding: 32px;
+            padding: 8px 24px 16px;
             overflow-x: auto;
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
-        
+
         th, td {
-            padding: 16px 12px;
+            padding: 11px 12px;
             text-align: left;
-            border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+            border-bottom: 1px solid var(--line-soft);
+            font-size: 13.5px;
         }
-        
+
         th {
-            background: var(--bg-tertiary);
-            font-weight: 700;
-            color: var(--razer-green);
-            font-family: var(--font-gaming);
+            color: var(--text-tertiary);
+            font-weight: 600;
+            font-size: 11.5px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 14px;
+            letter-spacing: 0.5px;
         }
-        
-        tr:hover {
-            background: rgba(0, 255, 136, 0.05);
-        }
-        
-        .week-badge {
-            background: var(--razer-green);
-            color: var(--razer-black);
-            padding: 6px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 700;
-            font-family: var(--font-gaming);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .score-high {
-            color: var(--razer-green);
-            font-weight: 700;
-            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
-        }
-        
-        .score-medium {
-            color: #ffd700;
-            font-weight: 700;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        }
-        
-        .score-low {
-            color: #ff6b6b;
-            font-weight: 700;
-            text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 32px;
+
+        tbody tr:last-child td { border-bottom: none; }
+
+        tbody tr:hover { background: #FAFBFC; }
+
+        td code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12.5px;
+            background: #F2F4F6;
+            padding: 2px 7px;
+            border-radius: 6px;
             color: var(--text-secondary);
-            background: var(--bg-tertiary);
-            border-top: 1px solid rgba(0, 255, 136, 0.2);
         }
-        
-        .refresh-btn {
-            background: var(--razer-green);
-            color: var(--razer-black);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 700;
-            font-family: var(--font-gaming);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 10px;
-            transition: all 0.3s ease;
-            box-shadow: var(--glow-green);
+
+        .week-badge {
+            display: inline-block;
+            background: var(--accent-soft);
+            color: var(--accent-strong);
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
         }
-        
-        .refresh-btn:hover {
-            background: var(--razer-green-light);
-            transform: translateY(-2px);
-            box-shadow: var(--glow-green-strong);
+
+        .score-high   { color: var(--accent-strong); font-weight: 600; font-variant-numeric: tabular-nums; }
+        .score-medium { color: #B26A00; font-weight: 600; font-variant-numeric: tabular-nums; }
+        .score-low    { color: var(--danger); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+        /* Info-Zeile unter der Tabelle */
+        .data-footer {
+            padding: 14px 24px;
+            border-top: 1px solid var(--line-soft);
+            font-size: 12.5px;
+            color: var(--text-tertiary);
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
         }
-        
-        .back-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            color: var(--razer-black);
-            border: 2px solid var(--razer-black);
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 700;
-            font-family: var(--font-gaming);
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        
-        .back-btn:hover {
-            background: var(--razer-black);
-            color: var(--razer-green);
-            transform: translateY(-2px);
-        }
-        
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 20px 16px;
-            }
-            
-            .page-header {
-                padding: 30px 20px;
-            }
-            
-            .stats {
-                flex-direction: column;
-                gap: 20px;
-                padding: 20px;
-            }
-            
-            .table-container {
-                padding: 20px;
-            }
-            
-            .nav {
-                padding: 0 16px;
-            }
+
+        .data-footer a { color: var(--accent-strong); text-decoration: none; }
+        .data-footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 720px) {
+            .page-head .head-actions { margin-left: 0; width: 100%; }
+            .table-container { padding: 4px 12px 12px; }
         }
     </style>
 </head>
 <body>
-    <!-- Header Navigation -->
     <header class="header">
-        <div class="nav">
-            <a href="index.html" class="logo">
-                <div class="logo-icon">SN</div>
-                <span>Spacenations</span>
+        <div class="wrap">
+            <a href="index.html" class="wordmark">
+                <span class="mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="4.4"/>
+                        <ellipse cx="12" cy="12" rx="9" ry="3.2" transform="rotate(-20 12 12)" opacity="0.55"/>
+                    </svg>
+                </span>
+                <span><strong>Spacenations</strong><span class="thin"> Tools</span></span>
             </a>
-            
-            <div class="nav-actions">
-                <a href="https://spacenations.eu" target="_blank" class="btn btn-primary">
-                    Zum Spiel
-                </a>
-                <a href="register.html" class="btn btn-secondary">
-                    Login
-                </a>
-            </div>
+
+            <nav class="header-auth">
+                <a href="index.html" class="btn btn-ghost btn-sm">Alle Tools</a>
+                <a href="https://beta4.game.spacenations.eu/" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Zum Spiel <span class="ext">↗</span></a>
+            </nav>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="container">
-            <div class="page-header">
-                <a href="index.html" class="back-btn">← Zurück</a>
-                <h1>🌌 ProximaDB</h1>
-                <p>Spacenations Tools - Planetenverfolgung</p>
-                <button class="refresh-btn" onclick="loadData()">🔄 Aktualisieren</button>
+    <main class="wrap tool-main">
+        <div class="page-head">
+            <span class="tool-icon tint-teal">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><ellipse cx="12" cy="12" rx="9.5" ry="3.4" transform="rotate(-18 12 12)"/></svg>
+            </span>
+            <div>
+                <h1>ProximaDB</h1>
+                <p>Planetenverfolgung – aktualisiert sich automatisch alle 60 Sekunden.</p>
             </div>
-            
+            <div class="head-actions">
+                <button class="btn btn-outline btn-sm refresh-btn">Aktualisieren</button>
+            </div>
+        </div>
+
+        <div class="card data-card">
             <div id="content">
                 <div class="loading">
                     <p>Lade Proxima-Daten...</p>
@@ -488,27 +190,27 @@
     </main>
 
     <script>
-        const API_URL = 'https://beta1.game.spacenations.eu/api/proxima';
+        const API_URL = 'https://beta4.game.spacenations.eu/api/proxima';
         const AUTO_REFRESH_MS = 60000;
         const REQUEST_TIMEOUT_MS = 12000;
 
         let refreshTimerId = null;
         let backoffMs = AUTO_REFRESH_MS;
 
-        // Genau EINE Anfrage, die nach ms abgebrochen wird (frueher wurden zwei
-        // fetches gestartet: der uebergebene und ein interner).
-        function fetchWithTimeout(ms) {
+        function withTimeout(promise, ms) {
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), ms);
-            return fetch(API_URL, { headers: { 'Accept': 'application/json' }, cache: 'no-store', signal: controller.signal })
-                .finally(() => clearTimeout(id));
+            return Promise.race([
+                fetch(API_URL, { headers: { 'Accept': 'application/json' }, cache: 'no-store', signal: controller.signal }),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout nach ' + ms + ' ms')), ms))
+            ]).finally(() => clearTimeout(id));
         }
 
         async function loadData() {
             const content = document.getElementById('content');
             content.innerHTML = '<div class="loading"><p>Lade Proxima-Daten...</p></div>';
             try {
-                const response = await fetchWithTimeout(REQUEST_TIMEOUT_MS);
+                const response = await withTimeout(fetch(API_URL, { headers: { 'Accept': 'application/json' }, cache: 'no-store' }), REQUEST_TIMEOUT_MS);
                 if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 const data = await response.json();
                 displayData(data);
@@ -517,11 +219,11 @@
                 console.error('Fehler beim Laden der Daten:', error);
                 content.innerHTML = `
                     <div class="error">
-                        <h3>⚠️ Fehler beim Laden der Daten</h3>
+                        <h3>Fehler beim Laden der Daten</h3>
                         <p>Die Proxima-Daten konnten nicht geladen werden.</p>
                         <p><strong>Fehler:</strong> ${error.message}</p>
                         <p>Bitte versuchen Sie es später erneut oder kontaktieren Sie den Administrator.</p>
-                        <button class="refresh-btn" onclick="manualRefresh()">🔄 Erneut versuchen</button>
+                        <button class="btn btn-outline btn-sm refresh-btn" onclick="manualRefresh()">Erneut versuchen</button>
                     </div>
                 `;
                 backoffMs = Math.min(Math.floor(backoffMs * 1.5), 120000);
@@ -581,7 +283,7 @@
                         <div class="stat-label">Letzte Aktualisierung</div>
                     </div>
                 </div>
-                
+
                 <div class="table-container">
                     <table>
                         <thead>
@@ -606,10 +308,10 @@
                         </tbody>
                     </table>
                 </div>
-                
-                <div class="footer">
-                    <p>Automatisch aktualisiert alle 60 Sekunden</p>
-                    <p>Datenquelle: <a href="https://beta1.game.spacenations.eu/api/proxima" target="_blank" style="color: var(--razer-green);">Spacenations API</a></p>
+
+                <div class="data-footer">
+                    <span>Automatisch aktualisiert alle 60 Sekunden</span>
+                    <span>Datenquelle: <a href="https://beta4.game.spacenations.eu/api/proxima" target="_blank" rel="noopener">Spacenations API</a></span>
                 </div>
             `;
         }
@@ -641,5 +343,8 @@
             if (headerBtn) headerBtn.addEventListener('click', manualRefresh);
         });
     </script>
+
+    <!-- Global Footer Loader -->
+    <script src="js/global-footer-loader.js"></script>
 </body>
 </html>

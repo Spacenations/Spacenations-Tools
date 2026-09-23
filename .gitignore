@@ -2,6 +2,11 @@
 dist/
 build-output/
 
+# Python-Bytecode-Cache
+__pycache__/
+*.pyc
+*.pyo
+
 # Node.js
 node_modules/
 npm-debug.log*
@@ -73,6 +78,5 @@ jspm_packages/
 
 # Yarn Integrity file
 .yarn-integrity
-# Python bytecode
-__pycache__/
-*.pyc
+# Proxima→Discord Selbsttest-Ausgabe (nur lokal)
+proxima_selftest.xlsx

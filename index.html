@@ -4,1014 +4,167 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spacenations Tools</title>
-    
-    <!-- Modern Fonts -->
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316181D'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='white' stroke-width='2'/%3E%3Cellipse cx='16' cy='16' rx='12' ry='4.4' fill='none' stroke='%2300D68F' stroke-width='1.6' transform='rotate(-20 16 16)'/%3E%3C/svg%3E">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            /* Razer Color Scheme */
-            --razer-green: #00FF88;
-            --razer-green-dark: #00CC6A;
-            --razer-green-light: #44FF99;
-            --razer-black: #0A0A0A;
-            --razer-dark: #111111;
-            --razer-gray: #1A1A1A;
-            --razer-gray-light: #2A2A2A;
-            --razer-white: #FFFFFF;
-            --razer-silver: #C0C0C0;
-            
-            --text-primary: var(--razer-white);
-            --text-secondary: var(--razer-silver);
-            --text-accent: var(--razer-green);
-            
-            --bg-primary: var(--razer-black);
-            --bg-secondary: var(--razer-dark);
-            --bg-tertiary: var(--razer-gray);
-            --bg-card: var(--razer-gray-light);
-            
-            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
-            --glow-green-strong: 0 0 30px rgba(0, 255, 136, 0.8);
-            --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.6);
-            
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            --font-gaming: 'Orbitron', monospace;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        body {
-            font-family: var(--font-primary);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-        
-        /* Animated Background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
-                linear-gradient(45deg, var(--razer-black) 0%, var(--razer-dark) 100%);
-            z-index: -1;
-            animation: backgroundPulse 8s ease-in-out infinite;
-        }
-        
-        @keyframes backgroundPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        
-        /* Header Navigation */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
-            transition: all 0.3s ease;
-        }
-        
-        .nav {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 80px;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            text-decoration: none;
-            color: var(--text-primary);
-            font-family: var(--font-gaming);
-            font-weight: 700;
-            font-size: 28px;
-            transition: all 0.3s ease;
-        }
-        
-        .logo:hover {
-            color: var(--razer-green);
-            text-shadow: var(--glow-green);
-            transform: scale(1.05);
-        }
-        
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--razer-black);
-            font-weight: 800;
-            font-size: 18px;
-            box-shadow: var(--glow-green);
-            animation: logoGlow 3s ease-in-out infinite;
-        }
-        
-        @keyframes logoGlow {
-            0%, 100% { box-shadow: var(--glow-green); }
-            50% { box-shadow: var(--glow-green-strong); }
-        }
-        
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 14px 28px;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            font-family: var(--font-gaming);
-            font-weight: 600;
-            font-size: 16px;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.6s ease;
-        }
-        
-        .btn:hover::before {
-            left: 100%;
-        }
-        
-        .btn-game {
-            background: var(--razer-green);
-            color: var(--razer-black);
-            border-color: var(--razer-green);
-            box-shadow: var(--glow-green);
-        }
-        
-        .btn-game:hover {
-            background: var(--razer-green-light);
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: var(--glow-green-strong);
-        }
-        
-        .btn-login {
-            background: transparent;
-            color: var(--razer-green);
-            border-color: var(--razer-green);
-        }
-        
-        .btn-login:hover {
-            background: var(--razer-green);
-            color: var(--razer-black);
-            transform: translateY(-2px);
-            box-shadow: var(--glow-green);
-        }
-        
-        /* Sidebar Navigation */
-        .sidebar {
-            position: fixed;
-            top: 80px;
-            left: 0;
-            width: 280px;
-            height: calc(100vh - 80px);
-            background: var(--bg-secondary);
-            border-right: 1px solid rgba(0, 255, 136, 0.2);
-            padding: 32px 0;
-            z-index: 900;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: var(--razer-green) var(--bg-secondary);
-        }
-        
-        .sidebar::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .sidebar::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-        }
-        
-        .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(0, 255, 136, 0.3);
-            border-radius: 3px;
-        }
-        
-        .sidebar::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 255, 136, 0.5);
-        }
-        
-        .sidebar-title {
-            font-family: var(--font-gaming);
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--razer-green);
-            margin-bottom: 24px;
-            padding: 0 24px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        .sidebar-subtitle {
-            font-family: var(--font-gaming);
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--razer-green);
-            margin-bottom: 16px;
-            padding: 0 24px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .sidebar-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            padding: 0 24px;
-        }
-        
-        .sidebar-btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 20px;
-            background: rgba(0, 255, 136, 0.05);
-            border: 2px solid rgba(0, 255, 136, 0.2);
-            border-radius: 10px;
-            font-family: var(--font-gaming);
-            font-weight: 600;
-            font-size: 15px;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            color: var(--text-secondary);
-        }
-        
-        .sidebar-btn-icon {
-            font-size: 20px;
-            filter: grayscale(0.2);
-            transition: all 0.3s ease;
-        }
-        
-        .sidebar-btn-text {
-            flex: 1;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .sidebar-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.2), transparent);
-            transition: left 0.6s ease;
-        }
-        
-        .sidebar-btn:hover::before {
-            left: 100%;
-        }
-        
-        .sidebar-btn:hover {
-            background: rgba(0, 255, 136, 0.1);
-            border-color: var(--razer-green);
-            color: var(--razer-green);
-            transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
-        }
-        
-        .sidebar-btn:hover .sidebar-btn-icon {
-            filter: grayscale(0);
-            transform: scale(1.1);
-        }
-        
-        .sidebar-btn:active {
-            transform: translateX(3px);
-        }
-        
-        
-        /* Main Content */
-        .main-content {
-            margin-left: 280px;
-            padding: 80px 0 0 0;
-            min-height: 100vh;
-        }
-        
-        /* Hero Section */
-        .hero {
-            padding: 120px 32px 80px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(ellipse at center, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
-            pointer-events: none;
-        }
-        
-        .hero-container {
-            max-width: 800px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .hero-title {
-            font-family: var(--font-gaming);
-            font-size: clamp(48px, 8vw, 96px);
-            font-weight: 900;
-            line-height: 0.9;
-            margin-bottom: 24px;
-            letter-spacing: -1px;
-            background: linear-gradient(180deg, var(--razer-green) 0%, var(--razer-green-dark) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            filter: drop-shadow(0 2px 8px rgba(0, 255, 136, 0.3));
-            text-transform: uppercase;
-            word-break: break-word;
-            overflow-wrap: break-word;
-        }
-        
-        .hero-subtitle {
-            font-size: clamp(18px, 2.5vw, 28px);
-            color: var(--text-primary);
-            margin-bottom: 16px;
-            line-height: 1.3;
-            font-weight: 300;
-            letter-spacing: 0.5px;
-        }
-        
-        .hero-description {
-            font-size: clamp(14px, 1.8vw, 18px);
-            color: var(--text-secondary);
-            margin-bottom: 48px;
-            line-height: 1.6;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            opacity: 0.9;
-        }
-        
-        .hero-cta {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 18px 36px;
-            background: var(--razer-green);
-            color: var(--razer-black);
-            border: none;
-            border-radius: 8px;
-            font-family: var(--font-gaming);
-            font-size: 16px;
-            font-weight: 700;
-            text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-primary:hover {
-            background: var(--razer-green-light);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 255, 136, 0.4);
-        }
-        
-        .btn-secondary {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 18px 36px;
-            background: transparent;
-            color: var(--razer-green);
-            border: 2px solid var(--razer-green);
-            border-radius: 8px;
-            font-family: var(--font-gaming);
-            font-size: 16px;
-            font-weight: 700;
-            text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(0, 255, 136, 0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 255, 136, 0.2);
-        }
-        
-        .btn span {
-            font-size: 20px;
-        }
-        
-        /* Stats Section */
-        .stats-section {
-            padding: 80px 48px;
-            background: var(--bg-secondary);
-            border-top: 1px solid rgba(0, 255, 136, 0.2);
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        
-        .stat-card {
-            text-align: center;
-            padding: 32px 24px;
-            background: var(--bg-card);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 255, 136, 0.2);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--razer-green), var(--razer-green-light));
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--razer-green);
-            box-shadow: var(--glow-green);
-        }
-        
-        .stat-card:hover::before {
-            transform: scaleX(1);
-        }
-        
-        .stat-number {
-            font-family: var(--font-gaming);
-            font-size: 48px;
-            font-weight: 800;
-            color: var(--razer-green);
-            margin-bottom: 8px;
-            text-shadow: var(--glow-green);
-        }
-        
-        .stat-label {
-            color: var(--text-secondary);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        /* Login Area */
-        .login-area {
-            position: fixed;
-            top: 50%;
-            right: 20px;
-            transform: translateY(-50%);
-            width: 320px;
-            background: var(--bg-card);
-            border: 2px solid var(--razer-green);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: var(--shadow-dark), var(--glow-green);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            transition: all 0.3s ease;
-            /* Sicherstellen dass es nicht scrollt */
-            position: fixed !important;
-            will-change: transform;
-        }
-        
-        .login-area:hover {
-            box-shadow: var(--shadow-dark), var(--glow-green-strong);
-            border-color: var(--razer-green-light);
-        }
-        
-        /* Sicherstellen dass Login-Bereich immer sichtbar und fest ist */
-        .login-area {
-            /* Höhere z-index für bessere Sichtbarkeit */
-            z-index: 1000 !important;
-            /* Verhindern von Scroll-Verhalten */
-            position: fixed !important;
-            /* Optimierung für bessere Performance */
-            transform: translateY(-50%) translateZ(0);
-            /* Sicherstellen dass es immer sichtbar bleibt */
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-        
-        .login-title {
-            color: var(--razer-green);
-            font-family: var(--font-gaming);
-            font-size: 1.2rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 20px;
-            text-shadow: var(--glow-green);
-        }
-        
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        
-        .login-input {
-            padding: 12px 16px;
-            border-radius: 8px;
-            border: 2px solid var(--razer-gray);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            font-family: var(--font-primary);
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-        
-        .login-input:focus {
-            outline: none;
-            border-color: var(--razer-green);
-            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.2);
-            background: var(--bg-tertiary);
-        }
-        
-        .login-input::placeholder {
-            color: var(--text-secondary);
-        }
-        
-        .login-message {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-top: 12px;
-            font-family: var(--font-primary);
-            font-size: 0.9rem;
-            font-weight: 500;
-            text-align: center;
-            animation: slideIn 0.3s ease;
-        }
-        
-        .login-message.success {
-            background: rgba(0, 255, 136, 0.1);
-            border: 2px solid var(--razer-green);
-            color: var(--razer-green);
-        }
-        
-        .login-message.error {
-            background: rgba(255, 59, 48, 0.1);
-            border: 2px solid #ff3b30;
-            color: #ff3b30;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .login-btn {
-            padding: 12px 20px;
-            border-radius: 8px;
-            border: 2px solid var(--razer-green);
-            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
-            color: var(--razer-black);
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: var(--font-primary);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-dark), var(--glow-green-strong);
-            background: var(--razer-green-light);
-        }
-        
-        .login-links {
-            margin-top: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            align-items: center;
-        }
-        
-        .login-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-        
-        .login-link:hover {
-            color: var(--razer-green);
-            background: rgba(0, 255, 136, 0.1);
-        }
-        
-        .login-link.primary {
-            color: var(--razer-green);
-            font-weight: 600;
-            border: 1px solid var(--razer-green);
-            padding: 8px 16px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
-        
-        .login-link.primary:hover {
-            background: var(--razer-green);
-            color: var(--razer-black);
-            transform: translateY(-1px);
-        }
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .hero {
-                padding: 80px 16px 60px;
-            }
-            
-            .hero-title {
-                font-size: clamp(40px, 12vw, 64px);
-                letter-spacing: 0px;
-            }
-            
-            .stats-section {
-                padding: 60px 24px;
-            }
-            
-            .nav {
-                padding: 0 16px;
-            }
-            
-            .mobile-menu {
-                display: block;
-                background: none;
-                border: none;
-                color: var(--razer-green);
-                font-size: 24px;
-                cursor: pointer;
-            }
-            
-            .login-area {
-                position: relative;
-                top: auto;
-                right: auto;
-                transform: none;
-                width: 100%;
-                max-width: 400px;
-                margin: 20px auto;
-            }
-            
-        }
-        
-        @media (max-width: 480px) {
-            .login-area {
-                margin: 10px;
-                padding: 20px;
-            }
-            
-            .login-title {
-                font-size: 1rem;
-            }
-            
-            .login-input {
-                padding: 10px 12px;
-                font-size: 0.85rem;
-            }
-            
-            .login-btn {
-                padding: 10px 16px;
-                font-size: 0.85rem;
-            }
-        }
-        
-        .mobile-menu {
-            display: none;
-        }
-        
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--razer-green);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--razer-green-light);
-        }
-    </style>
+    <link rel="stylesheet" href="css/app.css?v=light-2">
 </head>
 <body>
-    <!-- Header Navigation -->
     <header class="header">
-        <div class="nav">
-            <a href="#" class="logo">
-                <div class="logo-icon">SN</div>
-                <span>Spacenations</span>
+        <div class="wrap">
+            <a href="#" class="wordmark">
+                <span class="mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="4.4"/>
+                        <ellipse cx="12" cy="12" rx="9" ry="3.2" transform="rotate(-20 12 12)" opacity="0.55"/>
+                    </svg>
+                </span>
+                <span><strong>Spacenations</strong><span class="thin"> Tools</span></span>
             </a>
-            
-            <div class="nav-actions">
-                <a href="https://spacenations.eu" target="_blank" class="btn btn-game">
-                    Zum Spiel
-                </a>
+
+            <form class="header-auth" id="login-form">
+                <input type="text" id="login-email" placeholder="E-Mail" autocomplete="username" required>
+                <input type="password" id="login-password" placeholder="Passwort" autocomplete="current-password" required>
+                <button type="submit" class="btn btn-solid btn-sm">Anmelden</button>
+                <span class="header-divider"></span>
+                <a href="register.html" class="btn btn-ghost btn-sm">Registrieren</a>
+                <a href="https://beta4.game.spacenations.eu/" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Zum Spiel <span class="ext">↗</span></a>
+            </form>
+
+            <!-- Angemeldet-Zustand: erscheint statt des Login-Formulars, wenn eine Sitzung besteht -->
+            <div class="header-auth" id="user-info" style="display: none;">
+                <span class="header-user" id="user-welcome"></span>
+                <a href="user-dashboard.html" class="btn btn-solid btn-sm">Zum Dashboard</a>
+                <span class="header-divider"></span>
+                <a href="https://beta4.game.spacenations.eu/" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Zum Spiel <span class="ext">↗</span></a>
+                <button type="button" class="btn btn-ghost btn-sm" id="header-logout">Abmelden</button>
             </div>
-            
-            <button class="mobile-menu" onclick="toggleSidebar()">☰</button>
         </div>
     </header>
 
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar" id="sidebar">
-        <h3 class="sidebar-title">🎮 Gaming Tools</h3>
-        <div class="sidebar-buttons">
-            <a href="as-counter.html" class="sidebar-btn">
-                <span class="sidebar-btn-icon">⚔️</span>
-                <span class="sidebar-btn-text">AS Counter</span>
-            </a>
-            <a href="battle-counter.html" class="sidebar-btn">
-                <span class="sidebar-btn-icon">🧮</span>
-                <span class="sidebar-btn-text">Battle Counter</span>
-            </a>
-            <a href="raid-counter.html" class="sidebar-btn">
-                <span class="sidebar-btn-icon">🏴‍☠️</span>
-                <span class="sidebar-btn-text">Raid Counter</span>
-            </a>
-            <a href="sabo-counter.html" class="sidebar-btn">
-                <span class="sidebar-btn-icon">💣</span>
-                <span class="sidebar-btn-text">Sabo Counter</span>
-            </a>
-            <a href="ProximaDB.html" class="sidebar-btn">
-                <span class="sidebar-btn-icon">🌌</span>
-                <span class="sidebar-btn-text">ProximaDB</span>
-            </a>
+    <main class="wrap">
+        <div class="intro">
+            <h1>Tools</h1>
+            <p>Wähle ein Tool, um loszulegen.</p>
         </div>
-        
-    </aside>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="hero-container">
-                <h1 class="hero-title">Spacenations<br>Tools</h1>
-                <p class="hero-subtitle">Professional Gaming Analytics Platform</p>
-                <p class="hero-description">
-                    Advanced counter tools, raid calculators, and battle analytics designed for competitive Spacenations players. 
-                    Optimize your gameplay with precision-engineered tools.
-                </p>
-                <div class="hero-cta">
-                    <a href="as-counter.html" class="btn btn-primary">
-                        <span>⚔️</span> Start with AS Counter
-                    </a>
-                    <a href="raid-counter.html" class="btn btn-secondary">
-                        <span>🏴‍☠️</span> Raid Calculator
-                    </a>
-                </div>
+        <section class="app-section" id="public-tools">
+            <div class="app-section-header">
+                <h2>Öffentlich</h2>
+                <span class="tag tag-public">Ohne Anmeldung</span>
+                <span class="head-line"></span>
+                <span class="head-count">6 Tools</span>
+            </div>
+            <div class="app-grid">
+                <a href="as-counter.html" class="app-tile">
+                    <span class="app-tile-icon tint-rose">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.25"/><path d="M12 2.75V6M12 18v3.25M2.75 12H6M18 12h3.25"/></svg>
+                    </span>
+                    <span class="app-tile-name">AS Counter</span>
+                    <span class="app-tile-desc">Angriffssimulationen zählen</span>
+                    <span class="app-tile-go"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg></span>
+                </a>
+                <a href="battle-counter.html" class="app-tile">
+                    <span class="app-tile-icon tint-blue">
+                        <svg viewBox="0 0 24 24"><path d="M12 3.2l6.8 2.8v4.9c0 4.4-2.9 7.4-6.8 8.9-3.9-1.5-6.8-4.5-6.8-8.9V6l6.8-2.8z"/></svg>
+                    </span>
+                    <span class="app-tile-name">Battle Counter</span>
+                    <span class="app-tile-desc">Kämpfe erfassen &amp; auswerten</span>
+                    <span class="app-tile-go"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg></span>
+                </a>
+                <a href="raid-counter.html" class="app-tile">
+                    <span class="app-tile-icon tint-violet">
+                        <svg viewBox="0 0 24 24"><path d="M5.5 21V3.8"/><path d="M5.5 4.5h12.2l-3 4 3 4H5.5"/></svg>
+                    </span>
+                    <span class="app-tile-name">Raid Counter</span>
+                    <span class="app-tile-desc">Raids im Überblick</span>
+                    <span class="app-tile-go"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg></span>
+                </a>
+                <a href="sabo-counter.html" class="app-tile">
+                    <span class="app-tile-icon tint-amber">
+                        <svg viewBox="0 0 24 24"><path d="M13.2 2.6L4.8 13.4h6l-1.9 8 8.4-10.8h-6l1.9-8z"/></svg>
+                    </span>
+                    <span class="app-tile-name">Sabo Counter</span>
+                    <span class="app-tile-desc">Sabotagen protokollieren</span>
+                    <span class="app-tile-go"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg></span>
+                </a>
+                <a href="ProximaDB.html" class="app-tile">
+                    <span class="app-tile-icon tint-teal">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><ellipse cx="12" cy="12" rx="9.5" ry="3.4" transform="rotate(-18 12 12)"/></svg>
+                    </span>
+                    <span class="app-tile-name">ProximaDB</span>
+                    <span class="app-tile-desc">Proxima-Daten in Echtzeit</span>
+                    <span class="app-tile-go"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg></span>
+                </a>
+                <a href="rec-res-finder.html" class="app-tile">
+                    <span class="app-tile-icon tint-green">
+                        <svg viewBox="0 0 24 24"><path d="M7 19H4.8a1.83 1.83 0 0 1-1.57-2.66L7.2 9.5"/><path d="M11 19h8.2a1.83 1.83 0 0 0 1.55-2.66l-1.22-2.12"/><path d="m14 16-3 3 3 3"/><path d="M8.29 13.6 7.2 9.5l-4.1 1.1"/><path d="m9.34 5.81 1.1-1.89a1.83 1.83 0 0 1 3.09-.03l3.94 6.84"/><path d="m13.38 9.63 4.1 1.1 1.1-4.1"/></svg>
+                    </span>
+                    <span class="app-tile-name">Rec-Res-Finder</span>
+                    <span class="app-tile-desc">Recycling-Felder im Universum</span>
+                    <span class="app-tile-go"><svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg></span>
+                </a>
             </div>
         </section>
 
-        <!-- Login Area -->
-        <div class="login-area">
-            <h3 class="login-title">🎮 User Login</h3>
-            <form class="login-form" id="login-form">
-                <input 
-                    type="text" 
-                    class="login-input" 
-                    id="login-email" 
-                    placeholder="Benutzername oder E-Mail-Adresse" 
-                    required
-                >
-                <input 
-                    type="password" 
-                    class="login-input" 
-                    id="login-password" 
-                    placeholder="Passwort" 
-                    required
-                >
-                <button type="submit" class="login-btn">
-                    Anmelden
-                </button>
-                <div class="login-links">
-                    <a href="#" class="login-link" onclick="showForgotPassword()">
-                        Passwort vergessen?
-                    </a>
-                    <a href="register.html" class="login-link primary">
-                        Neu registrieren
-                    </a>
+        <section class="app-section" id="account-tools">
+            <div class="app-section-header">
+                <h2>Mit Konto</h2>
+                <span class="tag tag-account">Anmeldung erforderlich</span>
+                <span class="head-line"></span>
+                <span class="head-count">3 Tools</span>
+            </div>
+            <div class="app-grid">
+                <div class="app-tile locked" data-href="alliance-dashboard-redirect.html" title="Anmeldung erforderlich" tabindex="0" role="button" aria-label="Allianz-System – Anmeldung erforderlich">
+                    <span class="app-tile-icon tint-green">
+                        <svg viewBox="0 0 24 24"><circle cx="9" cy="8.2" r="3.2"/><path d="M3.2 19.4c.6-3.1 3-5 5.8-5s5.2 1.9 5.8 5"/><path d="M16.2 5.6a3.2 3.2 0 0 1 0 5.2"/><path d="M17.6 14.6c1.9.7 3.1 2.4 3.5 4.6"/></svg>
+                    </span>
+                    <span class="app-tile-name">Allianz-System</span>
+                    <span class="app-tile-desc">Mitglieder, Chat &amp; Verwaltung</span>
+                    <span class="app-tile-chip"><svg viewBox="0 0 24 24"><rect x="5.5" y="10.5" width="13" height="9" rx="2"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></svg>Login</span>
                 </div>
-            </form>
-        </div>
-
-        <!-- Stats Section -->
-        <section class="stats-section">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number">7</div>
-                    <div class="stat-label">Tools Available</div>
+                <div class="app-tile locked" data-href="spy-database.html" title="Anmeldung erforderlich" tabindex="0" role="button" aria-label="Spionage-Datenbank – Anmeldung erforderlich">
+                    <span class="app-tile-icon tint-indigo">
+                        <svg viewBox="0 0 24 24"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg>
+                    </span>
+                    <span class="app-tile-name">Spionage-DB</span>
+                    <span class="app-tile-desc">Spionageberichte der Allianz</span>
+                    <span class="app-tile-chip"><svg viewBox="0 0 24 24"><rect x="5.5" y="10.5" width="13" height="9" rx="2"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></svg>Login</span>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number">24/7</div>
-                    <div class="stat-label">Online Access</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">∞</div>
-                    <div class="stat-label">Calculations</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">PRO</div>
-                    <div class="stat-label">Performance</div>
+                <div class="app-tile locked" data-href="user-dashboard.html" title="Anmeldung erforderlich" tabindex="0" role="button" aria-label="Dashboard – Anmeldung erforderlich">
+                    <span class="app-tile-icon tint-pink">
+                        <svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="9.5" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="5.5" rx="1.5"/><rect x="13.5" y="12" width="7" height="8.5" rx="1.5"/><rect x="3.5" y="16" width="7" height="4.5" rx="1.5"/></svg>
+                    </span>
+                    <span class="app-tile-name">Dashboard</span>
+                    <span class="app-tile-desc">Dein persönlicher Bereich</span>
+                    <span class="app-tile-chip"><svg viewBox="0 0 24 24"><rect x="5.5" y="10.5" width="13" height="9" rx="2"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></svg>Login</span>
                 </div>
             </div>
         </section>
     </main>
 
-
     <script>
-
-
-        // Sidebar toggle for mobile
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('active');
-        }
-
-        // Header scroll effect
-        let lastScrollY = window.scrollY;
-        window.addEventListener('scroll', () => {
-            const header = document.querySelector('.header');
-            const currentScrollY = window.scrollY;
-            
-            if (currentScrollY > 100) {
-                header.style.background = 'rgba(10, 10, 10, 0.98)';
-                header.style.borderBottom = '1px solid rgba(0, 255, 136, 0.4)';
-            } else {
-                header.style.background = 'rgba(10, 10, 10, 0.95)';
-                header.style.borderBottom = '1px solid rgba(0, 255, 136, 0.2)';
-            }
-            
-            lastScrollY = currentScrollY;
-        });
-
-        // Animate stats on scroll
-        const observerOptions = {
-            threshold: 0.5,
-            rootMargin: '0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = 'fadeInUp 0.8s ease-out forwards';
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.stat-card').forEach(card => {
-            observer.observe(card);
-        });
-
-        // Add particle effect on mouse move
-        document.addEventListener('mousemove', (e) => {
-            const cursor = document.createElement('div');
-            cursor.style.position = 'fixed';
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursor.style.width = '4px';
-            cursor.style.height = '4px';
-            cursor.style.background = 'rgba(0, 255, 136, 0.6)';
-            cursor.style.borderRadius = '50%';
-            cursor.style.pointerEvents = 'none';
-            cursor.style.zIndex = '9999';
-            cursor.style.animation = 'fadeOut 1s ease-out forwards';
-            
-            document.body.appendChild(cursor);
-            
-            setTimeout(() => {
-                cursor.remove();
-            }, 1000);
-        });
-
-        // Add fadeOut animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeOut {
-                0% { opacity: 1; transform: scale(1); }
-                100% { opacity: 0; transform: scale(0); }
-            }
-        `;
-        document.head.appendChild(style);
-        
         // Login functionality
         async function handleLogin(event) {
             event.preventDefault();
-            
+
             const input = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            
+
             if (!input || !password) {
-                alert('Bitte füllen Sie alle Felder aus.');
+                showInlineMessage('Bitte E-Mail und Passwort eingeben.', 'error');
                 return;
             }
-            
-            // Grundlegende Eingabe-Validierung
+
             if (input.length < 2) {
-                alert('Bitte geben Sie einen gültigen Benutzernamen oder eine E-Mail-Adresse ein.');
+                showInlineMessage('Bitte eine gültige E-Mail-Adresse oder einen Benutzernamen eingeben.', 'error');
                 return;
             }
-            
-            // Warten bis AuthAPI verfügbar ist
+
             if (!window.AuthAPI) {
                 console.warn('⚠️ AuthAPI nicht verfügbar, warte...');
                 try {
@@ -1020,57 +173,40 @@
                     console.warn('⚠️ AuthAPI Wait Fehler ignoriert:', error);
                 }
             }
-            
+
             try {
-                // Firebase Login verwenden
                 const result = await window.AuthAPI.login(input, password);
-                
+
                 if (result.success) {
-                    // Erfolgreiche Anmeldung
                     console.log('Login successful:', { input, user: result.user });
-                    
-                    // Erfolgsmeldung anzeigen
-                    const loginForm = document.getElementById('login-form');
-                    const existingMessage = loginForm.querySelector('.login-message');
-                    if (existingMessage) existingMessage.remove();
-                    
-                    const successMessage = document.createElement('div');
-                    successMessage.className = 'login-message success';
-                    successMessage.innerHTML = '✅ Anmeldung erfolgreich! Weiterleitung...';
-                    loginForm.appendChild(successMessage);
-                    
-                    // Weiterleitung zum User Dashboard
+                    showInlineMessage('✅ Anmeldung erfolgreich! Weiterleitung...', 'success');
                     setTimeout(() => {
                         window.location.href = 'user-dashboard.html';
-                    }, 1500);
+                    }, 1200);
                 } else {
-                    // Fehlerhafte Anmeldung
                     console.log('Login failed:', { input, error: result.error });
-                    
-                    // Fehlermeldung anzeigen
-                    const loginForm = document.getElementById('login-form');
-                    const existingMessage = loginForm.querySelector('.login-message');
-                    if (existingMessage) existingMessage.remove();
-                    
-                    const errorMessage = document.createElement('div');
-                    errorMessage.className = 'login-message error';
-                    errorMessage.innerHTML = `❌ ${result.error || 'Ungültige E-Mail-Adresse oder Passwort. Bitte versuchen Sie es erneut.'}`;
-                    loginForm.appendChild(errorMessage);
-                    
-                    // Fehlermeldung nach 5 Sekunden entfernen
-                    setTimeout(() => {
-                        if (errorMessage.parentNode) {
-                            errorMessage.remove();
-                        }
-                    }, 5000);
+                    showInlineMessage(`❌ ${result.error || 'Ungültige E-Mail-Adresse oder Passwort.'}`, 'error');
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                alert('Fehler beim Login. Bitte versuchen Sie es erneut.');
+                showInlineMessage('❌ Fehler beim Login. Bitte versuchen Sie es erneut.', 'error');
             }
         }
-        
-        // Warten bis AuthAPI verfügbar ist
+
+        function showInlineMessage(text, type) {
+            const existing = document.querySelector('.login-message-inline');
+            if (existing) existing.remove();
+
+            const el = document.createElement('div');
+            el.className = `login-message-inline ${type}`;
+            el.textContent = text;
+            document.querySelector('.header').appendChild(el);
+
+            if (type === 'error') {
+                setTimeout(() => el.remove(), 5000);
+            }
+        }
+
         async function waitForAuthAPI() {
             return new Promise((resolve, reject) => {
                 const checkAuthAPI = setInterval(() => {
@@ -1079,29 +215,20 @@
                         resolve();
                     }
                 }, 100);
-                
-                // Timeout nach 5 Sekunden
+
                 setTimeout(() => {
                     clearInterval(checkAuthAPI);
                     console.warn('⚠️ AuthAPI Timeout - Login läuft ohne AuthAPI');
-                    resolve(); // Immer resolve, nie reject für bessere Stabilität
+                    resolve();
                 }, 5000);
             }).catch(error => {
                 console.warn('⚠️ AuthAPI Wait Fehler ignoriert:', error);
-                // Immer erfolgreich auflösen, auch bei Fehlern
                 return Promise.resolve();
             });
         }
-        
-        // Alte authenticateUser Funktion entfernt - jetzt wird Firebase verwendet
-        
-        function showForgotPassword() {
-            alert('Passwort vergessen Funktion wird implementiert. Kontaktieren Sie den Administrator.');
-        }
-        
+
         // Globale Fehlerbehandlung für Browser-Extensions und Service Workers
         window.addEventListener('error', (event) => {
-            // Ignoriere Fehler von Browser-Extensions
             if (event.message && (
                 event.message.includes('listener indicated an asynchronous response') ||
                 event.message.includes('message channel closed') ||
@@ -1114,14 +241,10 @@
                 event.stopPropagation();
                 return false;
             }
-            
-            // Andere Fehler normal behandeln
             console.error('JavaScript Fehler:', event.error);
         });
-        
-        // Unhandled Promise Rejections abfangen
+
         window.addEventListener('unhandledrejection', (event) => {
-            // Ignoriere Fehler von Browser-Extensions
             if (event.reason && (
                 (event.reason.message && (
                     event.reason.message.includes('listener indicated an asynchronous response') ||
@@ -1142,66 +265,119 @@
                 event.stopPropagation();
                 return false;
             }
-            
-            // Andere Promise-Fehler normal behandeln
             console.error('Unhandled Promise Rejection:', event.reason);
         });
-        
-        // Zusätzliche Fehlerbehandlung für Chrome Extensions
+
         if (window.chrome && window.chrome.runtime) {
             try {
                 window.chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-                    // Immer antworten um Fehler zu vermeiden
                     if (sendResponse) {
                         sendResponse({success: false, error: 'Not supported'});
                     }
                     return true;
                 });
             } catch (error) {
-                // Ignoriere Extension-Fehler
                 console.warn('⚠️ Chrome Extension Fehler ignoriert:', error);
             }
         }
 
-        // Initialize when page loads
+        // Header + Konto-Kacheln an den Anmeldestatus anpassen - OHNE Weiterleitung.
+        // Moderne Erwartung: Sitzung bleibt bestehen, aber man landet nicht bei jedem
+        // Seitenaufruf zwangsweise im Dashboard.
+        function applyAuthState(user, userData) {
+            const loggedIn = !!user;
+            const loginForm = document.getElementById('login-form');
+            const userInfo = document.getElementById('user-info');
+            const welcome = document.getElementById('user-welcome');
+
+            if (loginForm) loginForm.style.display = loggedIn ? 'none' : '';
+            if (userInfo) userInfo.style.display = loggedIn ? '' : 'none';
+
+            if (loggedIn && welcome) {
+                const name = (userData && (userData.username || userData.displayName)) ||
+                             (user && user.email) || 'Angemeldet';
+                welcome.textContent = 'Angemeldet als ' + name;
+            }
+
+            // Konto-Kacheln bei Anmeldung freischalten (anklickbar), sonst gesperrt.
+            document.querySelectorAll('#account-tools .app-tile').forEach(tile => {
+                const chip = tile.querySelector('.app-tile-chip');
+                if (loggedIn) {
+                    tile.classList.remove('locked');
+                    if (chip) chip.style.display = 'none';
+                } else {
+                    tile.classList.add('locked');
+                    if (chip) chip.style.display = '';
+                }
+            });
+        }
+
+        function isLoggedInNow() {
+            try {
+                return !!(window.AuthAPI && window.AuthAPI.getCurrentUser && window.AuthAPI.getCurrentUser());
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // Klick auf eine Konto-Kachel: eingeloggt -> öffnen, sonst Login fokussieren.
+        function handleTileActivate(tile) {
+            const href = tile.getAttribute('data-href');
+            if (isLoggedInNow() && href) {
+                window.location.href = href;
+            } else {
+                const email = document.getElementById('login-email');
+                if (email) email.focus();
+            }
+        }
+
+        async function handleHeaderLogout() {
+            try {
+                if (window.AuthAPI && window.AuthAPI.logout) {
+                    await window.AuthAPI.logout();
+                }
+            } catch (error) {
+                console.warn('⚠️ Logout-Fehler ignoriert:', error);
+            }
+            // Auf der Startseite bleiben und UI auf "ausgeloggt" zurücksetzen.
+            applyAuthState(null, null);
+            showInlineMessage('✅ Abgemeldet.', 'success');
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Spacenations Tools loaded');
-            
-            // Add login form event listener
+
             const loginForm = document.getElementById('login-form');
             if (loginForm) {
                 loginForm.addEventListener('submit', handleLogin);
             }
-            
-            // Sicherstellen dass Login-Bereich fest bleibt
-            const loginArea = document.querySelector('.login-area');
-            if (loginArea) {
-                // CSS-Eigenschaften per JavaScript setzen für maximale Sicherheit
-                loginArea.style.position = 'fixed';
-                loginArea.style.top = '50%';
-                loginArea.style.right = '20px';
-                loginArea.style.transform = 'translateY(-50%)';
-                loginArea.style.zIndex = '1000';
-                
-                // Event Listener für Scroll-Events um Position zu erhalten
-                window.addEventListener('scroll', () => {
-                    loginArea.style.position = 'fixed';
-                    loginArea.style.top = '50%';
-                    loginArea.style.right = '20px';
-                    loginArea.style.transform = 'translateY(-50%)';
-                });
-                
-                // Event Listener für Resize-Events
-                window.addEventListener('resize', () => {
-                    loginArea.style.position = 'fixed';
-                    loginArea.style.top = '50%';
-                    loginArea.style.right = '20px';
-                    loginArea.style.transform = 'translateY(-50%)';
-                });
+
+            const logoutBtn = document.getElementById('header-logout');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', handleHeaderLogout);
             }
+
+            document.querySelectorAll('#account-tools .app-tile').forEach(tile => {
+                tile.addEventListener('click', () => handleTileActivate(tile));
+                tile.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleTileActivate(tile);
+                    }
+                });
+            });
+
+            // Anmeldestatus beobachten und Oberfläche anpassen - KEINE Auto-Weiterleitung.
+            waitForAuthAPI().then(() => {
+                if (window.AuthAPI && window.AuthAPI.onAuthStateChange) {
+                    window.AuthAPI.onAuthStateChange((user, userData) => {
+                        applyAuthState(user, userData);
+                    });
+                }
+            }).catch(() => {});
         });
     </script>
-    
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onerror="console.warn('⚠️ Firebase App SDK Fehler ignoriert')"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js" onerror="console.warn('⚠️ Firebase Auth SDK Fehler ignoriert')"></script>
@@ -1215,7 +391,7 @@
     <script src="js/firebase-sync.js" onerror="console.warn('⚠️ Firebase Sync Script Fehler ignoriert')"></script>
     <script src="js/theme-manager.js" onerror="console.warn('⚠️ Theme Manager Script Fehler ignoriert')"></script>
     <script src="js/analytics-tracker.js" onerror="console.warn('⚠️ Analytics Tracker Script Fehler ignoriert')"></script>
-    
+
     <!-- Global Footer Loader -->
     <script src="js/global-footer-loader.js"></script>
 </body>

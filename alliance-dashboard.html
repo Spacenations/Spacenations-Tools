@@ -3,962 +3,580 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Allianzdashboard - Spacenations Tools</title>
-    
-    <!-- Modern Fonts -->
+    <title>Allianz-Dashboard – Spacenations Tools</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316181D'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='white' stroke-width='2'/%3E%3Cellipse cx='16' cy='16' rx='12' ry='4.4' fill='none' stroke='%2300D68F' stroke-width='1.6' transform='rotate(-20 16 16)'/%3E%3C/svg%3E">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+
     <style>
-        :root {
-            /* Razer Color Scheme */
-            --razer-green: #00FF88;
-            --razer-green-dark: #00CC6A;
-            --razer-green-light: #44FF99;
-            --razer-black: #0A0A0A;
-            --razer-dark: #111111;
-            --razer-gray: #1A1A1A;
-            --razer-gray-light: #2A2A2A;
-            --razer-white: #FFFFFF;
-            --razer-silver: #C0C0C0;
-            
-            --text-primary: var(--razer-white);
-            --text-secondary: var(--razer-silver);
-            --text-accent: var(--razer-green);
-            
-            --bg-primary: var(--razer-black);
-            --bg-secondary: var(--razer-dark);
-            --bg-tertiary: var(--razer-gray);
-            --bg-card: var(--razer-gray-light);
-            
-            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
-            --glow-green-strong: 0 0 30px rgba(0, 255, 136, 0.8);
-            --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.6);
-            
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            --font-gaming: 'Orbitron', monospace;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: var(--font-primary);
-            background: var(--bg-primary);
+        /* Seitenspezifisch: Allianz-Dashboard (Info, Karten, Chat, Berechtigungen) */
+        .dash-main { padding-bottom: 72px; }
+
+        .alliance-info { margin-top: 8px; }
+        .dashboard-grid,
+        .spy-database-section,
+        .permission-section { margin-top: 20px; }
+
+        .alliance-info h3,
+        .permission-section > h3 {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 16px;
             color: var(--text-primary);
-            min-height: 100vh;
-            line-height: 1.6;
         }
-        
-        /* Animated Background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
-                linear-gradient(45deg, var(--razer-black) 0%, var(--razer-dark) 100%);
-            z-index: -1;
-            animation: backgroundPulse 8s ease-in-out infinite;
-        }
-        
-        @keyframes backgroundPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        
-        /* Header */
-        .header {
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
-            padding: 20px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .nav {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--razer-green);
-            text-decoration: none;
-            font-family: var(--font-gaming);
-            font-weight: 700;
-            font-size: 1.5rem;
-        }
-        
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--razer-black);
-            font-weight: 900;
-            font-size: 1.2rem;
-        }
-        
-        .nav-actions {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-        
-        .btn {
-            padding: 12px 24px;
-            border-radius: 8px;
-            border: 2px solid var(--razer-green);
-            background: transparent;
-            color: var(--razer-green);
-            text-decoration: none;
+
+        .dashboard-card h3 {
+            font-size: 15px;
             font-weight: 600;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            margin-bottom: 16px;
+            color: var(--text-primary);
         }
-        
-        .btn:hover {
-            background: var(--razer-green);
-            color: var(--razer-black);
-            transform: translateY(-2px);
-            box-shadow: var(--glow-green);
-        }
-        
-        .spy-database-btn {
-            background: linear-gradient(135deg, #00FF88, #44FF99);
-            color: var(--razer-black);
-            font-weight: 700;
-            animation: pulse-glow 2s infinite;
-        }
-        
-        .spy-database-btn:hover {
-            background: linear-gradient(135deg, #44FF99, #88FFBB);
-            transform: translateY(-3px);
-            box-shadow: var(--glow-green-strong);
-        }
-        
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
-            50% { box-shadow: 0 0 30px rgba(0, 255, 136, 0.8); }
-        }
-        
-        .btn.primary {
-            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
-            color: var(--razer-black);
-            border: none;
-        }
-        
-        .btn.primary:hover {
-            background: var(--razer-green-light);
-            box-shadow: var(--glow-green-strong);
-        }
-        
-        /* Main Content */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 40px 32px;
-        }
-        
-        .welcome-section {
+
+        .placeholder {
             text-align: center;
-            margin-bottom: 60px;
+            color: var(--text-tertiary);
+            padding: 24px 16px;
+            font-size: 13px;
         }
-        
-        .welcome-title {
-            font-family: var(--font-gaming);
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--razer-green);
-            margin-bottom: 16px;
-            text-shadow: var(--glow-green);
-        }
-        
-        .welcome-subtitle {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-        }
-        
-        .alliance-info {
-            background: var(--bg-card);
-            border: 2px solid var(--razer-green);
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 40px;
-            box-shadow: var(--shadow-dark), var(--glow-green);
-        }
-        
-        .alliance-info h3 {
-            color: var(--razer-green);
-            font-family: var(--font-gaming);
-            font-size: 1.5rem;
-            margin-bottom: 16px;
-        }
-        
+
+        /* Allianz-Info-Kacheln */
         .info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
         }
-        
+
         .info-item {
-            background: var(--bg-secondary);
-            border: 1px solid var(--razer-gray);
-            border-radius: 8px;
-            padding: 16px;
+            background: #F7F8FA;
+            border: 1px solid var(--line-soft);
+            border-radius: 12px;
+            padding: 14px 16px;
         }
-        
+
         .info-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 4px;
-        }
-        
-        .info-value {
-            color: var(--text-primary);
+            font-size: 11.5px;
             font-weight: 600;
-            font-family: var(--font-gaming);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--text-tertiary);
+            margin-bottom: 5px;
         }
-        
-        /* Dashboard Grid */
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Karten-Raster */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 40px;
-        }
-        
-        /* Spy Database Section */
-        .spy-database-section {
-            margin-bottom: 40px;
-        }
-        
-        .spy-database-card {
-            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(68, 255, 153, 0.05));
-            border: 2px solid var(--razer-green);
-            box-shadow: var(--glow-green);
-        }
-        
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .spy-stats {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-number {
-            display: block;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--razer-green);
-            font-family: var(--font-gaming);
-        }
-        
-        .stat-label {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .spy-actions {
-            display: flex;
             gap: 16px;
-            margin-bottom: 24px;
         }
-        
-        .spy-action-btn {
-            flex: 1;
-            text-align: center;
-            font-weight: 600;
-        }
-        
-        .recent-reports h4 {
-            color: var(--text-accent);
-            margin-bottom: 16px;
-            font-size: 1.1rem;
-        }
-        
-        .reports-list {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        .report-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            margin-bottom: 8px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 6px;
-            border-left: 3px solid var(--razer-green);
-        }
-        
-        .report-player {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        
-        .report-planet {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-        
-        .report-date {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-        
-        .dashboard-card {
-            background: var(--bg-card);
-            border: 2px solid var(--razer-green);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: var(--shadow-dark);
-            transition: all 0.3s ease;
-        }
-        
-        .dashboard-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-dark), var(--glow-green);
-            border-color: var(--razer-green-light);
-        }
-        
-        .dashboard-card h3 {
-            color: var(--razer-green);
-            font-family: var(--font-gaming);
-            font-size: 1.3rem;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
+
+        /* Mitgliederliste */
         .member-list {
-            max-height: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 360px;
             overflow-y: auto;
         }
-        
+
         .member-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--razer-gray);
-            border-radius: 8px;
-            margin-bottom: 8px;
+            padding: 10px 12px;
+            background: #F7F8FA;
+            border: 1px solid var(--line-soft);
+            border-radius: 10px;
         }
-        
-        .member-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
+
+        .member-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
+
         .member-avatar {
             width: 32px;
             height: 32px;
-            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
             border-radius: 50%;
+            background: var(--accent-soft);
+            color: var(--accent-strong);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--razer-black);
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 13px;
+            flex-shrink: 0;
         }
-        
+
         .member-name {
             font-weight: 600;
+            font-size: 13.5px;
+            color: var(--text-primary);
+        }
+
+        .member-list .member-name {
             display: flex;
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
         }
-        
+
         .role-badge {
-            font-size: 0.75rem;
-            padding: 2px 6px;
-            border-radius: 12px;
-            font-weight: 500;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-weight: 600;
             white-space: nowrap;
         }
-        
-        .role-badge.admin {
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            color: #000;
-            border: 1px solid #FFA500;
-        }
-        
-        .role-badge.member {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            color: #fff;
-            border: 1px solid #45a049;
-        }
-        
-        .member-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-        }
-        
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-        
-        .status-online {
-            background: #22c55e;
-            box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
-        }
-        
-        .status-offline {
-            background: #ef4444;
-        }
-        
-        .status-away {
-            background: #f59e0b;
-        }
-        
-        /* Chat Section */
-        .chat-section {
-            background: var(--bg-card);
-            border: 2px solid var(--razer-green);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: var(--shadow-dark);
-        }
-        
-        .chat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        
+
+        .role-badge.admin { background: rgba(245, 158, 11, 0.14); color: #B26A00; }
+        .role-badge.member { background: var(--accent-soft); color: var(--accent-strong); }
+
+        /* Chat */
         .chat-messages {
-            height: 400px;
+            height: 360px;
             overflow-y: auto;
-            border: 1px solid var(--razer-gray);
-            border-radius: 8px;
-            padding: 16px;
-            background: var(--bg-secondary);
-            margin-bottom: 16px;
-        }
-        
-        .message {
+            border: 1px solid var(--line-soft);
+            border-radius: 10px;
+            padding: 14px;
+            background: #F7F8FA;
             margin-bottom: 12px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            background: var(--bg-tertiary);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
-        
+
+        .message {
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: var(--card);
+            border: 1px solid var(--line-soft);
+        }
+
         .message-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
             margin-bottom: 4px;
         }
-        
-        .message-author {
-            font-weight: 600;
-            color: var(--razer-green);
-        }
-        
-        .message-time {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-        
-        .message-content {
-            color: var(--text-primary);
-        }
-        
-        .chat-input {
-            display: flex;
-            gap: 12px;
-        }
-        
+
+        .message-author { font-weight: 600; color: var(--accent-strong); font-size: 13px; }
+        .message-time { font-size: 11.5px; color: var(--text-tertiary); white-space: nowrap; }
+        .message-content { color: var(--text-primary); font-size: 13.5px; line-height: 1.5; word-break: break-word; }
+
+        .chat-input { display: flex; gap: 10px; }
+
         .chat-input input {
             flex: 1;
-            padding: 12px 16px;
+            height: 40px;
+            padding: 0 12px;
             border-radius: 8px;
-            border: 2px solid var(--razer-gray);
-            background: var(--bg-secondary);
+            border: 1px solid var(--line);
+            background: var(--card);
             color: var(--text-primary);
-            font-family: var(--font-primary);
+            font-family: var(--font);
+            font-size: 14px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
-        
+
         .chat-input input:focus {
             outline: none;
-            border-color: var(--razer-green);
-            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.2);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 168, 120, 0.14);
         }
-        
+
         .chat-input button {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
-            color: var(--razer-black);
+            height: 40px;
+            padding: 0 18px;
             border: none;
             border-radius: 8px;
-            font-weight: 700;
+            background: var(--accent);
+            color: #FFFFFF;
+            font-family: var(--font);
+            font-weight: 600;
+            font-size: 13.5px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background 0.15s ease;
         }
-        
-        .chat-input button:hover {
-            background: var(--razer-green-light);
-            transform: translateY(-2px);
-            box-shadow: var(--glow-green);
+
+        .chat-input button:hover { background: #009068; }
+
+        /* Spionage-DB-Karte */
+        .spy-database-card { border-color: rgba(0, 168, 120, 0.28); }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
-        
-        /* Permission Section */
-        .permission-section {
-            background: var(--bg-card);
-            border: 2px solid var(--razer-green);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: var(--shadow-dark);
+
+        .card-header h3 { margin-bottom: 0; }
+
+        .spy-stats { display: flex; gap: 22px; }
+        .stat-item { text-align: center; }
+        .stat-number {
+            display: block;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent-strong);
+            font-variant-numeric: tabular-nums;
         }
-        
+        .stat-label {
+            font-size: 10.5px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .spy-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
+        .spy-action-btn { flex: 1; min-width: 220px; }
+
+        .recent-reports h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .reports-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .report-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            background: #F7F8FA;
+            border: 1px solid var(--line-soft);
+            border-left: 3px solid var(--accent);
+            border-radius: 8px;
+        }
+
+        .report-player { font-weight: 600; color: var(--text-primary); font-size: 13.5px; }
+        .report-planet { font-size: 12.5px; color: var(--text-secondary); }
+        .report-date { font-size: 11.5px; color: var(--text-tertiary); }
+
+        /* Berechtigungen */
+        .permission-subsection + .permission-subsection { margin-top: 28px; }
+
+        .permission-subsection h4 {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--line-soft);
+        }
+
         .permission-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
         }
-        
+
         .permission-item {
-            background: var(--bg-secondary);
-            border: 1px solid var(--razer-gray);
-            border-radius: 8px;
-            padding: 16px;
+            background: #F7F8FA;
+            border: 1px solid var(--line-soft);
+            border-radius: 10px;
+            padding: 14px 16px;
         }
-        
-        .permission-header {
+
+        .permission-item .permission-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
         }
-        
-        .permission-title {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        
+
+        .permission-title { font-weight: 600; color: var(--text-primary); font-size: 13.5px; }
+        .permission-description { font-size: 12.5px; color: var(--text-secondary); }
+
         .permission-toggle {
             width: 40px;
-            height: 20px;
-            background: var(--razer-gray);
-            border-radius: 10px;
+            height: 22px;
+            background: #E3E6EB;
+            border-radius: 11px;
             position: relative;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background 0.3s ease;
+            flex-shrink: 0;
         }
-        
-        .permission-toggle.active {
-            background: var(--razer-green);
-        }
-        
+
+        .permission-toggle.active { background: var(--accent); }
+
         .permission-toggle::after {
             content: '';
             position: absolute;
             top: 2px;
             left: 2px;
-            width: 16px;
-            height: 16px;
-            background: var(--razer-white);
+            width: 18px;
+            height: 18px;
+            background: #FFFFFF;
             border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-        
-        .permission-toggle.active::after {
-            transform: translateX(20px);
-        }
-        
-        .permission-description {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-        
-        .permission-subsection {
-            margin-bottom: 32px;
-        }
-        
-        .permission-subsection h4 {
-            color: var(--razer-green);
-            font-family: var(--font-gaming);
-            font-size: 1.1rem;
-            margin-bottom: 16px;
-            border-bottom: 1px solid var(--razer-gray);
-            padding-bottom: 8px;
-        }
-        
-        .member-management {
-            background: var(--bg-secondary);
-            border: 1px solid var(--razer-gray);
-            border-radius: 8px;
-            padding: 16px;
-        }
-        
-        .permission-table {
-            background: var(--razer-gray);
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid var(--razer-gray-light);
+            transition: transform 0.3s ease;
+            box-shadow: var(--shadow-sm);
         }
 
-        .permission-header {
+        .permission-toggle.active::after { transform: translateX(18px); }
+
+        /* Mitglieder-Tabelle (per JS erzeugt) */
+        #member-management { overflow-x: auto; }
+
+        .permission-table {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--card);
+            min-width: 720px;
+        }
+
+        .permission-table .permission-header {
             display: grid;
             grid-template-columns: 200px repeat(7, 1fr) 120px;
-            background: var(--razer-dark);
-            padding: 15px;
-            font-weight: bold;
-            color: var(--razer-green);
-            border-bottom: 2px solid var(--razer-green);
+            gap: 8px;
+            background: #F7F8FA;
+            padding: 12px 14px;
+            font-weight: 600;
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--text-tertiary);
+            border-bottom: 1px solid var(--line);
         }
 
         .permission-row {
             display: grid;
             grid-template-columns: 200px repeat(7, 1fr) 120px;
-            padding: 15px;
-            border-bottom: 1px solid var(--razer-gray-light);
+            gap: 8px;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--line-soft);
             align-items: center;
         }
 
-        .permission-row:last-child {
-            border-bottom: none;
-        }
+        .permission-row:last-child { border-bottom: none; }
+        .permission-row:hover { background: #FAFBFC; }
 
-        .permission-row:hover {
-            background: var(--razer-gray-light);
-        }
+        .member-column { display: flex; align-items: center; }
+        .permission-column { text-align: center; }
+        .action-column { text-align: center; }
 
-        .member-column, .member-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .permission-table .member-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .member-details { min-width: 0; }
+        .member-role { font-size: 11.5px; color: var(--text-secondary); }
 
-        .member-avatar {
-            width: 40px;
-            height: 40px;
-            background: var(--razer-green);
-            color: var(--razer-black);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
+        .permission-cell { display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .action-cell { text-align: center; }
+        .action-buttons { display: flex; gap: 6px; justify-content: center; align-items: center; }
 
-        .member-details {
-            flex: 1;
-        }
+        .custom-indicator { color: var(--accent-strong); font-weight: 700; }
 
-        .member-name {
-            font-weight: bold;
-            color: var(--text-primary);
-        }
-
-        .member-role {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .permission-column {
-            text-align: center;
-            font-size: 0.9rem;
-            padding: 0 5px;
-        }
-
-        .permission-cell {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-            position: absolute;
-        }
+        /* Toggle-Switch (Checkbox) */
+        .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
 
         .toggle-slider {
             position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--razer-gray-light);
-            transition: .4s;
+            inset: 0;
+            background: #E3E6EB;
+            border: 1px solid var(--line);
+            transition: 0.3s;
             border-radius: 24px;
-            border: 2px solid var(--razer-gray);
+            cursor: pointer;
         }
 
         .toggle-slider:before {
             position: absolute;
             content: "";
-            height: 16px;
-            width: 16px;
-            left: 2px;
+            height: 18px;
+            width: 18px;
+            left: 3px;
             bottom: 2px;
-            background-color: white;
-            transition: .4s;
+            background: #FFFFFF;
+            transition: 0.3s;
             border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: var(--shadow-sm);
         }
 
-        .toggle-switch:hover .toggle-slider {
-            box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
-        }
+        input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
+        input:checked + .toggle-slider:before { transform: translateX(20px); }
+        input:disabled + .toggle-slider { opacity: 0.55; cursor: not-allowed; }
 
-        input:checked + .toggle-slider {
-            background-color: var(--razer-green);
-            border-color: var(--razer-green);
-        }
-
-        input:checked + .toggle-slider:before {
-            transform: translateX(26px);
-        }
-
-        input:disabled + .toggle-slider {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background-color: var(--razer-gray);
-        }
-
-        input:disabled + .toggle-slider:before {
-            background-color: #ccc;
-        }
-
-        .custom-indicator {
-            color: var(--razer-green);
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .action-column, .action-cell {
-            text-align: center;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .admin-badge {
-            background: var(--razer-green);
-            color: var(--razer-black);
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
+        /* Mitglied hinzufügen */
         .add-member-section {
-            margin-top: 30px;
-            padding: 20px;
-            background: var(--razer-dark);
-            border-radius: 10px;
-            border: 1px solid var(--razer-gray-light);
+            margin-top: 24px;
+            padding: 18px;
+            background: #F7F8FA;
+            border: 1px solid var(--line-soft);
+            border-radius: 12px;
         }
 
         .add-member-section h4 {
-            color: var(--razer-green);
-            margin-bottom: 15px;
+            font-size: 13.5px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
         }
 
-        .add-member-form {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+        .add-member-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
-        .add-member-form .input {
+        #member-management .input {
             flex: 1;
-            min-width: 250px;
-            padding: 15px 20px;
-            font-size: 1.1rem;
-            height: 50px;
+            min-width: 200px;
+            height: 40px;
+            padding: 0 12px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: var(--card);
+            color: var(--text-primary);
+            font-family: var(--font);
+            font-size: 14px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .member-item-admin {
-            display: flex;
+        #member-management .input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 168, 120, 0.14);
+        }
+
+        /* Per JS erzeugte Buttons in der Mitgliederverwaltung */
+        #member-management .btn {
+            display: inline-flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 12px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--razer-gray);
+            justify-content: center;
+            height: 34px;
+            padding: 0 14px;
             border-radius: 8px;
-            margin-bottom: 8px;
+            font-family: var(--font);
+            font-weight: 600;
+            font-size: 13px;
+            border: 1px solid var(--line);
+            background: var(--card);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: border-color 0.15s ease, background 0.15s ease;
         }
-        
-        .member-info-admin {
-            display: flex;
+
+        #member-management .btn:hover { border-color: var(--line-strong); }
+        #member-management .btn.small { height: 30px; padding: 0 10px; font-size: 12.5px; }
+        #member-management .btn.danger { color: var(--danger); }
+        #member-management .btn.danger:hover { border-color: var(--danger); }
+        #member-management .btn.success { background: var(--accent); color: #FFFFFF; border-color: transparent; box-shadow: none; }
+        #member-management .btn.success:hover { background: #009068; }
+
+        /* Zugriffs-Fehlerseite (per JS erzeugt) - Buttons */
+        .btn.primary {
+            display: inline-flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
+            height: 40px;
+            padding: 0 20px;
+            border-radius: 8px;
+            background: var(--accent);
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1px solid transparent;
+            box-shadow: var(--shadow-sm);
         }
-        
-        .member-actions {
-            display: flex;
-            gap: 8px;
+        .btn.primary:hover { background: #009068; }
+
+        .container a.btn:not([class*="btn-"]):not(.primary) {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            padding: 0 20px;
+            border-radius: 8px;
+            background: var(--card);
+            color: var(--text-primary);
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow-sm);
+            font-weight: 600;
+            font-size: 14px;
         }
-        
-        .member-actions .btn {
-            padding: 6px 12px;
-            font-size: 0.8rem;
+        .container a.btn:not([class*="btn-"]):not(.primary):hover { border-color: var(--line-strong); }
+
+        @media (max-width: 860px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
         }
-        
-        .permission-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 6px;
-        }
-        
-        .permission-enabled {
-            background: #22c55e;
-        }
-        
-        .permission-disabled {
-            background: #ef4444;
-        }
-        
-        .permission-custom {
-            background: #f59e0b;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav {
-                padding: 0 16px;
-            }
-            
-            .container {
-                padding: 20px 16px;
-            }
-            
-            .welcome-title {
-                font-size: 2rem;
-            }
-            
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .nav-actions {
-                gap: 12px;
-            }
-            
-            .btn {
-                padding: 10px 16px;
-                font-size: 0.9rem;
-            }
-            
-            .spy-actions {
-                flex-direction: column;
-                gap: 12px;
-            }
-            
-            .spy-stats {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .card-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 16px;
-            }
+
+        @media (max-width: 720px) {
+            .spy-stats { gap: 14px; }
+            .spy-action-btn { min-width: 100%; }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
-        <nav class="nav">
-            <a href="user-dashboard.html" class="logo">
-                <div class="logo-icon">🤝</div>
-                <span id="alliance-name">Allianzdashboard</span>
+        <div class="wrap">
+            <a href="index.html?stay=true" class="wordmark">
+                <span class="mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="4.4"/>
+                        <ellipse cx="12" cy="12" rx="9" ry="3.2" transform="rotate(-20 12 12)" opacity="0.55"/>
+                    </svg>
+                </span>
+                <span><strong>Spacenations</strong><span class="thin"> Tools</span></span>
             </a>
-            
-            <div class="nav-actions">
-                <a href="user-dashboard.html" class="btn">← User Dashboard</a>
-                <a href="spy-database.html" class="btn spy-database-btn" id="spy-database-btn">🕵️ Spy-Datenbank</a>
-                <a href="index.html" class="btn">Zur Startseite</a>
-                <a href="logout-all.html" class="btn">Abmelden</a>
-            </div>
-        </nav>
+
+            <nav class="header-auth">
+                <a href="user-dashboard.html" class="btn btn-ghost btn-sm">User-Dashboard</a>
+                <a href="spy-database.html" class="btn btn-ghost btn-sm" id="spy-database-btn">Spionage-DB</a>
+                <a href="index.html" class="btn btn-ghost btn-sm">Startseite</a>
+                <span class="header-divider"></span>
+                <a href="logout-all.html" class="btn btn-outline btn-sm">Abmelden</a>
+            </nav>
+        </div>
     </header>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Welcome Section -->
-        <section class="welcome-section">
-            <h1 class="welcome-title">🤝 Allianzdashboard</h1>
-            <p class="welcome-subtitle" id="welcome-message">Willkommen im Allianzdashboard</p>
-        </section>
+    <main class="wrap container dash-main">
+        <div class="page-head">
+            <span class="tool-icon tint-green">
+                <svg viewBox="0 0 24 24"><circle cx="9" cy="8.2" r="3.2"/><path d="M3.2 19.4c.6-3.1 3-5 5.8-5s5.2 1.9 5.8 5"/><path d="M16.2 5.6a3.2 3.2 0 0 1 0 5.2"/><path d="M17.6 14.6c1.9.7 3.1 2.4 3.5 4.6"/></svg>
+            </span>
+            <div>
+                <h1 id="alliance-name">Allianz-Dashboard</h1>
+                <p id="welcome-message">Willkommen im Allianzdashboard</p>
+            </div>
+        </div>
 
-        <!-- Alliance Info -->
-        <section class="alliance-info">
+        <section class="card alliance-info">
             <h3 id="alliance-title">Allianz-Informationen</h3>
             <div class="info-grid">
                 <div class="info-item">
-                    <div class="info-label">Allianz Name</div>
+                    <div class="info-label">Allianz-Name</div>
                     <div class="info-value" id="alliance-name-info">-</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Allianz Tag</div>
+                    <div class="info-label">Allianz-Tag</div>
                     <div class="info-value" id="alliance-tag-info">-</div>
                 </div>
                 <div class="info-item">
@@ -972,25 +590,18 @@
             </div>
         </section>
 
-        <!-- Dashboard Grid -->
         <div class="dashboard-grid">
-            <!-- Active Members -->
-            <div class="dashboard-card">
-                <h3>👥 Aktive Mitglieder</h3>
+            <div class="card dashboard-card">
+                <h3>Aktive Mitglieder</h3>
                 <div class="member-list" id="active-members">
-                    <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
-                        Lade Mitglieder...
-                    </div>
+                    <div class="placeholder">Lade Mitglieder...</div>
                 </div>
             </div>
 
-            <!-- Alliance Chat -->
-            <div class="dashboard-card">
-                <h3>💬 Allianz Chat</h3>
+            <div class="card dashboard-card">
+                <h3>Allianz-Chat</h3>
                 <div class="chat-messages" id="chat-messages">
-                    <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
-                        Chat wird geladen...
-                    </div>
+                    <div class="placeholder">Chat wird geladen...</div>
                 </div>
                 <div class="chat-input">
                     <input type="text" id="chat-input" placeholder="Nachricht eingeben..." maxlength="500">
@@ -999,11 +610,10 @@
             </div>
         </div>
 
-        <!-- Spy Database Section -->
         <section class="spy-database-section" id="spy-database-section">
-            <div class="dashboard-card spy-database-card">
+            <div class="card dashboard-card spy-database-card">
                 <div class="card-header">
-                    <h3>🕵️ Spy-Datenbank</h3>
+                    <h3>Spionage-DB</h3>
                     <div class="spy-stats" id="spy-stats">
                         <span class="stat-item">
                             <span class="stat-number" id="total-reports">-</span>
@@ -1020,29 +630,21 @@
                     </div>
                 </div>
                 <div class="spy-actions">
-                    <a href="spy-database.html" class="btn primary spy-action-btn">
-                        📊 Spy-Datenbank öffnen
-                    </a>
-                    <a href="spy-report-input.html" class="btn spy-action-btn">
-                        ➕ Neuen Bericht hinzufügen
-                    </a>
+                    <a href="spy-database.html" class="btn btn-accent btn-md spy-action-btn">Spionage-DB öffnen</a>
+                    <a href="spy-report-input.html" class="btn btn-outline btn-md spy-action-btn">Neuen Bericht hinzufügen</a>
                 </div>
                 <div class="recent-reports" id="recent-reports">
-                    <h4>📋 Letzte Berichte</h4>
+                    <h4>Letzte Berichte</h4>
                     <div class="reports-list" id="reports-list">
-                        <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
-                            Lade letzte Berichte...
-                        </div>
+                        <div class="placeholder">Lade letzte Berichte...</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Permissions Section (only for admins) -->
-        <section class="permission-section" id="permission-section">
-            <h3>🔐 Berechtigungen verwalten</h3>
-            
-            <!-- Alliance-wide Permissions -->
+        <section class="card permission-section" id="permission-section">
+            <h3>Berechtigungen verwalten</h3>
+
             <div class="permission-subsection">
                 <h4>Allianz-weite Berechtigungen</h4>
                 <div class="permission-grid" id="alliance-permission-grid">
@@ -1050,7 +652,6 @@
                 </div>
             </div>
 
-            <!-- Member Management -->
             <div class="permission-subsection">
                 <h4>Mitglieder verwalten</h4>
                 <div class="member-management" id="member-management">
@@ -1058,7 +659,7 @@
                 </div>
             </div>
         </section>
-    </div>
+    </main>
 
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1077,81 +678,19 @@
     <script>
         // Alliance Dashboard JavaScript
         let currentAlliance = null;
+        let currentUser = null;
+        let myMembership = null;
         let isAdmin = false;
         let chatUnsubscribe = null;
-        let membersUnsubscribe = null;
         let permissionManager = null;
         let memberManager = null;
 
-        // Funktion zur korrekten Admin-Status-Prüfung
-        async function checkAdminStatus(username) {
-            if (!currentAlliance) {
-                console.warn('⚠️ Keine Allianz-Daten verfügbar für Admin-Check');
-                return false;
-            }
-            
-            // Prüfe zuerst Alliance-Daten
-            let adminFromAlliance = currentAlliance.admin === username || currentAlliance.founder === username;
-            
-            // Prüfe zusätzlich User-Datenbank für allianceRole
-            let adminFromUserData = false;
-            try {
-                // Prüfe ob Firebase verfügbar ist
-                if (typeof window.FirebaseConfig !== 'undefined' && window.FirebaseConfig.isReady()) {
-                    const db = window.FirebaseConfig.getDB();
-                    const userDoc = await db.collection('users').doc(username).get();
-                    if (userDoc.exists) {
-                        const userData = userDoc.data();
-                        adminFromUserData = userData.allianceRole === 'admin' || userData.allianceRole === 'founder';
-                    }
-                }
-            } catch (error) {
-                console.warn('⚠️ Konnte User-Daten nicht laden:', error);
-            }
-            
-            // User ist Admin wenn er in Alliance-Daten ODER User-Daten als Admin markiert ist
-            const isUserAdmin = adminFromAlliance || adminFromUserData;
-            
-            console.log('👑 Admin-Status-Prüfung:', {
-                username: username,
-                currentAlliance: currentAlliance ? currentAlliance.name : 'Nicht verfügbar',
-                adminFromAlliance: adminFromAlliance,
-                adminFromUserData: adminFromUserData,
-                allianceAdmin: currentAlliance ? currentAlliance.admin : 'N/A',
-                allianceFounder: currentAlliance ? currentAlliance.founder : 'N/A',
-                finalStatus: isUserAdmin
-            });
-            
-            return isUserAdmin;
+        function getCurrentUid() {
+            return currentUser ? currentUser.uid : null;
         }
 
-        // Funktion zur Prüfung der Member-Rolle
-        async function checkMemberRole(username) {
-            if (!currentAlliance) {
-                console.warn('⚠️ Keine Allianz-Daten verfügbar für Member-Rolle-Check');
-                return false;
-            }
-            
-            // Prüfe zuerst Alliance-Daten
-            let adminFromAlliance = currentAlliance.admin === username || currentAlliance.founder === username;
-            
-            // Prüfe zusätzlich User-Datenbank für allianceRole
-            let adminFromUserData = false;
-            try {
-                if (typeof window.FirebaseConfig !== 'undefined' && window.FirebaseConfig.isReady()) {
-                    const db = window.FirebaseConfig.getDB();
-                    const userDoc = await db.collection('users').doc(username).get();
-                    if (userDoc.exists) {
-                        const userData = userDoc.data();
-                        adminFromUserData = userData.allianceRole === 'admin' || userData.allianceRole === 'founder';
-                    }
-                }
-            } catch (error) {
-                console.warn('⚠️ Konnte User-Daten für Member-Rolle nicht laden:', error);
-            }
-            
-            // User ist Admin wenn er in Alliance-Daten ODER User-Daten als Admin markiert ist
-            return adminFromAlliance || adminFromUserData;
+        function myUsername() {
+            return myMembership?.username || currentUser?.email || 'Du';
         }
 
         // Spy Database Functions
@@ -1191,7 +730,7 @@
 
                 console.log('📊 Lade Spy-Statistiken für:', currentAlliance.name);
                 
-                const stats = await window.SpyDatabaseAPI.getStatistics(currentAlliance.name);
+                const stats = await window.SpyDatabaseAPI.getStatistics(currentAlliance.id);
                 
                 // Statistiken anzeigen
                 document.getElementById('total-reports').textContent = stats.totalReports || 0;
@@ -1215,7 +754,7 @@
 
                 console.log('📋 Lade letzte Spy-Reports...');
                 
-                const reports = await window.SpyDatabaseAPI.getAllianceReports(currentAlliance.name, {
+                const reports = await window.SpyDatabaseAPI.getAllianceReports(currentAlliance.id, {
                     limit: 5,
                     sortBy: 'createdAt',
                     sortDirection: 'desc'
@@ -1289,413 +828,67 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('Alliance Dashboard loaded');
-            console.log('🌐 Aktuelle URL:', window.location.href);
-            
-            // Event Listeners sofort einrichten
             setupEventListeners();
-            
-            // Hauptinitialisierung starten
             await initializeAllianceDashboard();
-            
-            // Lade Allianz-Daten basierend auf URL-Parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const allianceId = urlParams.get('id');
-            const allianceTag = urlParams.get('alliance');
-            const username = urlParams.get('username');
-            
-            console.log('🔍 URL-Parameter Debug:', {
-                url: window.location.href,
-                search: window.location.search,
-                allianceId: allianceId,
-                allianceTag: allianceTag,
-                username: username,
-                allParams: Object.fromEntries(urlParams.entries())
-            });
-            
-            if (allianceId && username) {
-                console.log('✅ Individuelle Allianz-ID gefunden, lade spezifische Daten:', { allianceId, username });
-                loadIndividualAllianceDataById(allianceId, username);
-            } else if (allianceTag && username) {
-                console.log('✅ Allianz-Tag gefunden, lade individuelle Daten:', { allianceTag, username });
-                loadIndividualAllianceData(allianceTag, username);
-            } else {
-                console.log('⚠️ Keine Allianz-Parameter gefunden, versuche localStorage-Daten zu laden');
-                
-                // Versuche Allianz-Daten aus localStorage zu laden
-                const storedAlliance = localStorage.getItem('currentAlliance');
-                const storedUsername = localStorage.getItem('currentUsername');
-                
-                console.log('🔍 localStorage Debug:', {
-                    currentAlliance: storedAlliance ? 'Vorhanden' : 'Nicht vorhanden',
-                    currentUsername: storedUsername || 'Nicht vorhanden',
-                    allKeys: Object.keys(localStorage)
-                });
-                
-                if (storedAlliance && storedUsername) {
-                    try {
-                        const allianceData = JSON.parse(storedAlliance);
-                        console.log('✅ Allianz-Daten aus localStorage gefunden:', { 
-                            alliance: allianceData.name,
-                            tag: allianceData.tag,
-                            status: allianceData.status,
-                            username: storedUsername 
-                        });
-                        loadAllianceFromLocalStorage(storedAlliance, storedUsername);
-                    } catch (error) {
-                        console.error('❌ Fehler beim Parsen der localStorage-Daten:', error);
-                        console.log('🔄 Verwende Standard-Initialisierung');
-                        showAllianceAccessError();
-                    }
-                } else {
-                    console.log('❌ Keine Allianz-Daten gefunden');
-                    showAllianceAccessError();
-                }
-            }
         });
 
-        async function loadAllianceFromLocalStorage(storedAlliance, storedUsername) {
-            try {
-                console.log('🚀 Lade Allianz-Daten aus localStorage...');
-                
-                // Parse Allianz-Daten
-                currentAlliance = JSON.parse(storedAlliance);
-                const username = storedUsername;
-                
-                console.log('✅ Allianz-Daten geladen:', {
-                    name: currentAlliance.name,
-                    tag: currentAlliance.tag,
-                    status: currentAlliance.status,
-                    members: currentAlliance.members
-                });
-                
-                // Spy-Datenbank wird später nach Firebase-Initialisierung aufgerufen
-                
-                // Prüfe ob User Mitglied ist
-                if (!currentAlliance.members || !currentAlliance.members.includes(username)) {
-                    throw new Error(`Du bist kein Mitglied der Allianz "${currentAlliance.name}"`);
-                }
-                
-                // Prüfe ob User Admin ist
-                isAdmin = await checkAdminStatus(username);
-                console.log('👑 Admin-Status:', isAdmin);
-                
-                if (isAdmin) {
-                    console.log('🎉 User ist Admin - Berechtigungen und Mitgliederverwaltung werden geladen');
-                } else {
-                    console.log('ℹ️ User ist kein Admin - nur Standard-Features verfügbar');
-                }
-                
-                // Prüfe Allianz-Status
-                if (currentAlliance.status !== 'approved') {
-                    showError(`Deine Allianz wurde noch nicht genehmigt. Status: ${currentAlliance.status}`);
-                    if (currentAlliance.status === 'pending') {
-                        showError('Deine Allianz wartet auf Genehmigung durch einen Super-Admin. Bitte warte auf die Bestätigung.');
-                    } else if (currentAlliance.status === 'rejected') {
-                        showError('Deine Allianz wurde abgelehnt. Kontaktiere einen Super-Admin für weitere Informationen.');
-                    }
-                    return;
-                }
-                
-                // Lade Dashboard-Daten
-                displayAllianceInfo();
-                
-                // Versuche Firebase zu initialisieren für erweiterte Features
-                try {
-                    await initializeFirebaseForAlliance();
-                    console.log('✅ Firebase initialisiert, lade erweiterte Features...');
-                    loadActiveMembers();
-                    loadChatMessages();
-                } catch (error) {
-                    console.warn('⚠️ Firebase nicht verfügbar, verwende lokale Features:', error.message);
-                    loadActiveMembersLocal();
-                    loadChatMessagesLocal();
-                }
-                
-                // Initialisiere Permission Manager und Member Manager
-                await initializePermissionManager();
-                await initializeMemberManager();
-                
-                // Lade Berechtigungen für alle Benutzer (Inhalte nur für Admins)
-                loadPermissions();
-                if (isAdmin) {
-                    loadMemberManagement();
-                }
-                
-                console.log('🎉 Allianz-Dashboard aus localStorage erfolgreich geladen');
-                
-            } catch (error) {
-                console.error('❌ Fehler beim Laden der Allianz-Daten aus localStorage:', error);
-                showError('Fehler beim Laden der Allianz-Daten: ' + error.message);
-            }
-        }
+        // Einziger Ladepfad (ersetzt die vormals vier parallelen, teils gleichzeitig
+        // laufenden Lade-Funktionen): ermittelt die Allianz-ID aus dem URL-Parameter
+        // ?id= oder ?alliance=<tag>, sonst über die eigene allianceMembers-Mitgliedschaft.
+        async function resolveAllianceId(db, allianceIdParam, allianceTagParam) {
+            if (allianceIdParam) return allianceIdParam;
 
-        async function loadIndividualAllianceDataById(allianceId, username) {
-            try {
-                console.log('🚀 Lade individuelle Allianz-Daten nach ID...');
-                
-                // Initialisiere Firebase
-                await initializeFirebaseForAlliance();
-                
-                const db = window.FirebaseConfig.getDB();
-                
-                // Lade Allianz-Daten direkt nach ID
-                const allianceDoc = await db.collection('alliances').doc(allianceId).get();
-                
-                if (!allianceDoc.exists) {
-                    throw new Error(`Allianz mit ID "${allianceId}" nicht gefunden`);
-                }
-                
-                currentAlliance = {
-                    id: allianceDoc.id,
-                    ...allianceDoc.data()
-                };
-                
-                console.log('✅ Allianz gefunden:', currentAlliance.name);
-                
-                // Prüfe ob User Mitglied ist
-                if (!currentAlliance.members || !currentAlliance.members.includes(username)) {
-                    throw new Error(`Du bist kein Mitglied der Allianz "${currentAlliance.name}"`);
-                }
-                
-                // Prüfe ob User Admin ist
-                isAdmin = await checkAdminStatus(username);
-                console.log('👑 Admin-Status:', isAdmin);
-                
-                if (isAdmin) {
-                    console.log('🎉 User ist Admin - Berechtigungen und Mitgliederverwaltung werden geladen');
-                } else {
-                    console.log('ℹ️ User ist kein Admin - nur Standard-Features verfügbar');
-                }
-                
-                // Prüfe Allianz-Status
-                if (currentAlliance.status !== 'approved') {
-                    showError(`Deine Allianz wurde noch nicht genehmigt. Status: ${currentAlliance.status}`);
-                    if (currentAlliance.status === 'pending') {
-                        showError('Deine Allianz wartet auf Genehmigung durch einen Super-Admin. Bitte warte auf die Bestätigung.');
-                    } else if (currentAlliance.status === 'rejected') {
-                        showError('Deine Allianz wurde abgelehnt. Kontaktiere einen Super-Admin für weitere Informationen.');
-                    }
-                    return;
-                }
-                
-                // Lade Dashboard-Daten
-                displayAllianceInfo();
-                
-                // Versuche Firebase zu initialisieren für erweiterte Features
-                try {
-                    await initializeFirebaseForAlliance();
-                    console.log('✅ Firebase initialisiert, lade erweiterte Features...');
-                    loadActiveMembers();
-                    loadChatMessages();
-                } catch (error) {
-                    console.warn('⚠️ Firebase nicht verfügbar, verwende lokale Features:', error.message);
-                    loadActiveMembersLocal();
-                    loadChatMessagesLocal();
-                }
-                
-                // Initialisiere Permission Manager und Member Manager
-                await initializePermissionManager();
-                await initializeMemberManager();
-                
-                // Lade Berechtigungen für alle Benutzer (Inhalte nur für Admins)
-                loadPermissions();
-                if (isAdmin) {
-                    loadMemberManagement();
-                }
-                
-                console.log('🎉 Individuelles Allianz-Dashboard (ID) erfolgreich geladen');
-                
-            } catch (error) {
-                console.error('❌ Fehler beim Laden der individuellen Allianz-Daten (ID):', error);
-                showError('Fehler beim Laden der Allianz-Daten: ' + error.message);
+            if (allianceTagParam) {
+                const tagQuery = await db.collection('alliances').where('tag', '==', allianceTagParam).limit(1).get();
+                if (!tagQuery.empty) return tagQuery.docs[0].id;
             }
-        }
 
-        async function loadIndividualAllianceData(allianceTag, username) {
-            try {
-                console.log('🚀 Lade individuelle Allianz-Daten...');
-                
-                // Initialisiere Firebase
-                await initializeFirebaseForAlliance();
-                
-                const db = window.FirebaseConfig.getDB();
-                
-                // Suche Allianz nach Tag oder ID
-                let allianceQuery = await db.collection('alliances')
-                    .where('tag', '==', allianceTag)
-                    .get();
-                
-                if (allianceQuery.empty) {
-                    // Fallback: Suche nach ID
-                    allianceQuery = await db.collection('alliances')
-                        .where('__name__', '==', allianceTag)
-                        .get();
-                }
-                
-                if (allianceQuery.empty) {
-                    throw new Error(`Allianz mit Tag/ID "${allianceTag}" nicht gefunden`);
-                }
-                
-                const allianceDoc = allianceQuery.docs[0];
-                currentAlliance = {
-                    id: allianceDoc.id,
-                    ...allianceDoc.data()
-                };
-                
-                console.log('✅ Allianz gefunden:', currentAlliance.name);
-                
-                // Prüfe ob User Mitglied ist
-                if (!currentAlliance.members || !currentAlliance.members.includes(username)) {
-                    throw new Error(`Du bist kein Mitglied der Allianz "${currentAlliance.name}"`);
-                }
-                
-                // Prüfe ob User Admin ist
-                isAdmin = await checkAdminStatus(username);
-                console.log('👑 Admin-Status:', isAdmin);
-                
-                if (isAdmin) {
-                    console.log('🎉 User ist Admin - Berechtigungen und Mitgliederverwaltung werden geladen');
-                } else {
-                    console.log('ℹ️ User ist kein Admin - nur Standard-Features verfügbar');
-                }
-                
-                // Prüfe Allianz-Status
-                if (currentAlliance.status !== 'approved') {
-                    showError(`Deine Allianz wurde noch nicht genehmigt. Status: ${currentAlliance.status}`);
-                    if (currentAlliance.status === 'pending') {
-                        showError('Deine Allianz wartet auf Genehmigung durch einen Super-Admin. Bitte warte auf die Bestätigung.');
-                    } else if (currentAlliance.status === 'rejected') {
-                        showError('Deine Allianz wurde abgelehnt. Kontaktiere einen Super-Admin für weitere Informationen.');
-                    }
-                    return;
-                }
-                
-                // Lade Dashboard-Daten
-                displayAllianceInfo();
-                loadActiveMembers();
-                loadChatMessages();
-                
-                // Initialisiere Permission Manager
-                initializePermissionManager().then(() => {
-                    // Lade Berechtigungen für alle Benutzer (Inhalte nur für Admins)
-                    loadPermissions();
-                    if (isAdmin) {
-                        loadMemberManagement();
-                    }
-                });
-                
-                console.log('🎉 Individuelles Allianz-Dashboard erfolgreich geladen');
-                
-            } catch (error) {
-                console.error('❌ Fehler beim Laden der individuellen Allianz-Daten:', error);
-                showError('Fehler beim Laden der Allianz-Daten: ' + error.message);
-            }
-        }
-        
-        async function initializeFirebaseForAlliance() {
-            try {
-                console.log('🔥 Initialisiere Firebase für Allianz-Dashboard...');
-                
-                // Prüfe ob Firebase bereits initialisiert ist
-                if (typeof window.FirebaseConfig !== 'undefined' && window.FirebaseConfig.isReady()) {
-                    console.log('✅ Firebase bereits initialisiert');
-                    return;
-                }
-                
-                // Prüfe ob Firebase verfügbar ist
-                if (typeof firebase === 'undefined') {
-                    throw new Error('Firebase-Scripts nicht geladen');
-                }
-                
-                // Initialisiere Firebase
-                const firebaseConfig = {
-                    apiKey: 'AIzaSyDr4-ap_EubUn0UdP7hkEpS2jkzLIVgvyc',
-                    authDomain: 'spacenations-tools.firebaseapp.com',
-                    projectId: 'spacenations-tools',
-                    storageBucket: 'spacenations-tools.firebasestorage.app',
-                    messagingSenderId: '651338201276',
-                    appId: '1:651338201276:web:89e7d9c19dbd2611d3f8b9',
-                    measurementId: 'G-SKWJWH2ERX'
-                };
-                
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                }
-                
-                // Teste die Verbindung
-                const db = firebase.firestore();
-                await db.collection('_test').doc('connection').set({
-                    test: true,
-                    timestamp: new Date()
-                });
-                await db.collection('_test').doc('connection').delete();
-                
-                // Erstelle FirebaseConfig Mock
-                window.FirebaseConfig = {
-                    isReady: () => true,
-                    getAuth: () => firebase.auth(),
-                    getDB: () => firebase.firestore(),
-                    getServerTimestamp: () => firebase.firestore.FieldValue.serverTimestamp(),
-                    waitForInit: () => Promise.resolve()
-                };
-                
-                console.log('✅ Firebase erfolgreich initialisiert');
-                
-            } catch (error) {
-                console.error('❌ Firebase-Initialisierung fehlgeschlagen:', error);
-                throw error;
-            }
+            const membershipQuery = await db.collection('allianceMembers')
+                .where('uid', '==', getCurrentUid())
+                .limit(1)
+                .get();
+
+            return membershipQuery.empty ? null : membershipQuery.docs[0].data().allianceId;
         }
 
         async function initializeAllianceDashboard() {
             try {
-                // Prüfe ob Firebase verfügbar ist
-                if (typeof window.FirebaseConfig === 'undefined') {
-                console.log('Firebase nicht verfügbar, verwende lokale Daten');
-                await loadAllianceDataLocal();
-                
-                // Spy-Datenbank auch für lokale Daten versuchen
-                await initializeSpyDatabaseAfterFirebase();
-                return;
+                await window.AuthAPI.waitForInit();
+                currentUser = window.AuthAPI.getCurrentUser();
+
+                if (!currentUser) {
+                    showAllianceAccessError();
+                    return;
                 }
 
                 await window.FirebaseConfig.waitForReady();
-                await loadAllianceData();
-                
-                // Spy-Datenbank nach Firebase-Initialisierung laden
-                await initializeSpyDatabaseAfterFirebase();
-            } catch (error) {
-                console.error('Fehler beim Initialisieren des Allianzdashboards:', error);
-                showError('Fehler beim Laden des Allianzdashboards');
-            }
-        }
-
-        async function loadAllianceData() {
-            try {
                 const db = window.FirebaseConfig.getDB();
-                const username = getCurrentUsername();
 
-                if (!username) {
-                    showError('Bitte melde dich an, um das Allianzdashboard zu nutzen.');
+                const urlParams = new URLSearchParams(window.location.search);
+                const allianceId = await resolveAllianceId(db, urlParams.get('id'), urlParams.get('alliance'));
+
+                if (!allianceId) {
+                    showAllianceAccessError();
                     return;
                 }
 
-                // Suche nach Allianzen, in denen der User Mitglied ist
-                const userAlliancesQuery = await db.collection('alliances')
-                    .where('members', 'array-contains', username)
-                    .get();
-
-                if (userAlliancesQuery.empty) {
-                    showError('Du bist keiner Allianz beigetreten.');
+                const allianceDoc = await db.collection('alliances').doc(allianceId).get();
+                if (!allianceDoc.exists) {
+                    showError('Allianz nicht gefunden.');
                     return;
                 }
-
-                const allianceDoc = userAlliancesQuery.docs[0];
                 currentAlliance = { id: allianceDoc.id, ...allianceDoc.data() };
+
+                const memberDoc = await db.collection('allianceMembers').doc(`${allianceId}_${getCurrentUid()}`).get();
+                if (!memberDoc.exists) {
+                    showError(`Du bist kein Mitglied der Allianz "${currentAlliance.name}".`);
+                    return;
+                }
+                myMembership = memberDoc.data();
+                isAdmin = myMembership.role === 'admin' || myMembership.role === 'founder';
 
                 if (currentAlliance.status !== 'approved') {
                     showError(`Deine Allianz wurde noch nicht genehmigt. Status: ${currentAlliance.status}`);
-                    // Zeige zusätzliche Informationen je nach Status
                     if (currentAlliance.status === 'pending') {
                         showError('Deine Allianz wartet auf Genehmigung durch einen Super-Admin. Bitte warte auf die Bestätigung.');
                     } else if (currentAlliance.status === 'rejected') {
@@ -1704,135 +897,55 @@
                     return;
                 }
 
-                // Prüfe ob User Admin ist
-                isAdmin = await checkAdminStatus(username);
-
                 displayAllianceInfo();
+                await initializePermissionManager();
+                await initializeMemberManager();
                 loadActiveMembers();
                 loadChatMessages();
-                
-                await initializePermissionManager();
-                await initializeMemberManager();
                 loadPermissions();
                 if (isAdmin) {
                     loadMemberManagement();
                 }
+
+                await initializeSpyDatabaseAfterFirebase();
+
+                console.log('🎉 Allianz-Dashboard erfolgreich geladen');
 
             } catch (error) {
-                console.error('Fehler beim Laden der Allianzdaten:', error);
-                showError('Fehler beim Laden der Allianzdaten');
-            }
-        }
-
-        async function loadAllianceDataLocal() {
-            // Fallback für lokale Entwicklung
-            const localAlliance = localStorage.getItem('userAlliance');
-            if (localAlliance) {
-                currentAlliance = JSON.parse(localAlliance);
-                const username = localStorage.getItem('currentUsername') || 'TestUser';
-                isAdmin = await checkAdminStatus(username);
-                displayAllianceInfo();
-                loadActiveMembersLocal();
-                loadChatMessagesLocal();
-                await initializePermissionManager();
-                await initializeMemberManager();
-                
-                // Lade Berechtigungen für alle Benutzer (Inhalte nur für Admins)
-                loadPermissions();
-                if (isAdmin) {
-                    loadMemberManagement();
-                }
-            } else {
-                showError('Keine Allianzdaten gefunden');
+                console.error('Fehler beim Initialisieren des Allianzdashboards:', error);
+                showError('Fehler beim Laden des Allianzdashboards: ' + error.message);
             }
         }
 
         function displayAllianceInfo() {
             if (!currentAlliance) return;
 
+            const memberCount = memberManager ? memberManager.getMembers().length : 0;
+            const admins = memberManager ? memberManager.getAdmins().map(m => m.username) : [];
+
             document.getElementById('alliance-name').textContent = currentAlliance.name;
             document.getElementById('alliance-name-info').textContent = currentAlliance.name;
             document.getElementById('alliance-tag-info').textContent = currentAlliance.tag;
-            document.getElementById('alliance-members-count').textContent = currentAlliance.members ? currentAlliance.members.length : 0;
-            document.getElementById('alliance-admin-info').textContent = currentAlliance.admin || 'Nicht gesetzt';
-            
-            const welcomeMessage = `Willkommen in der Allianz "${currentAlliance.name}"!`;
-            document.getElementById('welcome-message').textContent = welcomeMessage;
+            document.getElementById('alliance-members-count').textContent = memberCount;
+            document.getElementById('alliance-admin-info').textContent = admins.length ? admins.join(', ') : 'Nicht gesetzt';
+
+            document.getElementById('welcome-message').textContent = `Willkommen in der Allianz "${currentAlliance.name}"!`;
         }
 
-        async function loadActiveMembers() {
-            try {
-                // Prüfe ob Firebase verfügbar ist
-                if (typeof window.FirebaseConfig === 'undefined' || !window.FirebaseConfig.isReady()) {
-                    console.log('⚠️ Firebase nicht verfügbar, verwende lokale Mitglieder-Daten');
-                    loadActiveMembersLocal();
-                    return;
-                }
-                
-                const db = window.FirebaseConfig.getDB();
-                
-                // Lade Mitglieder mit Admin/Member-Status
-                const members = currentAlliance.members || [];
-                const membersWithStatus = await Promise.all(members.map(async member => {
-                    // Prüfe Admin-Status für jeden Member
-                    const isMemberAdmin = await checkMemberRole(member);
-                    
-                    return {
-                        name: member,
-                        status: Math.random() > 0.3 ? 'online' : 'offline', // Simuliert Online-Status
-                        lastSeen: new Date(),
-                        role: isMemberAdmin ? 'admin' : 'member'
-                    };
-                }));
+        function loadActiveMembers() {
+            if (!memberManager) return;
 
-                displayMembers(membersWithStatus);
+            const members = memberManager.getMembers().map(m => ({
+                name: m.username,
+                role: (m.role === 'admin' || m.role === 'founder') ? 'admin' : 'member'
+            }));
 
-                // Setze up Real-time Updates für Mitglieder
-                membersUnsubscribe = db.collection('alliances').doc(currentAlliance.id)
-                    .onSnapshot(async doc => {
-                        if (doc.exists) {
-                            const data = doc.data();
-                            currentAlliance = { id: doc.id, ...data };
-                            displayAllianceInfo();
-                            
-                            const members = data.members || [];
-                            const membersWithStatus = await Promise.all(members.map(async member => {
-                                const isMemberAdmin = await checkMemberRole(member);
-                                return {
-                                    name: member,
-                                    status: Math.random() > 0.3 ? 'online' : 'offline',
-                                    lastSeen: new Date(),
-                                    role: isMemberAdmin ? 'admin' : 'member'
-                                };
-                            }));
-                            displayMembers(membersWithStatus);
-                        }
-                    });
-
-            } catch (error) {
-                console.error('Fehler beim Laden der Mitglieder:', error);
-            }
-        }
-
-        function loadActiveMembersLocal() {
-            const members = currentAlliance.members || [];
-            const membersWithStatus = members.map(member => {
-                // Prüfe Admin-Status für lokale Entwicklung
-                const isMemberAdmin = currentAlliance.admin === member || currentAlliance.founder === member;
-                
-                return {
-                    name: member,
-                    status: Math.random() > 0.3 ? 'online' : 'offline',
-                    lastSeen: new Date(),
-                    role: isMemberAdmin ? 'admin' : 'member'
-                };
-            });
-            displayMembers(membersWithStatus);
+            displayMembers(members);
         }
 
         function displayMembers(members) {
             const container = document.getElementById('active-members');
-            
+
             if (members.length === 0) {
                 container.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">Keine Mitglieder gefunden</div>';
                 return;
@@ -1842,79 +955,35 @@
                 <div class="member-item">
                     <div class="member-info">
                         <div class="member-avatar">${member.name.charAt(0).toUpperCase()}</div>
-                        <div>
-                            <div class="member-name">
-                                ${member.name}
-                                ${member.role === 'admin' ? '<span class="role-badge admin">👑 Admin</span>' : '<span class="role-badge member">👤 Member</span>'}
-                            </div>
-                            <div class="member-status">
-                                <span class="status-indicator status-${member.status}"></span>
-                                ${member.status === 'online' ? 'Online' : 'Offline'}
-                            </div>
+                        <div class="member-name">
+                            ${member.name}
+                            ${member.role === 'admin' ? '<span class="role-badge admin">👑 Admin</span>' : '<span class="role-badge member">👤 Member</span>'}
                         </div>
                     </div>
                 </div>
             `).join('');
         }
 
-        async function loadChatMessages() {
-            try {
-                // Prüfe ob User Mitglied der Allianz ist
-                const username = getCurrentUsername();
-                if (!username || !currentAlliance.members || !currentAlliance.members.includes(username)) {
-                    console.log('⚠️ User ist kein Mitglied der Allianz, Chat nicht verfügbar');
-                    displayChatMessages([]);
-                    return;
-                }
+        function loadChatMessages() {
+            if (!currentAlliance) return;
 
-                // Prüfe ob Firebase verfügbar ist
-                if (typeof window.FirebaseConfig === 'undefined' || !window.FirebaseConfig.isReady()) {
-                    console.log('⚠️ Firebase nicht verfügbar, verwende lokale Chat-Daten');
-                    loadChatMessagesLocal();
-                    return;
-                }
-                
-                const db = window.FirebaseConfig.getDB();
-                
-                // Lade Chat-Nachrichten für alle Mitglieder
-                const messagesQuery = await db.collection('allianceChats')
-                    .doc(currentAlliance.id)
-                    .collection('messages')
-                    .orderBy('timestamp', 'desc')
-                    .limit(50)
-                    .get();
+            const db = window.FirebaseConfig.getDB();
 
-                const messages = [];
-                messagesQuery.forEach(doc => {
-                    messages.push({ id: doc.id, ...doc.data() });
-                });
-
-                displayChatMessages(messages.reverse());
-
-                // Setze up Real-time Chat Updates für alle Mitglieder
-                chatUnsubscribe = db.collection('allianceChats')
-                    .doc(currentAlliance.id)
-                    .collection('messages')
-                    .orderBy('timestamp', 'desc')
-                    .limit(50)
-                    .onSnapshot(snapshot => {
-                        const messages = [];
-                        snapshot.forEach(doc => {
-                            messages.push({ id: doc.id, ...doc.data() });
-                        });
-                        displayChatMessages(messages.reverse());
+            chatUnsubscribe = db.collection('allianceChats')
+                .doc(currentAlliance.id)
+                .collection('messages')
+                .orderBy('timestamp', 'desc')
+                .limit(50)
+                .onSnapshot(snapshot => {
+                    const messages = [];
+                    snapshot.forEach(doc => {
+                        messages.push({ id: doc.id, ...doc.data() });
                     });
-
-            } catch (error) {
-                console.error('Fehler beim Laden der Chat-Nachrichten:', error);
-                displayChatMessages([]);
-            }
-        }
-
-        function loadChatMessagesLocal() {
-            // Fallback für lokale Entwicklung
-            const localMessages = JSON.parse(localStorage.getItem(`allianceChat_${currentAlliance.id}`) || '[]');
-            displayChatMessages(localMessages);
+                    displayChatMessages(messages.reverse());
+                }, error => {
+                    console.error('Fehler beim Laden der Chat-Nachrichten:', error);
+                    displayChatMessages([]);
+                });
         }
 
         function displayChatMessages(messages) {
@@ -1942,7 +1011,7 @@
         async function initializePermissionManager() {
             try {
                 permissionManager = new window.AlliancePermissionManager();
-                await permissionManager.initialize(currentAlliance.id, getCurrentUsername());
+                await permissionManager.initialize(currentAlliance.id, getCurrentUid());
                 
                 // Setze Callbacks für Real-time Updates
                 permissionManager.onPermissionsUpdated = () => {
@@ -1961,7 +1030,7 @@
         async function initializeMemberManager() {
             try {
                 memberManager = new window.AllianceMemberManager();
-                await memberManager.initialize(currentAlliance.id, getCurrentUsername(), permissionManager);
+                await memberManager.initialize(currentAlliance.id, getCurrentUid());
                 
                 // Setze Callbacks für Real-time Updates
                 memberManager.onMembersUpdated = () => {
@@ -2001,7 +1070,7 @@
                     memberManagement.innerHTML = `
                         <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
                             <div style="font-size: 2rem; margin-bottom: 15px;">🔒</div>
-                            <h4 style="color: var(--razer-green); margin-bottom: 10px;">Admin-Berechtigung erforderlich</h4>
+                            <h4 style="color: var(--accent-strong); margin-bottom: 10px;">Admin-Berechtigung erforderlich</h4>
                             <p>Nur Allianz-Admins können Berechtigungen verwalten.</p>
                         </div>
                     `;
@@ -2010,22 +1079,13 @@
             }
         }
 
-        async function loadMemberManagement() {
-            console.log('👥 loadMemberManagement aufgerufen:', { isAdmin, permissionManager: !!permissionManager, memberManager: !!memberManager });
-            
-            if (!isAdmin || !permissionManager || !memberManager) {
-                console.log('⚠️ loadMemberManagement abgebrochen - nicht alle Voraussetzungen erfüllt');
-                return;
-            }
+        function loadMemberManagement() {
+            if (!isAdmin || !permissionManager || !memberManager) return;
 
             const members = memberManager.getMembers();
             const permissions = permissionManager.getPermissionList();
             const container = document.getElementById('member-management');
-            
-            console.log('🔍 Berechtigungen für UI:', permissions);
-            console.log('👥 Mitglieder für UI:', members);
-            
-            // Erstelle Tabellen-Header
+
             let html = `
                 <div class="permission-table">
                     <div class="permission-header">
@@ -2039,66 +1099,53 @@
                     </div>
             `;
 
-            // Erstelle Zeilen für jedes Mitglied
             members.forEach(member => {
-                const memberPermissions = permissionManager.getMemberPermissionList(member);
-                const isCurrentUser = member === getCurrentUsername();
-                
+                const memberPermissions = permissionManager.getMemberPermissionList(member.uid);
+                const isCurrentUser = member.uid === getCurrentUid();
+                const isAdminUser = member.role === 'admin' || member.role === 'founder';
+
                 html += `
                     <div class="permission-row">
                         <div class="member-info">
-                            <div class="member-avatar">${member.charAt(0).toUpperCase()}</div>
+                            <div class="member-avatar">${member.username.charAt(0).toUpperCase()}</div>
                             <div class="member-details">
-                                <div class="member-name">${member} ${isCurrentUser ? '(Du)' : ''}</div>
-                                <div class="member-role">${member === currentAlliance.admin ? 'Admin' : 'Mitglied'}</div>
+                                <div class="member-name">${member.username} ${isCurrentUser ? '(Du)' : ''}</div>
+                                <div class="member-role">${member.role === 'founder' ? 'Gründer' : (member.role === 'admin' ? 'Admin' : 'Mitglied')}</div>
                             </div>
                         </div>
                         ${permissions.map(perm => {
                             const memberPerm = memberPermissions.find(p => p.id === perm.id);
-                            const isEnabled = memberPerm ? memberPerm.enabled : perm.enabled;
+                            const finalEnabled = isAdminUser ? true : (memberPerm ? memberPerm.enabled : false);
                             const isCustom = memberPerm ? memberPerm.isCustom : false;
-                            
-                            // Admin hat immer alle Berechtigungen
-                            const isAdminUser = member === currentAlliance.admin || member === currentAlliance.founder;
-                            const finalEnabled = isAdminUser ? true : isEnabled;
-                            
-                            const canEdit = isAdmin && !isCurrentUser;
-                            
-                            console.log(`🔍 Berechtigung ${perm.id} für ${member}:`, {
-                                memberPerm: memberPerm,
-                                isEnabled: isEnabled,
-                                isAdminUser: isAdminUser,
-                                finalEnabled: finalEnabled,
-                                canEdit: canEdit
-                            });
-                            
+                            const canEdit = isAdmin && !isCurrentUser && !isAdminUser;
+
                             return `
                                 <div class="permission-cell">
                                     <label class="toggle-switch" style="cursor: ${canEdit ? 'pointer' : 'not-allowed'};">
-                                        <input type="checkbox" 
-                                               ${finalEnabled ? 'checked' : ''} 
+                                        <input type="checkbox"
+                                               ${finalEnabled ? 'checked' : ''}
                                                ${!canEdit ? 'disabled' : ''}
-                                               onchange="handlePermissionToggle('${member}', '${perm.id}', this.checked, this)"
-                                               data-member="${member}" 
+                                               onchange="handlePermissionToggle('${member.uid}', '${perm.id}', this.checked, this)"
+                                               data-member="${member.uid}"
                                                data-permission="${perm.id}">
                                         <span class="toggle-slider"></span>
                                     </label>
                                     ${isCustom ? '<span class="custom-indicator" title="Individuelle Berechtigung">*</span>' : ''}
-                                    ${isAdminUser ? '<span class="admin-indicator" title="Allianz-Admin" style="color: #FFD700; font-weight: bold; margin-left: 5px;">👑</span>' : ''}
+                                    ${isAdminUser ? '<span class="admin-indicator" title="Allianz-Admin" style="color: #B26A00; font-weight: bold; margin-left: 5px;">👑</span>' : ''}
                                 </div>
                             `;
                         }).join('')}
                         <div class="action-cell">
-                            ${!isCurrentUser ? `
+                            ${(!isCurrentUser && member.role !== 'founder') ? `
                                 <div class="action-buttons">
-                                    <button class="btn small danger" 
-                                            onclick="removeMember('${member}')"
-                                            ${!isAdmin ? 'disabled' : ''}
+                                    ${member.role !== 'admin' ? `<button class="btn small" onclick="setAllianceAdmin('${member.uid}')" title="Zum Allianz-Admin machen">👑</button>` : ''}
+                                    <button class="btn small danger"
+                                            onclick="removeMember('${member.uid}')"
                                             title="Mitglied aus der Allianz entfernen">
                                         Entfernen
                                     </button>
                                 </div>
-                            ` : '<span style="color: var(--text-secondary); font-size: 0.8rem;">Eigener Account</span>'}
+                            ` : '<span style="color: var(--text-secondary); font-size: 0.8rem;">-</span>'}
                         </div>
                     </div>
                 `;
@@ -2106,7 +1153,6 @@
 
             html += '</div>';
 
-            // Füge "Mitglied hinzufügen" Button hinzu
             html += `
                 <div class="add-member-section">
                     <h4>Mitglied hinzufügen</h4>
@@ -2120,21 +1166,6 @@
             `;
 
             container.innerHTML = html;
-            console.log('✅ Mitglieder-Verwaltung HTML generiert und angezeigt');
-            
-            // Debug: Teste Toggle-Switches
-            setTimeout(() => {
-                const toggles = container.querySelectorAll('.toggle-switch input');
-                console.log('🔍 Gefundene Toggle-Switches:', toggles.length);
-                toggles.forEach((toggle, index) => {
-                    console.log(`Toggle ${index}:`, {
-                        member: toggle.dataset.member,
-                        permission: toggle.dataset.permission,
-                        checked: toggle.checked,
-                        disabled: toggle.disabled
-                    });
-                });
-            }, 100);
         }
 
         function setupEventListeners() {
@@ -2152,133 +1183,34 @@
         async function sendMessage() {
             const input = document.getElementById('chat-input');
             const content = input.value.trim();
-            
+
             if (!content) return;
-
-            const username = getCurrentUsername();
-            if (!username) {
-                alert('Bitte melde dich an, um Nachrichten zu senden.');
-                return;
-            }
-
-            // Prüfe ob User Mitglied der Allianz ist
-            if (!currentAlliance.members || !currentAlliance.members.includes(username)) {
+            if (!currentUser || !myMembership) {
                 alert('Du musst Mitglied der Allianz sein, um Nachrichten zu senden.');
                 return;
             }
+            if (permissionManager && !permissionManager.canWriteChat()) {
+                alert('Du hast keine Berechtigung, im Chat zu schreiben.');
+                return;
+            }
 
             try {
-                if (typeof window.FirebaseConfig !== 'undefined' && window.FirebaseConfig.isReady()) {
-                    await sendMessageFirebase(content, username);
-                } else {
-                    sendMessageLocal(content, username);
-                }
-                
+                const db = window.FirebaseConfig.getDB();
+                await db.collection('allianceChats')
+                    .doc(currentAlliance.id)
+                    .collection('messages')
+                    .add({
+                        content: content,
+                        author: myUsername(),
+                        authorUid: currentUser.uid,
+                        timestamp: window.FirebaseConfig.getServerTimestamp(),
+                        allianceId: currentAlliance.id
+                    });
+
                 input.value = '';
             } catch (error) {
                 console.error('Fehler beim Senden der Nachricht:', error);
-                alert('Fehler beim Senden der Nachricht');
-            }
-        }
-
-        async function sendMessageFirebase(content, author) {
-            const db = window.FirebaseConfig.getDB();
-            
-            await db.collection('allianceChats')
-                .doc(currentAlliance.id)
-                .collection('messages')
-                .add({
-                    content: content,
-                    author: author,
-                    timestamp: window.FirebaseConfig.getServerTimestamp(),
-                    allianceId: currentAlliance.id
-                });
-        }
-
-        function sendMessageLocal(content, author) {
-            const message = {
-                content: content,
-                author: author,
-                timestamp: new Date().toISOString(),
-                allianceId: currentAlliance.id
-            };
-            
-            const messages = JSON.parse(localStorage.getItem(`allianceChat_${currentAlliance.id}`) || '[]');
-            messages.push(message);
-            localStorage.setItem(`allianceChat_${currentAlliance.id}`, JSON.stringify(messages));
-            
-            displayChatMessages(messages);
-        }
-
-        // toggleAlliancePermission entfernt - Berechtigungen werden jetzt über Mitgliederverwaltung gesteuert
-
-        async function editMemberPermissions(memberUsername) {
-            if (!permissionManager) return;
-            
-            const memberPermissions = permissionManager.getMemberPermissionList(memberUsername);
-            
-            // Erstelle Modal für Berechtigungsbearbeitung
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.style.display = 'flex';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <h3>Berechtigungen für ${memberUsername}</h3>
-                    <div id="member-permission-list">
-                        ${memberPermissions.map(perm => `
-                            <div class="permission-item">
-                                <div class="permission-header">
-                                    <span class="permission-title">${perm.description}</span>
-                                    <div class="permission-toggle ${perm.enabled ? 'active' : ''}" 
-                                         data-permission="${perm.id}"></div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="controls" style="margin-top: 20px;">
-                        <button class="btn success" onclick="saveMemberPermissions('${memberUsername}')">Speichern</button>
-                        <button class="btn" onclick="closeMemberPermissionModal()">Abbrechen</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // Event Listener für Toggles
-            modal.querySelectorAll('.permission-toggle').forEach(toggle => {
-                toggle.addEventListener('click', () => {
-                    toggle.classList.toggle('active');
-                });
-            });
-        }
-
-        async function saveMemberPermissions(memberUsername) {
-            if (!permissionManager) return;
-            
-            try {
-                const toggles = document.querySelectorAll('#member-permission-list .permission-toggle');
-                
-                for (const toggle of toggles) {
-                    const permission = toggle.getAttribute('data-permission');
-                    const enabled = toggle.classList.contains('active');
-                    
-                    await permissionManager.setMemberPermission(memberUsername, permission, enabled);
-                }
-                
-                closeMemberPermissionModal();
-                loadMemberManagement();
-                console.log(`Berechtigungen für ${memberUsername} gespeichert`);
-                
-            } catch (error) {
-                console.error('Fehler beim Speichern der Mitglieder-Berechtigungen:', error);
-                alert('Fehler beim Speichern der Berechtigungen: ' + error.message);
-            }
-        }
-
-        function closeMemberPermissionModal() {
-            const modal = document.querySelector('.modal');
-            if (modal) {
-                modal.remove();
+                alert('Fehler beim Senden der Nachricht: ' + error.message);
             }
         }
 
@@ -2314,70 +1246,46 @@
             }
         }
 
-        async function handlePermissionToggle(member, permission, enabled, element) {
-            console.log('🔄 Toggle geklickt:', { member, permission, enabled });
-            
-            // Prüfe ob der User Admin ist
+        async function handlePermissionToggle(memberUid, permission, enabled, element) {
             if (!isAdmin) {
-                console.warn('⚠️ Nur Admins können Berechtigungen ändern');
-                element.checked = !enabled; // Toggle zurück
+                element.checked = !enabled;
                 showError('Nur Allianz-Admins können Berechtigungen ändern');
                 return;
             }
-            
-            // Prüfe ob es der aktuelle User ist
-            if (member === getCurrentUsername()) {
-                console.warn('⚠️ Du kannst deine eigenen Berechtigungen nicht ändern');
-                element.checked = !enabled; // Toggle zurück
+
+            if (memberUid === getCurrentUid()) {
+                element.checked = !enabled;
                 showError('Du kannst deine eigenen Berechtigungen nicht ändern');
                 return;
             }
-            
-            // Prüfe ob es ein Admin-User ist (kann nicht geändert werden)
-            const isAdminUser = member === currentAlliance.admin || member === currentAlliance.founder;
-            if (isAdminUser) {
-                console.warn('⚠️ Admin-Berechtigungen können nicht geändert werden');
-                element.checked = true; // Immer auf true setzen für Admins
-                showError('Admin-Berechtigungen können nicht geändert werden');
-                return;
-            }
-            
+
             try {
-                // Zeige Loading-Status
                 element.disabled = true;
                 element.style.opacity = '0.5';
-                
-                await permissionManager.setMemberPermission(member, permission, enabled);
-                console.log(`✅ Berechtigung ${permission} für ${member} auf ${enabled} gesetzt`);
-                
-                // Erfolgsmeldung
-                showSuccess(`Berechtigung "${permission}" für ${member} ${enabled ? 'aktiviert' : 'deaktiviert'}`);
-                
+
+                await permissionManager.setMemberPermission(memberUid, permission, enabled);
+                showSuccess(`Berechtigung "${permission}" ${enabled ? 'aktiviert' : 'deaktiviert'}`);
+
             } catch (error) {
                 console.error('❌ Fehler beim Setzen der Berechtigung:', error);
-                element.checked = !enabled; // Toggle zurück bei Fehler
+                element.checked = !enabled;
                 showError('Fehler beim Setzen der Berechtigung: ' + error.message);
             } finally {
-                // Reaktiviere Element
                 element.disabled = false;
                 element.style.opacity = '1';
             }
         }
 
-        async function toggleMemberPermission(member, permission, enabled) {
-            // Legacy-Funktion für Rückwärtskompatibilität
-            return handlePermissionToggle(member, permission, enabled, null);
-        }
-
-        async function setAllianceAdmin(username) {
-            if (!confirm(`"${username}" als neuen Allianzadmin setzen?`)) {
+        async function setAllianceAdmin(memberUid) {
+            const target = memberManager?.findByUid(memberUid);
+            if (!confirm(`"${target?.username || memberUid}" als neuen Allianzadmin setzen?`)) {
                 return;
             }
 
             try {
-                await memberManager.setAllianceAdmin(username);
-                currentAlliance.admin = username;
-                showSuccess(`"${username}" ist jetzt der neue Allianzadmin`);
+                await memberManager.setAllianceAdmin(memberUid);
+                showSuccess(`"${target?.username}" ist jetzt der neue Allianzadmin`);
+                displayAllianceInfo();
                 loadMemberManagement();
             } catch (error) {
                 console.error('Fehler beim Setzen des Allianzadmins:', error);
@@ -2385,27 +1293,19 @@
             }
         }
 
-        async function removeMember(memberUsername) {
-            if (!confirm(`Mitglied ${memberUsername} wirklich aus der Allianz entfernen?`)) {
+        async function removeMember(memberUid) {
+            const target = memberManager?.findByUid(memberUid);
+            if (!confirm(`Mitglied ${target?.username || memberUid} wirklich aus der Allianz entfernen?`)) {
                 return;
             }
-            
+
             try {
-                if (memberManager) {
-                    await memberManager.removeMember(memberUsername);
-                } else if (permissionManager) {
-                    await permissionManager.removeMember(memberUsername);
-                }
-                
-                // Aktualisiere lokale Daten
-                if (currentAlliance && currentAlliance.members) {
-                    currentAlliance.members = currentAlliance.members.filter(m => m !== memberUsername);
-                }
-                
+                await memberManager.removeMember(memberUid);
                 loadMemberManagement();
                 loadActiveMembers();
-                showSuccess(`Mitglied "${memberUsername}" erfolgreich entfernt`);
-                
+                displayAllianceInfo();
+                showSuccess(`Mitglied "${target?.username}" erfolgreich entfernt`);
+
             } catch (error) {
                 console.error('Fehler beim Entfernen des Mitglieds:', error);
                 showError('Fehler beim Entfernen des Mitglieds: ' + error.message);
@@ -2419,7 +1319,7 @@
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                background: #4CAF50;
+                background: var(--accent);
                 color: white;
                 padding: 15px 20px;
                 border-radius: 5px;
@@ -2441,7 +1341,7 @@
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                background: #F44336;
+                background: var(--danger);
                 color: white;
                 padding: 15px 20px;
                 border-radius: 5px;
@@ -2474,50 +1374,33 @@
             }
         }
 
-        function getCurrentUsername() {
-            // Methode 1: Aus URL-Parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const usernameFromUrl = urlParams.get('username');
-            if (usernameFromUrl) return usernameFromUrl;
-            
-            // Methode 2: Aus localStorage
-            const usernameFromStorage = localStorage.getItem('currentUsername');
-            if (usernameFromStorage) return usernameFromStorage;
-            
-            // Methode 3: Aus sessionStorage
-            const usernameFromSession = sessionStorage.getItem('currentUsername');
-            if (usernameFromSession) return usernameFromSession;
-            
-            return null;
-        }
-
         function showAllianceAccessError() {
             const container = document.querySelector('.container');
             container.innerHTML = `
                 <div style="text-align: center; padding: 60px 20px; max-width: 600px; margin: 0 auto;">
                     <div style="font-size: 4rem; margin-bottom: 20px;">🏰</div>
-                    <h1 style="color: var(--razer-green); font-family: var(--font-gaming); margin-bottom: 20px;">
+                    <h1 style="color: var(--accent-strong); font-family: var(--font-gaming); margin-bottom: 20px;">
                         Allianz-Dashboard
                     </h1>
-                    <div style="background: var(--bg-card); border: 2px solid var(--razer-green); border-radius: 12px; padding: 30px; margin-bottom: 30px;">
-                        <h2 style="color: var(--razer-green); margin-bottom: 15px;">Zugriff erforderlich</h2>
+                    <div style="background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 30px; margin-bottom: 30px;">
+                        <h2 style="color: var(--accent-strong); margin-bottom: 15px;">Zugriff erforderlich</h2>
                         <p style="color: var(--text-primary); margin-bottom: 20px; line-height: 1.6;">
                             Um das Allianz-Dashboard zu nutzen, musst du über das User-Dashboard darauf zugreifen.
                         </p>
-                        <div style="background: var(--bg-secondary); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-                            <h3 style="color: var(--razer-green); margin-bottom: 10px;">So gelangst du hierher:</h3>
+                        <div style="background: #F7F8FA; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                            <h3 style="color: var(--accent-strong); margin-bottom: 10px;">So gelangst du hierher:</h3>
                             <ol style="color: var(--text-primary); text-align: left; line-height: 1.8;">
-                                <li>Gehe zu <a href="user-dashboard.html" style="color: var(--razer-green);">User-Dashboard</a></li>
+                                <li>Gehe zu <a href="user-dashboard.html" style="color: var(--accent-strong);">User-Dashboard</a></li>
                                 <li>Melde dich mit deinem Account an</li>
                                 <li>Klicke auf "Zum Allianzdashboard" bei deiner Allianz</li>
                             </ol>
                         </div>
                         <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                             <a href="user-dashboard.html" class="btn primary" style="text-decoration: none;">
-                                🏠 Zum User-Dashboard
+                                Zum User-Dashboard
                             </a>
                             <a href="index.html" class="btn" style="text-decoration: none;">
-                                🏠 Zur Startseite
+                                Zur Startseite
                             </a>
                         </div>
                     </div>
@@ -2528,125 +1411,13 @@
             `;
         }
 
-        function showError(message) {
-            document.getElementById('welcome-message').textContent = message;
-            document.getElementById('welcome-message').style.color = '#ef4444';
-        }
-
         // Cleanup beim Verlassen der Seite
         window.addEventListener('beforeunload', () => {
             if (chatUnsubscribe) chatUnsubscribe();
-            if (membersUnsubscribe) membersUnsubscribe();
         });
-        // Debug-Funktionen
-        function createTestAllianceData() {
-            const testAlliance = {
-                id: 'test-alliance-123',
-                name: 'Test Allianz',
-                tag: 'TEST',
-                description: 'Test-Allianz für Debugging',
-                founder: 'testuser',
-                members: ['testuser'],
-                status: 'approved',
-                admin: 'testuser',
-                createdAt: new Date().toISOString()
-            };
-            
-            localStorage.setItem('currentAlliance', JSON.stringify(testAlliance));
-            localStorage.setItem('currentUsername', 'testuser');
-            
-            console.log('✅ Test-Allianz-Daten erstellt:', testAlliance);
-            alert('Test-Allianz-Daten erstellt! Lade die Seite neu.');
-        }
-        
-        function clearAllianceData() {
-            localStorage.removeItem('currentAlliance');
-            localStorage.removeItem('currentUsername');
-            console.log('🗑️ Allianz-Daten gelöscht');
-            alert('Allianz-Daten gelöscht! Lade die Seite neu.');
-        }
-        
-        // Debug-Buttons hinzufügen (nur für Entwicklung)
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('debug') === 'true') {
-                // Test Alliance Button
-                const testBtn = document.createElement('button');
-                testBtn.textContent = '🧪 Test Allianz';
-                testBtn.style.position = 'fixed';
-                testBtn.style.top = '10px';
-                testBtn.style.right = '10px';
-                testBtn.style.zIndex = '9999';
-                testBtn.style.background = '#4CAF50';
-                testBtn.style.color = 'white';
-                testBtn.style.border = 'none';
-                testBtn.style.padding = '10px';
-                testBtn.style.borderRadius = '5px';
-                testBtn.style.cursor = 'pointer';
-                testBtn.style.marginRight = '10px';
-                testBtn.onclick = createTestAllianceData;
-                document.body.appendChild(testBtn);
-                
-                // Clear Data Button
-                const clearBtn = document.createElement('button');
-                clearBtn.textContent = '🗑️ Clear Data';
-                clearBtn.style.position = 'fixed';
-                clearBtn.style.top = '10px';
-                clearBtn.style.right = '200px';
-                clearBtn.style.zIndex = '9999';
-                clearBtn.style.background = '#f44336';
-                clearBtn.style.color = 'white';
-                clearBtn.style.border = 'none';
-                clearBtn.style.padding = '10px';
-                clearBtn.style.borderRadius = '5px';
-                clearBtn.style.cursor = 'pointer';
-                clearBtn.onclick = clearAllianceData;
-                document.body.appendChild(clearBtn);
-                
-                // Test Toggle Button
-                const toggleTestBtn = document.createElement('button');
-                toggleTestBtn.textContent = '🔄 Test Toggle';
-                toggleTestBtn.style.position = 'fixed';
-                toggleTestBtn.style.top = '50px';
-                toggleTestBtn.style.right = '10px';
-                toggleTestBtn.style.zIndex = '9999';
-                toggleTestBtn.style.background = '#2196F3';
-                toggleTestBtn.style.color = 'white';
-                toggleTestBtn.style.border = 'none';
-                toggleTestBtn.style.padding = '10px';
-                toggleTestBtn.style.borderRadius = '5px';
-                toggleTestBtn.style.cursor = 'pointer';
-                toggleTestBtn.onclick = testToggleFunctionality;
-                document.body.appendChild(toggleTestBtn);
-            }
-        });
-        
-        // Test-Funktion für Toggle-Funktionalität
-        function testToggleFunctionality() {
-            console.log('🧪 Teste Toggle-Funktionalität...');
-            
-            const toggles = document.querySelectorAll('.toggle-switch input');
-            console.log('Gefundene Toggles:', toggles.length);
-            
-            if (toggles.length === 0) {
-                alert('Keine Toggle-Switches gefunden!');
-                return;
-            }
-            
-            // Teste den ersten verfügbaren Toggle
-            const firstToggle = Array.from(toggles).find(t => !t.disabled);
-            if (firstToggle) {
-                console.log('Teste Toggle:', firstToggle);
-                const member = firstToggle.dataset.member;
-                const permission = firstToggle.dataset.permission;
-                const newState = !firstToggle.checked;
-                
-                console.log(`Simuliere Toggle für ${member}, ${permission}, ${newState}`);
-                handlePermissionToggle(member, permission, newState, firstToggle);
-            } else {
-                alert('Alle Toggle-Switches sind deaktiviert!');
-            }
-        }
     </script>
+
+    <!-- Global Footer Loader -->
+    <script src="js/global-footer-loader.js"></script>
 </body>
 </html>

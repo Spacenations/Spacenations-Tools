@@ -7,14 +7,20 @@ class FirebaseSync {
     constructor() {
         this.currentPage = this.detectCurrentPage();
         this.redirectRules = {
-            'index': { requiresAuth: false, redirectTo: 'dashboard.html' },
+            // Start- und Registrierungsseite leiten eingeloggte Nutzer BEWUSST nicht mehr
+            // automatisch weiter (moderner Standard: Sitzung bleibt bestehen, aber man wird
+            // nicht bei jedem Aufruf ins Dashboard geworfen). index.html regelt seinen
+            // Angemeldet-Zustand selbst im eigenen Skript.
             'dashboard': { requiresAuth: true, redirectTo: 'index.html' },
             'user-dashboard': { requiresAuth: true, redirectTo: 'index.html' },
-            'register': { requiresAuth: false, redirectTo: 'dashboard.html' },
             'spy-database': { requiresAuth: true, redirectTo: 'index.html' },
             'spy-report-input': { requiresAuth: true, redirectTo: 'index.html' },
-            'admin-login': { requiresAuth: false, adminLogin: true },
-            'admin-dashboard': { requiresAuth: true, requiresSuperAdmin: true, redirectTo: 'admin-login.html' }
+            'admin-login': { requiresAuth: false, adminLogin: true }
+            // admin-dashboard bewusst nicht hier: js/admin-dashboard-enhanced.js prüft den
+            // Zugriff bereits selbst (mit Retries + eigener Zugriff-verweigert-UI). Eine zweite,
+            // unabhängige Prüfung hier lief der ersten Firestore-Antwort öfter davon und konnte
+            // einen echten Global-Admin fälschlich zum Login zurückschicken, bevor die eigentliche
+            // Prüfung überhaupt fertig war.
         };
         
         this.init();
@@ -123,29 +129,17 @@ class FirebaseSync {
             }
         }
 
-        // Admin-spezifische Logik. Quelle der Wahrheit ist globalRole; uebergangs-
-        // weise wird isSuperAdmin/systemRole noch akzeptiert. KEIN E-Mail-Fallback.
-        const isAdminUser = userData?.globalRole === 'global_admin' ||
-                            userData?.isSuperAdmin === true ||
-                            userData?.systemRole === 'superadmin';
-
+        // Admin-Login: bereits als Super-Admin eingeloggt -> direkt zum Dashboard weiterleiten.
+        // Der Zugriffsschutz von admin-dashboard.html selbst liegt vollständig in
+        // js/admin-dashboard-enhanced.js (gateAndInit/requireSuperAdmin), siehe Kommentar oben
+        // bei redirectRules.
         if (this.currentPage === 'admin-login') {
-            if (isLoggedIn && isAdminUser) {
-                console.log('🛡️ Admin eingeloggt - Weiterleitung zum Admin-Dashboard');
+            if (isLoggedIn && userData?.globalRole === 'global_admin') {
+                console.log('🛡️ Super-Admin eingeloggt - Weiterleitung zum Admin-Dashboard');
                 this.redirectAfterDelay('admin-dashboard.html', 800);
             }
         }
 
-        if (this.currentPage === 'admin-dashboard') {
-            if (!isLoggedIn) return; // oben bereits handled
-
-            if (pageConfig.requiresSuperAdmin && !isAdminUser) {
-                console.log('🚫 Kein Admin - Weiterleitung zum Admin-Login');
-                this.redirectAfterDelay('admin-login.html', 1000);
-                return;
-            }
-        }
-        
         // UI für aktuellen Auth-Status aktualisieren
         this.updateUIForAuthState(isLoggedIn, userData);
         
@@ -455,7 +449,7 @@ window.firebaseSync = new FirebaseSync();
 window.SyncAPI = {
     loadDashboardData: (userId) => window.firebaseSync.loadDashboardData(userId),
     updateUserStats: (statType, increment) => window.firebaseSync.updateUserStats(statType, increment),
-    redirectToDashboard: () => window.firebaseSync.redirectAfterDelay('dashboard.html', 1500),
+    redirectToDashboard: () => window.firebaseSync.redirectAfterDelay('user-dashboard.html', 1500),
     redirectToIndex: () => window.firebaseSync.redirectAfterDelay('index.html', 1500),
     getCurrentPage: () => window.firebaseSync.currentPage,
     
