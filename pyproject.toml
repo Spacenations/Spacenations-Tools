@@ -11,11 +11,7 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">=3.9"
-dependencies = [
-    "requests==2.31.0",
-    "schedule==1.2.0",
-    "gunicorn==21.2.0"
-]
+dependencies = []
 
 [project.scripts]
 spacenations-tools = "app:main"
