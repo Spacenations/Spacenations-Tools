@@ -11,6 +11,7 @@
     const state = {
         users: [],
         alliances: [],
+        allianceMembers: [],
         filtered: [],
         filteredAlliances: [],
         currentTab: 'users',
@@ -18,8 +19,31 @@
         proximaData: null,
         unsubUsers: null,
         unsubAlliances: null,
+        unsubAllianceMembers: null,
         lastUpdate: null
     };
+
+    // --- Hilfsfunktionen für das vereinheitlichte Rollen-/Allianz-Schema ---
+    function membersOfAlliance(allianceId) {
+        return state.allianceMembers.filter(m => m.allianceId === allianceId);
+    }
+
+    function founderOfAlliance(allianceId) {
+        return membersOfAlliance(allianceId).find(m => m.role === 'founder');
+    }
+
+    function adminsOfAlliance(allianceId) {
+        return membersOfAlliance(allianceId).filter(m => m.role === 'admin' || m.role === 'founder');
+    }
+
+    function membershipsOfUser(uid) {
+        return state.allianceMembers.filter(m => m.uid === uid);
+    }
+
+    function allianceNameById(allianceId) {
+        const alliance = state.alliances.find(a => a.id === allianceId);
+        return alliance ? alliance.name : allianceId;
+    }
 
     // Utility functions
     function formatTimestamp(ts){
@@ -93,9 +117,7 @@
     // User statistics
     function renderStats(){
         const usersCount = state.users.length;
-        const admins = state.users.filter(u => u.isAllianceAdmin === true).length;
-        const superAdmins = state.users.filter(u => u.globalRole === 'global_admin' || u.isSuperAdmin === true).length;
-        
+
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -138,20 +160,25 @@
     // User table rendering
     function rolePills(user){
         const pills = [];
-        if (user.globalRole === 'global_admin' || user.isSuperAdmin) pills.push('<span class="pill super">Super</span>');
-        if (user.isAllianceAdmin) pills.push('<span class="pill admin">Alliance</span>');
-        if (!user.isAllianceAdmin && !(user.globalRole === 'global_admin' || user.isSuperAdmin)) pills.push('<span class="pill user">User</span>');
+        if (user.globalRole === 'global_admin') pills.push('<span class="pill super">Super</span>');
+        membershipsOfUser(user.id).forEach(m => {
+            if (m.role === 'admin' || m.role === 'founder') {
+                pills.push(`<span class="pill admin">${allianceNameById(m.allianceId)}: ${m.role === 'founder' ? 'Gründer' : 'Admin'}</span>`);
+            }
+        });
+        if (!pills.length) pills.push('<span class="pill user">User</span>');
         return `<div class="role">${pills.join('')}</div>`;
     }
 
     function userRow(user){
         const lastLogin = formatTimestamp(user.lastLogin);
         const firstLogin = hasFirstLogin(user) ? '✅ Ja' : '❌ Nein';
-        const alliance = user.alliance || '-';
+        const memberships = membershipsOfUser(user.id);
+        const alliance = memberships.length ? memberships.map(m => allianceNameById(m.allianceId)).join(', ') : '-';
         const username = user.username || '-';
         const email = user.email || '-';
         const status = getStatusIndicator(user);
-        
+
         return `
             <tr data-uid="${user.id}">
                 <td>${status}</td>
@@ -163,7 +190,6 @@
                 <td>${rolePills(user)}</td>
                 <td>
                     <div class="actions">
-                        <button class="btn" data-action="toggle-alliance" title="Toggle Alliance Admin">🔄</button>
                         <button class="btn" data-action="toggle-super" title="Toggle Super Admin">⚡</button>
                         <button class="btn" data-action="change-password" title="Passwort ändern">🔑</button>
                         <button class="btn danger" data-action="delete-user" title="Benutzer löschen">🗑️</button>
@@ -207,7 +233,7 @@
         const total = state.alliances.length;
         const approved = state.alliances.filter(a => a.status === 'approved').length;
         const pending = state.alliances.filter(a => a.status === 'pending').length;
-        const avgMembers = total > 0 ? Math.round(state.alliances.reduce((sum, a) => sum + (a.members ? a.members.length : 0), 0) / total) : 0;
+        const avgMembers = total > 0 ? Math.round(state.allianceMembers.length / total) : 0;
 
         document.getElementById('stat-alliances-total').textContent = total;
         document.getElementById('stat-alliances-approved').textContent = approved;
@@ -232,9 +258,11 @@
         }
 
         const created = formatTimestamp(alliance.createdAt);
-        const members = alliance.members ? alliance.members.length : 0;
-        const founder = alliance.founder || '-';
-        const admin = alliance.admin || 'Nicht gesetzt';
+        const members = membersOfAlliance(alliance.id).length;
+        const founderMember = founderOfAlliance(alliance.id);
+        const founder = founderMember ? founderMember.username : '-';
+        const adminMembers = adminsOfAlliance(alliance.id).filter(m => m.role === 'admin');
+        const admin = adminMembers.length ? adminMembers.map(m => m.username).join(', ') : 'Nicht gesetzt';
         const description = alliance.description ? `"${alliance.description}"` : '';
 
         return `
@@ -283,10 +311,10 @@
     async function loadSystemStatus() {
         try {
             const db = window.FirebaseConfig.getDB();
-            
-            // Test database connection
-            const testDoc = await db.collection('_system_health').doc('test').get();
-            
+            if (!db) {
+                throw new Error('Firestore nicht verfügbar');
+            }
+
             state.systemStatus = {
                 firebase: 'online',
                 timestamp: new Date(),
@@ -398,45 +426,43 @@
         }
     }
 
-    // ProximaDB integration
-    async function loadProximaData() {
-        // Direkt von der Spiel-API laden (das serverseitige proxima_data.json /
-        // die Python-Pipeline wurden entfernt - sie liefen in Produktion nie).
-        const PROXIMA_API = 'https://beta4.game.spacenations.eu/api/proxima';
-        try {
-            const response = await fetch(PROXIMA_API, { headers: { 'Accept': 'application/json' }, cache: 'no-store' });
-            if (!response.ok) throw new Error('ProximaDB Daten nicht verfügbar');
-            const raw = await response.json();
-            const data = (Array.isArray(raw) ? raw : []).map(p => ({
-                name: String(p.name || ''),
-                coordinates: String(p.coordinates || ''),
-                score: Number(p.score || 0),
-                deleteOn: String(p.deleteOn || '')
-            })).sort((a, b) => b.score - a.score);
-            state.proximaData = data;
+    // ProximaDB integration - ruft dieselbe externe Spiel-API direkt auf wie
+    // ProximaDB.html. Die frühere Python/SQLite-Pipeline wurde entfernt, da sie auf
+    // Railway nie persistierte und den falschen Rhythmus fuhr (siehe Systemanalyse).
+    const PROXIMA_API_URL = 'https://beta4.game.spacenations.eu/api/proxima';
 
-            document.getElementById('proxima-total-systems').textContent = data.length;
-            document.getElementById('proxima-last-update').textContent = new Date().toLocaleString('de-DE');
-            document.getElementById('proxima-update-status').textContent = 'Live';
-            document.getElementById('proxima-next-update').textContent = 'Live-Abruf';
+    async function loadProximaData() {
+        try {
+            const response = await fetch(PROXIMA_API_URL, { headers: { 'Accept': 'application/json' }, cache: 'no-store' });
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            const data = await response.json();
+            state.proximaData = Array.isArray(data) ? data : [];
+
+            document.getElementById('proxima-total-systems').textContent = state.proximaData.length;
+            document.getElementById('proxima-last-update').textContent = formatDate(new Date());
+            document.getElementById('proxima-update-status').textContent = 'Live (direkter API-Abruf)';
+            document.getElementById('proxima-next-update').textContent = '-';
+
             renderProximaStats();
         } catch (error) {
             console.error('ProximaDB Fehler:', error);
-            ['proxima-total-systems', 'proxima-last-update', 'proxima-update-status', 'proxima-next-update']
-                .forEach(id => { const el = document.getElementById(id); if (el) el.textContent = 'Fehler'; });
+            document.getElementById('proxima-total-systems').textContent = 'Fehler';
+            document.getElementById('proxima-last-update').textContent = 'Fehler';
+            document.getElementById('proxima-update-status').textContent = error.message;
+            document.getElementById('proxima-next-update').textContent = '-';
         }
     }
 
     function renderProximaStats() {
-        if (!state.proximaData) return;
-        
-        const d = state.proximaData;
+        if (!state.proximaData || state.proximaData.length === 0) return;
+
+        const sorted = [...state.proximaData].sort((a, b) => (b.score || 0) - (a.score || 0));
         const stats = {
-            totalSystems: d.length,
-            topSystem: d.length > 0 ? d[0].name : 'Unbekannt',
-            topScore: d.length > 0 ? d[0].score : 0,
-            averageScore: d.length > 0 ?
-                Math.round(d.reduce((sum, s) => sum + (s.score || 0), 0) / d.length) : 0
+            topSystem: sorted[0]?.name || 'Unbekannt',
+            topScore: sorted[0]?.score || 0,
+            averageScore: Math.round(state.proximaData.reduce((sum, system) => sum + (system.score || 0), 0) / state.proximaData.length)
         };
 
         document.getElementById('proxima-stats').innerHTML = `
@@ -471,9 +497,8 @@
             await db.collection('users').doc(userCredential.user.uid).set({
                 username: userData.username,
                 email: userData.email,
-                alliance: userData.alliance || '',
-                isAllianceAdmin: userData.isAllianceAdmin || false,
                 globalRole: userData.isSuperAdmin ? 'global_admin' : 'user',
+                isActive: true,
                 createdAt: window.FirebaseConfig.getServerTimestamp(),
                 lastLogin: null,
                 createdBy: window.AuthAPI.getCurrentUser().uid
@@ -496,42 +521,43 @@
     }
 
     async function changeUserPassword(userId, newPassword) {
+        // Der Client kann fremde Firebase-Auth-Passwörter nicht ändern - das erfordert das
+        // Admin SDK in einer Cloud Function, die in diesem Projekt nicht deployt ist. Diese
+        // Anfrage wird protokolliert, aber NICHT automatisch verarbeitet.
         try {
-            // Note: In a real implementation, you would need Firebase Admin SDK
-            // For now, we'll just update the user data
             const db = window.FirebaseConfig.getDB();
-            
+
             await db.collection('userPasswordChanges').add({
                 userId: userId,
                 requestedBy: window.AuthAPI.getCurrentUser().uid,
                 timestamp: window.FirebaseConfig.getServerTimestamp(),
-                status: 'pending'
+                status: 'pending_manual_action'
             });
 
-            console.log('Passwort-Änderung angefordert');
             return { success: true };
         } catch (error) {
-            console.error('Fehler beim Ändern des Passworts:', error);
+            console.error('Fehler beim Protokollieren der Passwort-Änderung:', error);
             return { success: false, error: error.message };
         }
     }
 
     async function deleteUser(userId) {
+        // Der Client kann nur das eigene Firestore-Profil löschen. Das zugehörige
+        // Firebase-Auth-Konto kann aus Sicherheitsgründen nur serverseitig (Admin SDK /
+        // Cloud Function) gelöscht werden, die in diesem Projekt nicht deployt ist - das
+        // Auth-Konto bleibt also bestehen, bis das separat eingerichtet wird.
         try {
             const db = window.FirebaseConfig.getDB();
-            
-            // Delete user data
+
             await db.collection('users').doc(userId).delete();
-            
-            // Log activity
+
             await db.collection('userActivities').add({
                 userId: window.AuthAPI.getCurrentUser().uid,
                 icon: '🗑️',
-                text: `Benutzer gelöscht: ${userId}`,
+                text: `Benutzerprofil gelöscht: ${userId} (Auth-Konto bleibt bestehen)`,
                 timestamp: window.FirebaseConfig.getServerTimestamp()
             });
 
-            console.log('Benutzer erfolgreich gelöscht');
             return { success: true };
         } catch (error) {
             console.error('Fehler beim Löschen des Benutzers:', error);
@@ -543,48 +569,23 @@
     async function approveAlliance(allianceId) {
         try {
             const db = window.FirebaseConfig.getDB();
-            
-            // Hole die Allianz-Daten um den Gründer zu finden
+
             const allianceDoc = await db.collection('alliances').doc(allianceId).get();
             const allianceData = allianceDoc.data();
-            
+
             if (!allianceData) {
                 throw new Error('Allianz nicht gefunden');
             }
-            
+
             await db.collection('alliances').doc(allianceId).update({
                 status: 'approved',
-                approvedAt: window.FirebaseConfig.getServerTimestamp(),
-                approvedBy: window.AuthAPI.getCurrentUser().uid,
-                admin: allianceData.founder // Setze Gründer als Admin
+                reviewedAt: window.FirebaseConfig.getServerTimestamp(),
+                reviewedBy: window.AuthAPI.getCurrentUser().uid
             });
 
-            // Finde das User-Dokument des Gründers
-            let founderDocRef = null;
-            
-            // Versuche zuerst mit Benutzername
-            const founderByUsername = await db.collection('users').doc(allianceData.founder).get();
-            if (founderByUsername.exists) {
-                founderDocRef = db.collection('users').doc(allianceData.founder);
-            } else {
-                // Suche nach User mit diesem Benutzernamen
-                const founderQuery = await db.collection('users').where('username', '==', allianceData.founder).get();
-                if (!founderQuery.empty) {
-                    founderDocRef = founderQuery.docs[0].ref;
-                } else {
-                    throw new Error(`Gründer "${allianceData.founder}" nicht gefunden`);
-                }
-            }
-            
-            // Aktualisiere User-Dokument mit Admin-Rolle
-            await founderDocRef.update({
-                alliance: allianceData.name, // Verwende Allianz-Namen statt ID
-                allianceTag: allianceData.tag, // Füge Allianz-Tag hinzu
-                allianceRole: 'admin',
-                lastUpdated: window.FirebaseConfig.getServerTimestamp()
-            });
+            // Die Founder-Mitgliedschaft (allianceMembers/{allianceId}_{founderUid}) wurde bereits
+            // bei der Allianz-Erstellung angelegt - hier ist kein weiterer Schreibzugriff nötig.
 
-            // Log activity
             await db.collection('userActivities').add({
                 userId: window.AuthAPI.getCurrentUser().uid,
                 icon: '✅',
@@ -592,7 +593,6 @@
                 timestamp: window.FirebaseConfig.getServerTimestamp()
             });
 
-            console.log('Allianz erfolgreich genehmigt');
             return { success: true };
         } catch (error) {
             console.error('Fehler beim Genehmigen der Allianz:', error);
@@ -603,88 +603,45 @@
     async function setAllianceAdmin(allianceId) {
         try {
             const db = window.FirebaseConfig.getDB();
-            
-            // Hole die Allianz-Daten
+
             const allianceDoc = await db.collection('alliances').doc(allianceId).get();
             const allianceData = allianceDoc.data();
-            
+
             if (!allianceData) {
                 throw new Error('Allianz nicht gefunden');
             }
-            
-            // Zeige Modal zur Admin-Auswahl
-            const newAdmin = prompt(`Neuer Allianz-Admin für "${allianceData.name} [${allianceData.tag}]":\n\nVerfügbare Mitglieder:\n${allianceData.members.join('\n')}\n\nBenutzername eingeben:`);
-            
-            if (!newAdmin || !allianceData.members.includes(newAdmin)) {
+
+            const members = membersOfAlliance(allianceId);
+            const newAdminName = prompt(`Neuer Allianz-Admin für "${allianceData.name} [${allianceData.tag}]":\n\nVerfügbare Mitglieder:\n${members.map(m => m.username).join('\n')}\n\nBenutzername eingeben:`);
+
+            const target = members.find(m => m.username === newAdminName);
+            if (!newAdminName || !target) {
                 alert('Ungültiger Benutzername oder Benutzer ist kein Mitglied der Allianz!');
                 return { success: false, error: 'Ungültiger Benutzername' };
             }
-            
-            await db.collection('alliances').doc(allianceId).update({
-                admin: newAdmin,
-                adminSetAt: window.FirebaseConfig.getServerTimestamp(),
-                adminSetBy: window.AuthAPI.getCurrentUser().uid
-            });
 
-            // Finde das User-Dokument (kann mit Username oder UID sein)
-            let userDocRef = null;
-            
-            // Versuche zuerst mit Benutzername
-            const userByUsername = await db.collection('users').doc(newAdmin).get();
-            if (userByUsername.exists) {
-                userDocRef = db.collection('users').doc(newAdmin);
-            } else {
-                // Suche nach User mit diesem Benutzernamen
-                const userQuery = await db.collection('users').where('username', '==', newAdmin).get();
-                if (!userQuery.empty) {
-                    userDocRef = userQuery.docs[0].ref;
-                } else {
-                    throw new Error(`User "${newAdmin}" nicht gefunden`);
-                }
-            }
-            
-            // Aktualisiere User-Dokument mit Admin-Rolle
-            await userDocRef.update({
-                alliance: allianceData.name, // Verwende Allianz-Namen statt ID
-                allianceTag: allianceData.tag, // Füge Allianz-Tag hinzu
-                allianceRole: 'admin',
+            const previousAdmins = adminsOfAlliance(allianceId).filter(m => m.role === 'admin' && m.uid !== target.uid);
+
+            await db.collection('allianceMembers').doc(`${allianceId}_${target.uid}`).update({
+                role: 'admin',
                 lastUpdated: window.FirebaseConfig.getServerTimestamp()
             });
 
-            // Entferne Admin-Rolle vom vorherigen Admin (falls vorhanden)
-            if (allianceData.admin && allianceData.admin !== newAdmin) {
-                // Finde das User-Dokument des vorherigen Admins
-                let previousAdminDocRef = null;
-                
-                // Versuche zuerst mit Benutzername
-                const prevUserByUsername = await db.collection('users').doc(allianceData.admin).get();
-                if (prevUserByUsername.exists) {
-                    previousAdminDocRef = db.collection('users').doc(allianceData.admin);
-                } else {
-                    // Suche nach User mit diesem Benutzernamen
-                    const prevUserQuery = await db.collection('users').where('username', '==', allianceData.admin).get();
-                    if (!prevUserQuery.empty) {
-                        previousAdminDocRef = prevUserQuery.docs[0].ref;
-                    }
-                }
-                
-                if (previousAdminDocRef) {
-                    await previousAdminDocRef.update({
-                        allianceRole: 'member',
-                        lastUpdated: window.FirebaseConfig.getServerTimestamp()
-                    });
-                }
+            // Vorherige (nicht-Gründer) Admins auf einfaches Mitglied zurückstufen.
+            for (const previous of previousAdmins) {
+                await db.collection('allianceMembers').doc(`${allianceId}_${previous.uid}`).update({
+                    role: 'member',
+                    lastUpdated: window.FirebaseConfig.getServerTimestamp()
+                });
             }
 
-            // Log activity
             await db.collection('userActivities').add({
                 userId: window.AuthAPI.getCurrentUser().uid,
                 icon: '👑',
-                text: `Allianz-Admin gesetzt: ${allianceData.name} [${allianceData.tag}] → ${newAdmin}`,
+                text: `Allianz-Admin gesetzt: ${allianceData.name} [${allianceData.tag}] → ${newAdminName}`,
                 timestamp: window.FirebaseConfig.getServerTimestamp()
             });
 
-            console.log('Allianz-Admin erfolgreich gesetzt');
             return { success: true };
         } catch (error) {
             console.error('Fehler beim Setzen des Allianz-Admins:', error);
@@ -731,10 +688,14 @@
             const db = window.FirebaseConfig.getDB();
             const allianceDoc = await db.collection('alliances').doc(allianceId).get();
             const allianceData = allianceDoc.data();
-            
+
             if (!allianceData) {
                 throw new Error('Allianz nicht gefunden');
             }
+
+            const memberList = membersOfAlliance(allianceId);
+            const founderMember = founderOfAlliance(allianceId);
+            const adminMembers = adminsOfAlliance(allianceId).filter(m => m.role === 'admin');
 
             // Erstelle Modal für Details
             const modal = document.createElement('div');
@@ -755,11 +716,11 @@
                             </div>
                             <div>
                                 <strong>Gründer:</strong><br>
-                                ${allianceData.founder || '-'}
+                                ${founderMember ? founderMember.username : '-'}
                             </div>
                             <div>
                                 <strong>Admin:</strong><br>
-                                ${allianceData.admin || 'Nicht gesetzt'}
+                                ${adminMembers.length ? adminMembers.map(m => m.username).join(', ') : 'Nicht gesetzt'}
                             </div>
                             <div>
                                 <strong>Status:</strong><br>
@@ -767,7 +728,7 @@
                             </div>
                             <div>
                                 <strong>Mitglieder:</strong><br>
-                                ${allianceData.members ? allianceData.members.length : 0}
+                                ${memberList.length}
                             </div>
                         </div>
                         <div style="margin-bottom: 15px;">
@@ -779,7 +740,7 @@
                         <div style="margin-bottom: 15px;">
                             <strong>Mitglieder-Liste:</strong><br>
                             <div style="background: var(--bg-secondary); padding: 10px; border-radius: 6px; margin-top: 5px; max-height: 150px; overflow-y: auto;">
-                                ${allianceData.members ? allianceData.members.map(member => `• ${member}`).join('<br>') : 'Keine Mitglieder'}
+                                ${memberList.length ? memberList.map(m => `• ${m.username} (${m.role})`).join('<br>') : 'Keine Mitglieder'}
                             </div>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.9rem; color: var(--text-secondary);">
@@ -877,51 +838,37 @@
     // Export functions
     async function exportUsersCSV(){
         const list = state.users;
-        const headers = ['uid','username','email','alliance','isAllianceAdmin','isSuperAdmin','hasFirstLogin','createdAt','lastLogin'];
+        const headers = ['uid','username','email','alliances','globalRole','hasFirstLogin','createdAt','lastLogin'];
         const lines = [headers.join(';')];
-        
+
         for (const u of list){
             const createdAt = u.createdAt ? (u.createdAt.toDate ? u.createdAt.toDate().toISOString() : new Date(u.createdAt).toISOString()) : '';
             const lastLogin = u.lastLogin ? (u.lastLogin.toDate ? u.lastLogin.toDate().toISOString() : new Date(u.lastLogin).toISOString()) : '';
             const hasFirst = hasFirstLogin(u) ? '1' : '0';
-            
+            const alliances = membershipsOfUser(u.id).map(m => `${allianceNameById(m.allianceId)}(${m.role})`).join(',');
+
             lines.push([
                 u.id,
                 JSON.stringify(u.username || ''),
                 JSON.stringify(u.email || ''),
-                JSON.stringify(u.alliance || ''),
-                u.isAllianceAdmin ? 1 : 0,
-                u.isSuperAdmin ? 1 : 0,
+                JSON.stringify(alliances),
+                u.globalRole || 'user',
                 hasFirst,
                 createdAt,
                 lastLogin
             ].join(';'));
         }
-        
+
         const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url; 
-        a.download = `users_export_${new Date().toISOString().split('T')[0]}.csv`; 
+        a.href = url;
+        a.download = `users_export_${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
         URL.revokeObjectURL(url);
     }
 
     // Role toggle functions
-    async function toggleAllianceAdmin(uid){
-        const db = window.FirebaseConfig.getDB();
-        const ref = db.collection('users').doc(uid);
-        const doc = await ref.get();
-        if (!doc.exists) return alert('Benutzer nicht gefunden');
-        const val = !!doc.data().isAllianceAdmin;
-        await ref.update({ 
-            isAllianceAdmin: !val,
-            updatedAt: window.FirebaseConfig.getServerTimestamp(),
-            updatedBy: window.AuthAPI.getCurrentUser().uid
-        });
-        console.log(`✅ Alliance Admin Status für ${uid} auf ${!val} gesetzt`);
-    }
-
     async function toggleSuperAdmin(uid){
         const me = window.AuthAPI.getCurrentUser();
         if (me && me.uid === uid){
@@ -933,13 +880,13 @@
         const doc = await ref.get();
         if (!doc.exists) return alert('Benutzer nicht gefunden');
         
-        const isAdminNow = doc.data().globalRole === 'global_admin' || doc.data().isSuperAdmin === true;
-        await ref.update({ 
-            globalRole: isAdminNow ? 'user' : 'global_admin',
+        const val = doc.data().globalRole === 'global_admin';
+        await ref.update({
+            globalRole: val ? 'user' : 'global_admin',
             updatedAt: window.FirebaseConfig.getServerTimestamp(),
             updatedBy: me.uid
         });
-        
+
         console.log(`✅ Super Admin Status für ${uid} auf ${!val} gesetzt`);
         
         // Log activity
@@ -993,6 +940,28 @@
         });
     }
 
+    // Alliance-Mitgliedschaften (ersetzt das alte members-Array/admin-Feld auf alliances)
+    function subscribeAllianceMembers(force=false){
+        const db = window.FirebaseConfig.getDB();
+        if (state.unsubAllianceMembers && force){
+            state.unsubAllianceMembers();
+            state.unsubAllianceMembers = null;
+        }
+        if (state.unsubAllianceMembers) return;
+
+        state.unsubAllianceMembers = db.collection('allianceMembers').onSnapshot(snap => {
+            const list = [];
+            snap.forEach(doc => list.push({ id: doc.id, ...doc.data() }));
+            state.allianceMembers = list;
+            renderStats();
+            renderAllianceStats();
+            renderUsersTable();
+            renderAlliancesTable();
+        }, err => {
+            console.error('AllianceMembers subscribe error', err);
+        });
+    }
+
     // Event handlers
     function attachEvents(){
         // Logout
@@ -1007,6 +976,7 @@
         document.getElementById('refresh-btn').addEventListener('click', () => {
             subscribeUsers(true);
             subscribeAlliances(true);
+            subscribeAllianceMembers(true);
             loadSystemStatus();
             loadProximaData();
         });
@@ -1039,8 +1009,6 @@
                 email: document.getElementById('new-user-email').value,
                 password: document.getElementById('new-user-password').value,
                 username: document.getElementById('new-user-username').value,
-                alliance: document.getElementById('new-user-alliance').value,
-                isAllianceAdmin: document.getElementById('new-user-alliance-admin').checked,
                 isSuperAdmin: document.getElementById('new-user-super-admin').checked
             };
 
@@ -1089,9 +1057,6 @@
             const action = btn.getAttribute('data-action');
             
             switch(action) {
-                case 'toggle-alliance':
-                    await toggleAllianceAdmin(uid);
-                    break;
                 case 'toggle-super':
                     await toggleSuperAdmin(uid);
                     break;
@@ -1170,8 +1135,8 @@
 
         document.getElementById('view-proxima-data').addEventListener('click', () => {
             if (state.proximaData) {
-                const dataPreview = state.proximaData.slice(0, 10).map(system => 
-                    `${system[0]} - Score: ${system[2]} - ${system[1]}`
+                const dataPreview = state.proximaData.slice(0, 10).map(system =>
+                    `${system.name} - Score: ${system.score} - ${system.coordinates}`
                 ).join('\n');
                 
                 document.getElementById('proxima-data-content').innerHTML = `
@@ -1235,7 +1200,7 @@ ${state.proximaData.length > 10 ? `\n... und ${state.proximaData.length - 10} we
             const status = await window.AdminAuth.checkSuperAdminStatus(currentUser.uid);
             
             const username = status.userData?.username || currentUser?.email || 'Admin';
-            const superStatus = (status.globalRole === 'global_admin' || status.isSuperAdmin) ? '<span class="pill super">Super</span>' : '<span class="pill user">User</span>';
+            const superStatus = status.isSuperAdmin ? '<span class="pill super">Super</span>' : '<span class="pill user">User</span>';
             const lastUpdate = status.userData?.updatedAt ? 
                 `<div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px;">
                     Aktualisiert: ${formatTimestamp(status.userData.updatedAt)}
@@ -1250,7 +1215,7 @@ ${state.proximaData.length > 10 ? `\n... und ${state.proximaData.length - 10} we
             document.getElementById('system-status-mini').innerHTML = `
                 <div style="font-size: 0.8rem;">
                     <div>🟢 System Online</div>
-                    <div style="color: var(--text-secondary);">Super-Admin: ${(status.globalRole === 'global_admin' || status.isSuperAdmin) ? '✅ Ja' : '❌ Nein'}</div>
+                    <div style="color: var(--text-secondary);">Super-Admin: ${status.isSuperAdmin ? '✅ Ja' : '❌ Nein'}</div>
                     <div style="color: var(--text-secondary);">Letztes Update: ${formatTimestamp(new Date())}</div>
                 </div>
             `;
@@ -1295,6 +1260,7 @@ ${state.proximaData.length > 10 ? `\n... und ${state.proximaData.length - 10} we
             attachEvents();
             subscribeUsers();
             subscribeAlliances();
+            subscribeAllianceMembers();
             loadSystemStatus();
             loadProximaData();
             
@@ -1311,7 +1277,7 @@ ${state.proximaData.length > 10 ? `\n... und ${state.proximaData.length - 10} we
                 <strong>Zugriff verweigert: Nur Super-Admins</strong><br><br>
                 <strong>Fehler:</strong> ${e.message}<br><br>
                 <strong>Lösungen:</strong><br>
-                1. Stellen Sie sicher, dass Ihr Konto Super-Admin-Rechte besitzt.<br>
+                1. Bei einem bestehenden Super-Admin-Konto anmelden, oder einen bestehenden Super-Admin bitten, Ihr Konto freizuschalten<br>
                 2. Seite neu laden (F5)<br>
                 3. Browser-Extensions temporär deaktivieren<br><br>
                 <strong>Debugging:</strong> Öffnen Sie die Browser-Konsole (F12) für weitere Details.

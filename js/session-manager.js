@@ -247,12 +247,35 @@ class SessionManager {
     // ===== SESSION MONITORING =====
     
     startSessionMonitoring() {
+        this.warningShown = false;
         setInterval(() => {
-            if (this.isSessionActive() && this.isSessionExpired()) {
+            if (!this.isSessionActive()) return;
+
+            if (this.isSessionExpired()) {
                 console.log('⏰ Session abgelaufen');
                 this.handleSessionExpired();
+                return;
+            }
+
+            if (this.isSessionWarning() && !this.warningShown) {
+                this.warningShown = true;
+                this.showExpiryWarning();
             }
         }, 60000); // Jede Minute prüfen
+    }
+
+    // Zeigt einen Hinweis kurz vor Ablauf der Session (siehe WARNING_TIME).
+    showExpiryWarning() {
+        window.dispatchEvent(new CustomEvent('sessionWarning', {
+            detail: { remainingMs: this.getSessionTimeRemaining() }
+        }));
+
+        if (typeof document === 'undefined') return;
+        const banner = document.createElement('div');
+        banner.textContent = '⏰ Deine Sitzung läuft in wenigen Minuten ab. Bei weiterer Aktivität bleibst du angemeldet.';
+        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#f2b33d;color:#1a1a1a;text-align:center;padding:10px;font-weight:bold;';
+        document.body?.appendChild(banner);
+        setTimeout(() => banner.remove(), 15000);
     }
     
     startActivityTracking() {
@@ -273,13 +296,18 @@ class SessionManager {
     handleSessionExpired() {
         // Session als inaktiv markieren
         this.setSessionActive(false);
-        
+
         // User-Daten löschen
         this.clearUserData();
-        
+
+        // Echten Firebase-Auth-Logout auslösen, nicht nur lokale Daten leeren.
+        if (window.AuthAPI) {
+            window.AuthAPI.logout().catch(() => {});
+        }
+
         // Event für andere Komponenten
         window.dispatchEvent(new CustomEvent('sessionExpired'));
-        
+
         // Automatische Weiterleitung zur Startseite
         setTimeout(() => {
             window.location.href = 'index.html';

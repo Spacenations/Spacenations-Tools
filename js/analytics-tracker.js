@@ -73,36 +73,18 @@ class AnalyticsTracker {
     }
     
     async testPermissions() {
-        try {
-            // Prüfe ob Firebase bereit ist
-            if (!window.FirebaseConfig || window.FirebaseConfig.isOffline()) {
-                this.firebaseReady = false;
-                return;
-            }
-            
-            const db = window.FirebaseConfig.getDB();
-            if (!db) {
-                this.firebaseReady = false;
-                return;
-            }
-            
-            // Teste Schreibberechtigung mit einem einfachen Test
-            await db.collection('_test').doc('analytics_test').set({
-                test: true,
-                timestamp: window.FirebaseConfig.getServerTimestamp()
-            });
-            
-            // Test erfolgreich - lösche Test-Dokument
-            await db.collection('_test').doc('analytics_test').delete();
-            
-            this.firebaseReady = true;
-            console.log('✅ Analytics Firebase-Berechtigungen OK');
-            
-        } catch (error) {
-            console.warn('⚠️ Analytics Firebase-Berechtigungen fehlen:', error.message);
+        // Rein lokale Prüfung, kein Schreib-Roundtrip auf eine eigens dafür angelegte
+        // Test-Collection: analytics_pageViews/_sessions/_events haben in firestore.rules
+        // bereits eine feste Regel (jeder angemeldete Nutzer darf schreiben), ein separater
+        // Vorab-Test auf einer fremden "_test"-Collection sagt darüber nichts aus.
+        if (!window.FirebaseConfig || window.FirebaseConfig.isOffline()) {
             this.firebaseReady = false;
-            this.permissionsDenied = true;
+            return;
         }
+
+        const db = window.FirebaseConfig.getDB();
+        this.firebaseReady = !!db;
+        console.log(this.firebaseReady ? '✅ Analytics: Firestore verfügbar' : '⚠️ Analytics: Firestore nicht verfügbar');
     }
     
     generateSessionId() {

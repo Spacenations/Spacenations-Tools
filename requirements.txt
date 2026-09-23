@@ -1,2 +1,3 @@
-# Keine externen Abhängigkeiten – die App nutzt ausschließlich die
-# Python-Standardbibliothek (app.py + proxima_discord.py).
+# app.py verwendet ausschließlich die Python-Standardbibliothek - keine externen
+# Abhängigkeiten mehr nötig, seit die Proxima-Python-Pipeline (requests/schedule)
+# und der nie aufgerufene gunicorn-Server entfernt wurden.

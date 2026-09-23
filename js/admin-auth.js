@@ -1,7 +1,7 @@
 /**
  * Admin Auth Utilities
- * - Enforces Super-Admin access for admin pages
- * - Utility functions to check roles
+ * - Erzwingt Super-Admin-Zugriff (globalRole === 'global_admin') für Admin-Seiten
+ * - Hilfsfunktionen zur Rollenprüfung
  */
 
 (function(){
@@ -27,54 +27,29 @@
         }
 
         async requireSuperAdmin(){
-            try {
-                await window.AuthAPI.waitForInit();
-            } catch (error) {
-                console.warn('⚠️ AuthAPI nicht bereit, versuche direkte Firebase-Initialisierung...');
-                // Try direct Firebase initialization
-                try {
-                    await window.FirebaseConfig.waitForReady();
-                } catch (firebaseError) {
-                    console.error('❌ Firebase-Initialisierung fehlgeschlagen:', firebaseError);
-                    throw new Error('Firebase-Verbindung fehlgeschlagen. Bitte Seite neu laden.');
-                }
-            }
-            
+            await window.AuthAPI.waitForInit();
+
             const user = window.AuthAPI.getCurrentUser();
-            
             if (!user) {
                 throw new Error('Nicht angemeldet');
             }
 
-            console.log('🔍 Prüfe Super-Admin Status für:', user.email, 'UID:', user.uid);
-            
-            // Always check directly from Firestore for most up-to-date data
             const db = window.FirebaseConfig.getDB();
             const doc = await db.collection('users').doc(user.uid).get();
-            
+
             if (!doc.exists) {
-                // SICHERHEIT: Kein Auto-Grant. Fehlt das Benutzerdokument, wird der
-                // Zugriff verweigert. (Früher wurde hier still ein Super-Admin-Konto
-                // angelegt -> jeder eingeloggte Nutzer ohne Doc wurde Admin.)
-                console.warn('⚠️ Kein Benutzerdokument – Super-Admin-Zugriff verweigert');
-                throw new Error('Zugriff verweigert: Nur Super-Admins');
+                throw new Error('Zugriff verweigert: Kein Benutzerprofil gefunden. Bitte an einen bestehenden Super-Admin wenden.');
             }
-            
+
             const userData = doc.data();
-            console.log('📊 Benutzerdaten aus Firestore:', userData);
-            // Admin-Erkennung: globalRole ist die Quelle der Wahrheit;
-            // uebergangsweise wird isSuperAdmin===true noch akzeptiert.
-            if (userData && (userData.globalRole === 'global_admin' || userData.isSuperAdmin === true)) {
-                console.log('✅ Admin-Status bestätigt');
+            if (userData.globalRole === 'global_admin') {
                 return true;
             }
 
-            console.log('❌ Keine Admin-Berechtigung gefunden');
-            alert('Super-Admin-Zugriff verweigert.');
-            throw new Error('Zugriff verweigert: Nur Super-Admins');
+            throw new Error(`Zugriff verweigert: ${user.email} ist kein Super-Admin. Bitte an einen bestehenden Super-Admin wenden, um Zugriff zu erhalten.`);
         }
 
-        // Helper function to check and update Super Admin status
+        // Prüft den Super-Admin-Status, ohne bei fehlender Berechtigung zu werfen.
         async checkSuperAdminStatus(uid = null) {
             try {
                 const userId = uid || (this.currentUser ? this.currentUser.uid : null);
@@ -84,14 +59,14 @@
 
                 const db = window.FirebaseConfig.getDB();
                 const doc = await db.collection('users').doc(userId).get();
-                
+
                 if (!doc.exists) {
                     return { isSuperAdmin: false, userData: null };
                 }
 
                 const userData = doc.data();
                 return {
-                    isSuperAdmin: userData.globalRole === 'global_admin' || userData.isSuperAdmin === true,
+                    isSuperAdmin: userData.globalRole === 'global_admin',
                     userData: userData
                 };
             } catch (error) {
@@ -100,17 +75,17 @@
             }
         }
 
-        // Helper function to set Super Admin status
-        async setSuperAdminStatus(uid, makeAdmin = true) {
+        // Setzt den Super-Admin-Status. Greift nur, wenn die Firestore-Regeln es dem
+        // aufrufenden Konto erlauben (nur bestehende Global-Admins dürfen fremde globalRole ändern).
+        async setSuperAdminStatus(uid, isSuperAdmin = true) {
             try {
                 const db = window.FirebaseConfig.getDB();
                 await db.collection('users').doc(uid).update({
-                    globalRole: makeAdmin ? 'global_admin' : 'user',
+                    globalRole: isSuperAdmin ? 'global_admin' : 'user',
                     updatedAt: window.FirebaseConfig.getServerTimestamp(),
                     updatedBy: this.currentUser ? this.currentUser.uid : 'system'
                 });
 
-                console.log(`✅ Admin-Status für ${uid} auf ${makeAdmin} gesetzt`);
                 return { success: true };
             } catch (error) {
                 console.error('Fehler beim Setzen des Super-Admin Status:', error);
@@ -121,4 +96,3 @@
 
     window.AdminAuth = new AdminAuth();
 })();
-

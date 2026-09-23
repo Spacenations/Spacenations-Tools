@@ -50,334 +50,215 @@ class AutoGlobalFooterLoader {
     // Footer CSS Styles
     getFooterStyles() {
         return `
-            /* Global Footer Styles - Professional Gaming Design */
+            /* Global Footer Styles - hell & freundlich, full-width */
             .global-footer {
-                background: #0A0A0A;
-                border-top: 1px solid rgba(0, 255, 136, 0.2);
-                padding: 60px 48px 40px;
+                background: #FFFFFF;
+                border-top: 1px solid #ECEEF2;
+                padding: 64px 48px 32px;
                 margin-top: 80px;
-                margin-left: 280px;
-                margin-right: 0;
-                margin-bottom: 0;
+                margin-left: 0;
+                width: 100%;
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
                 position: relative;
-                overflow: hidden;
                 transition: margin-left 0.3s ease;
-                width: calc(100% - 280px);
             }
-            
-            @media (max-width: 768px) {
-                .global-footer {
-                    margin-left: 0;
-                    width: 100%;
-                }
-            }
-            
-            .global-footer::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 1px;
-                background: linear-gradient(90deg, 
-                    transparent, 
-                    rgba(0, 255, 136, 0.5), 
-                    rgba(0, 255, 136, 0.8),
-                    rgba(0, 255, 136, 0.5),
-                    transparent
-                );
-                animation: footerGlow 3s ease-in-out infinite;
-            }
-            
-            @keyframes footerGlow {
-                0%, 100% { opacity: 0.5; }
-                50% { opacity: 1; }
-            }
-            
+
             .footer-container {
-                max-width: 1400px;
+                max-width: 1440px;
                 margin: 0 auto;
                 position: relative;
             }
-            
+
             .footer-main {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 48px;
-                margin-bottom: 48px;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 40px;
+                margin-bottom: 40px;
             }
-            
+
             .footer-section h4 {
-                color: #00FF88;
-                font-size: 14px;
-                font-weight: 700;
+                color: #9AA1AC;
+                font-size: 12px;
+                font-weight: 600;
                 text-transform: uppercase;
-                letter-spacing: 2px;
-                margin-bottom: 20px;
-                font-family: 'Orbitron', monospace;
-                display: flex;
-                align-items: center;
-                gap: 8px;
+                letter-spacing: 0.6px;
+                margin-bottom: 18px;
             }
-            
+
             .footer-links {
                 list-style: none;
                 padding: 0;
                 margin: 0;
                 display: flex;
                 flex-direction: column;
-                gap: 12px;
+                gap: 11px;
             }
-            
+
             .footer-link {
-                color: #C0C0C0;
+                color: #5B6472;
                 text-decoration: none;
-                transition: all 0.3s ease;
-                position: relative;
+                transition: color 0.15s ease;
                 display: inline-flex;
                 align-items: center;
                 gap: 8px;
-                padding: 4px 0;
-                font-size: 15px;
+                font-size: 14px;
             }
-            
-            .footer-link::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                width: 0;
-                height: 2px;
-                background: #00FF88;
-                transition: width 0.3s ease;
-            }
-            
+
             .footer-link:hover {
-                color: #00FF88;
-                transform: translateX(5px);
+                color: #16181D;
             }
-            
-            .footer-link:hover::after {
-                width: 100%;
-            }
-            
+
             /* Special Sections */
             .footer-tools {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
+                display: flex;
+                flex-direction: column;
+                gap: 11px;
             }
-            
+
             .footer-tool-link {
-                background: rgba(0, 255, 136, 0.05);
-                border: 1px solid rgba(0, 255, 136, 0.2);
-                padding: 12px 16px;
-                border-radius: 8px;
-                color: #C0C0C0;
+                color: #5B6472;
                 text-decoration: none;
-                transition: all 0.3s ease;
                 display: flex;
                 align-items: center;
                 gap: 8px;
-                font-weight: 600;
+                font-size: 14px;
+                transition: color 0.15s ease;
             }
-            
+
             .footer-tool-link:hover {
-                background: rgba(0, 255, 136, 0.1);
-                border-color: #00FF88;
-                color: #00FF88;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+                color: #16181D;
             }
-            
+
             /* Footer Bottom */
             .footer-divider {
                 height: 1px;
-                background: linear-gradient(90deg, 
-                    transparent, 
-                    rgba(0, 255, 136, 0.2), 
-                    transparent
-                );
-                margin: 40px 0 32px;
+                background: #ECEEF2;
+                margin: 8px 0 24px;
             }
-            
+
             .footer-bottom {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 flex-wrap: wrap;
-                gap: 24px;
+                gap: 20px;
             }
-            
+
             .footer-copyright {
-                color: rgba(192, 192, 192, 0.6);
-                font-size: 14px;
+                color: #9AA1AC;
+                font-size: 13px;
                 line-height: 1.6;
             }
-            
+
             .footer-copyright strong {
-                color: #00FF88;
+                color: #5B6472;
                 font-weight: 600;
             }
-            
+
             .footer-actions {
                 display: flex;
                 align-items: center;
-                gap: 24px;
+                gap: 16px;
             }
-            
+
             /* Status Indicator */
             .status-indicator {
                 display: flex;
                 align-items: center;
-                gap: 8px;
-                padding: 8px 16px;
-                background: rgba(0, 255, 136, 0.1);
-                border: 1px solid rgba(0, 255, 136, 0.3);
-                border-radius: 20px;
-                color: #00FF88;
-                font-size: 13px;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 1px;
+                gap: 7px;
+                padding: 6px 12px;
+                background: rgba(0, 168, 120, 0.08);
+                border: 1px solid rgba(0, 168, 120, 0.18);
+                border-radius: 999px;
+                color: #00845A;
+                font-size: 12px;
+                font-weight: 500;
             }
-            
+
             .status-dot {
-                width: 8px;
-                height: 8px;
-                background: #00FF88;
+                width: 6px;
+                height: 6px;
+                background: #00D68F;
                 border-radius: 50%;
-                animation: statusPulse 2s ease-in-out infinite;
             }
-            
-            @keyframes statusPulse {
-                0%, 100% { 
-                    opacity: 1;
-                    transform: scale(1);
-                }
-                50% { 
-                    opacity: 0.5;
-                    transform: scale(1.2);
-                }
-            }
-            
+
             .status-indicator.offline {
-                background: rgba(255, 68, 68, 0.1);
-                border-color: rgba(255, 68, 68, 0.3);
-                color: #FF4444;
+                background: rgba(217, 48, 37, 0.06);
+                border-color: rgba(217, 48, 37, 0.2);
+                color: #D93025;
             }
-            
+
             .status-indicator.offline .status-dot {
-                background: #FF4444;
-                animation: none;
+                background: #D93025;
             }
-            
+
             /* Social Links */
             .social-links {
                 display: flex;
-                gap: 12px;
+                gap: 8px;
             }
-            
+
             .social-link {
-                width: 40px;
-                height: 40px;
+                padding: 6px 12px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: rgba(0, 255, 136, 0.05);
-                border: 1px solid rgba(0, 255, 136, 0.2);
-                border-radius: 8px;
-                color: #C0C0C0;
+                background: #FFFFFF;
+                border: 1px solid #E3E6EB;
+                border-radius: 999px;
+                color: #5B6472;
                 text-decoration: none;
-                transition: all 0.3s ease;
-                font-size: 20px;
+                transition: all 0.15s ease;
+                font-size: 12px;
+                font-weight: 500;
+                white-space: nowrap;
             }
-            
+
             .social-link:hover {
-                background: #00FF88;
-                border-color: #00FF88;
-                color: #0A0A0A;
-                transform: translateY(-3px) rotate(5deg);
-                box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
+                border-color: #C9CED6;
+                color: #16181D;
             }
-            
+
             /* Admin Badge */
             .admin-badge {
                 display: inline-flex;
                 align-items: center;
                 gap: 4px;
-                background: linear-gradient(135deg, #8B5CF6, #6366F1);
-                color: white;
-                padding: 4px 12px;
-                border-radius: 12px;
-                font-size: 11px;
-                font-weight: 700;
+                background: #EEF0F3;
+                color: #5B6472;
+                padding: 3px 10px;
+                border-radius: 999px;
+                font-size: 10px;
+                font-weight: 600;
                 text-transform: uppercase;
-                letter-spacing: 1px;
-                margin-left: 8px;
+                letter-spacing: 0.5px;
+                margin-left: 6px;
             }
-            
+
             /* Responsive Design */
             @media (max-width: 768px) {
                 .global-footer {
-                    padding: 40px 20px 30px;
+                    padding: 40px 20px 24px;
                 }
-                
+
                 .footer-main {
                     grid-template-columns: 1fr;
-                    gap: 32px;
+                    gap: 28px;
                 }
-                
-                .footer-tools {
-                    grid-template-columns: 1fr;
-                }
-                
+
                 .footer-bottom {
                     flex-direction: column;
                     text-align: center;
                 }
-                
+
                 .footer-actions {
                     flex-direction: column;
                     width: 100%;
                 }
-                
+
                 .social-links {
                     justify-content: center;
                 }
-            }
-            
-            /* Dark mode adjustments */
-            body.light-mode .global-footer {
-                background: #F8FAFC;
-                border-top-color: rgba(74, 144, 226, 0.2);
-            }
-            
-            body.light-mode .global-footer::before {
-                background: linear-gradient(90deg, 
-                    transparent, 
-                    rgba(74, 144, 226, 0.5), 
-                    rgba(74, 144, 226, 0.8),
-                    rgba(74, 144, 226, 0.5),
-                    transparent
-                );
-            }
-            
-            body.light-mode .footer-section h4 {
-                color: #4A90E2;
-            }
-            
-            body.light-mode .footer-link {
-                color: #64748B;
-            }
-            
-            body.light-mode .footer-link:hover {
-                color: #4A90E2;
-            }
-            
-            body.light-mode .footer-copyright {
-                color: #94A3B8;
             }
         `;
     }
@@ -475,108 +356,103 @@ class AutoGlobalFooterLoader {
     // Footer HTML Template
     getFooterTemplate() {
         return `
-            <!-- GLOBAL FOOTER - Professional Gaming Design -->
+            <!-- GLOBAL FOOTER -->
             <footer class="global-footer">
                 <div class="footer-container">
                     <div class="footer-main">
                         <!-- Navigation & Tools -->
                         <div class="footer-section">
-                            <h4>🎮 GAMING TOOLS</h4>
+                            <h4>Öffentliche Tools</h4>
                             <div class="footer-tools">
                                 <a href="as-counter.html" class="footer-tool-link auto-tool-link" data-dashboard="dashboard-as-counter.html">
-                                    ⚔️ AS Counter
+                                    AS Counter
                                 </a>
                                 <a href="raid-counter.html" class="footer-tool-link auto-tool-link" data-dashboard="dashboard-raid-counter.html">
-                                    🏴‍☠️ Raid Counter
+                                    Raid Counter
                                 </a>
                                 <a href="sabo-counter.html" class="footer-tool-link">
-                                    💣 Sabo Counter
+                                    Sabo Counter
                                 </a>
                                 <a href="battle-counter.html" class="footer-tool-link">
-                                    🧮 Battle Counter
+                                    Battle Counter
+                                </a>
+                                <a href="ProximaDB.html" class="footer-tool-link">
+                                    ProximaDB
                                 </a>
                             </div>
                         </div>
-                        
+
                         <!-- Quick Links -->
                         <div class="footer-section">
-                            <h4>🚀 QUICK LINKS</h4>
+                            <h4>Konto</h4>
                             <ul class="footer-links">
-                                <li><a href="index.html" class="footer-link">🏠 Home</a></li>
-                                <li><a href="dashboard.html" class="footer-link" id="auto-quick-dashboard">📊 Dashboard</a></li>
-                                <li><a href="register.html" class="footer-link">🔐 Register</a></li>
-                                <li><a href="changelog.html" class="footer-link">📝 Changelog</a></li>
+                                <li><a href="index.html" class="footer-link">Start</a></li>
+                                <li><a href="dashboard.html" class="footer-link" id="auto-quick-dashboard">Dashboard</a></li>
+                                <li><a href="register.html" class="footer-link">Konto erstellen</a></li>
+                                <li><a href="changelog.html" class="footer-link">Changelog</a></li>
                             </ul>
                         </div>
-                        
+
                         <!-- Support & Legal -->
                         <div class="footer-section">
-                            <h4>⚖️ SUPPORT & LEGAL</h4>
+                            <h4>Support & Rechtliches</h4>
                             <ul class="footer-links">
-                                <li><a href="hilfe.html" class="footer-link">❓ Help & FAQ</a></li>
-                                <li><a href="impressum.html" class="footer-link">📄 Impressum</a></li>
-                                <li><a href="datenschutz.html" class="footer-link">🔒 Privacy Policy</a></li>
-                                <li><a href="kontakt.html" class="footer-link">✉️ Contact</a></li>
+                                <li><a href="hilfe.html" class="footer-link">Hilfe & FAQ</a></li>
+                                <li><a href="impressum.html" class="footer-link">Impressum</a></li>
+                                <li><a href="datenschutz.html" class="footer-link">Datenschutz</a></li>
+                                <li><a href="kontakt.html" class="footer-link">Kontakt</a></li>
                             </ul>
                         </div>
-                        
+
                         <!-- Admin Section -->
                         <div class="footer-section">
-                            <h4>⚙️ ADMINISTRATION</h4>
+                            <h4>Administration</h4>
                             <ul class="footer-links admin-links">
                                 <li>
                                     <a href="admin-login.html" class="footer-link" id="auto-admin-login-link">
-                                        🔐 Admin Login
+                                        Admin-Login
                                     </a>
                                 </li>
                                 <li style="display: none;">
                                     <a href="admin-dashboard.html" class="footer-link" id="auto-admin-dashboard-link">
-                                        🛡️ Admin Dashboard
-                                        <span class="admin-badge">ADMIN</span>
+                                        Admin-Dashboard
+                                        <span class="admin-badge">Admin</span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="roadmap.html" class="footer-link">
-                                        🗺️ Roadmap
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="footer-link auto-theme-toggle">
-                                        🌙 Toggle Theme
+                                        Roadmap
                                     </a>
                                 </li>
                             </ul>
                         </div>
                     </div>
-                    
+
                     <div class="footer-divider"></div>
-                    
+
                     <div class="footer-bottom">
                         <div class="footer-copyright">
-                            <strong>© 2025 Spacenations Tools</strong><br>
-                            Professional gaming tools for competitive Spacenations players<br>
-                            <span style="font-size: 12px; opacity: 0.7;">
-                                Version 3.0 | Built for gamers, by gamers ⚡
-                            </span>
+                            <strong>© 2026 Spacenations Tools</strong><br>
+                            <span style="font-size: 12px;">Version 3.0</span>
                         </div>
-                        
+
                         <div class="footer-actions">
                             <!-- System Status -->
                             <div class="status-indicator" id="auto-system-status">
                                 <span class="status-dot"></span>
-                                <span>ONLINE</span>
+                                <span>Online</span>
                             </div>
-                            
+
                             <!-- Social Links -->
                             <div class="social-links">
-                                <a href="https://discord.gg/spacenations" class="social-link" title="Join our Discord" target="_blank">
-                                    🎮
+                                <a href="https://discord.gg/spacenations" class="social-link" title="Discord" target="_blank">
+                                    Discord
                                 </a>
                                 <a href="https://github.com/Trend4Media/Spacenations-Tools" class="social-link" title="GitHub Repository" target="_blank">
-                                    ⚡
+                                    GitHub
                                 </a>
-                                <a href="mailto:admin@spacenations-tools.de" class="social-link" title="Contact Support">
-                                    ✉️
+                                <a href="mailto:admin@spacenations-tools.de" class="social-link" title="Kontakt">
+                                    Kontakt
                                 </a>
                             </div>
                         </div>
@@ -625,7 +501,7 @@ class AutoGlobalFooterLoader {
                     const adminLoginLink = document.getElementById('auto-admin-login-link');
                     const adminDashboardLink = document.getElementById('auto-admin-dashboard-link');
                     
-                    if (userData && (userData.globalRole === 'global_admin' || userData.isSuperAdmin === true)) {
+                    if (userData && userData.globalRole === 'global_admin') {
                         if (adminLoginLink) adminLoginLink.parentElement.style.display = 'none';
                         if (adminDashboardLink) adminDashboardLink.parentElement.style.display = 'block';
                     } else {

@@ -3,82 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datenschutzerklärung - Spacenations Tools</title>
+    <title>Datenschutzerklärung – Spacenations Tools</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/theme-variables.css">
-    <link rel="stylesheet" href="css/content-page.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+    <style>
+        .legal { max-width: 820px; margin: 0 auto; padding: 36px 20px 88px; }
+        .legal h1 { font-size: clamp(1.6rem,4vw,2.1rem); margin: 0 0 6px; color: var(--text-primary); letter-spacing: -0.01em; }
+        .legal .lead { color: var(--text-secondary); margin: 0 0 26px; }
+        .legal h2 { font-size: 1.05rem; margin: 30px 0 8px; color: var(--text-primary); }
+        .legal p { margin: 0 0 12px; color: var(--text-secondary); line-height: 1.65; }
+        .legal code { background: var(--accent-soft); border-radius:5px; padding:1px 6px; font-size:.9em; }
+        .todo { display:inline-block; background: var(--accent-soft); border:1px solid var(--accent); color: var(--accent-strong); padding:0 8px; border-radius:6px; font-size:.78rem; font-weight:600; }
+        .notice { background: var(--card); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:12px; padding:14px 16px; margin:0 0 26px; color: var(--text-secondary); font-size:.92rem; box-shadow: var(--shadow-sm); }
+    </style>
 </head>
 <body>
-    <header class="page-header">
-        <a class="home" href="index.html">← Startseite</a>
-        <span class="brand">SPACENATIONS TOOLS</span>
+    <header class="header">
+        <div class="wrap">
+            <a href="index.html" class="wordmark"><span><strong>Spacenations</strong><span class="thin"> Tools</span></span></a>
+            <nav class="header-auth"><a href="index.html" class="btn btn-ghost btn-sm">Alle Tools</a></nav>
+        </div>
     </header>
-    <main class="content">
+    <main class="legal">
         <h1>Datenschutzerklärung</h1>
         <p class="lead">Informationen zur Verarbeitung personenbezogener Daten (DSGVO).</p>
-
-        <div class="notice">
-            <strong>Hinweis:</strong> Diese Seite ist ein Gerüst. Die technischen
-            Verarbeitungen unten beschreiben, welche Daten die Anwendung <em>tatsächlich</em>
-            verarbeitet – die rechtlichen Angaben (Verantwortlicher, Rechtsgrundlagen,
-            Aufbewahrungsfristen, Auftragsverarbeitungsverträge) sind mit
-            <span class="todo">BITTE AUSFÜLLEN</span> markiert und müssen ergänzt und
-            rechtlich geprüft werden.
-        </div>
+        <div class="notice"><strong>Hinweis:</strong> Die technischen Verarbeitungen unten beschreiben, welche Daten die Anwendung <em>tatsächlich</em> verarbeitet. Die rechtlichen Angaben (Verantwortlicher, Rechtsgrundlagen, Fristen) sind mit <span class="todo">BITTE AUSFÜLLEN</span> markiert und müssen ergänzt und rechtlich geprüft werden.</div>
 
         <h2>1. Verantwortlicher</h2>
-        <p><span class="todo">BITTE AUSFÜLLEN</span> – Name, Anschrift und Kontakt der/des Verantwortlichen (siehe Impressum).</p>
+        <p><span class="todo">BITTE AUSFÜLLEN</span> – Name, Anschrift und Kontakt (siehe Impressum).</p>
 
         <h2>2. Hosting</h2>
-        <p>
-            Die Anwendung wird über <strong>Railway</strong> bereitgestellt. Beim Aufruf
-            der Seiten werden technisch notwendige Verbindungsdaten (z. B. IP-Adresse,
-            Zeitpunkt, angeforderte Ressource) verarbeitet.
-            <span class="todo">BITTE AUSFÜLLEN</span> – Rechtsgrundlage und Details zum Hosting-Anbieter.
-        </p>
+        <p>Die Anwendung wird über <strong>Railway</strong> bereitgestellt. Dabei werden technisch notwendige Verbindungsdaten (IP-Adresse, Zeitpunkt, angeforderte Ressource) verarbeitet. <span class="todo">BITTE AUSFÜLLEN</span> – Rechtsgrundlage.</p>
 
-        <h2>3. Konto & Authentifizierung (Firebase Authentication)</h2>
-        <p>
-            Für Konten nutzt die Anwendung <strong>Firebase Authentication</strong> (Google).
-            Dabei werden E-Mail-Adresse und Anmeldedaten verarbeitet.
-            <span class="todo">BITTE AUSFÜLLEN</span> – Rechtsgrundlage, Google als Auftragsverarbeiter, Drittlandübermittlung.
-        </p>
+        <h2>3. Konto &amp; Authentifizierung</h2>
+        <p>Für Konten wird <strong>Firebase Authentication</strong> (Google) genutzt; verarbeitet werden E-Mail-Adresse und Anmeldedaten. <span class="todo">BITTE AUSFÜLLEN</span> – Rechtsgrundlage, Auftragsverarbeiter, Drittlandübermittlung.</p>
 
         <h2>4. Gespeicherte Nutzerdaten (Firestore)</h2>
-        <p>
-            In der Datenbank <strong>Cloud Firestore</strong> (Google) werden je nach Nutzung gespeichert:
-        </p>
-        <p>
-            Profil (E-Mail, Benutzername, Rolle, Zeitstempel), Allianz-Zugehörigkeiten und
-            -Aktivitäten, Spionageberichte sowie persönliche Rechner-Auswertungen
-            (Raids, Sabotagen, Kämpfe). <span class="todo">BITTE AUSFÜLLEN</span> – Zweck,
-            Rechtsgrundlage und Speicherdauer je Datenkategorie.
-        </p>
+        <p>In <strong>Cloud Firestore</strong> (Google) werden je nach Nutzung gespeichert: Profil (E-Mail, Benutzername, Rolle, Zeitstempel), Allianz-Zugehörigkeiten und -Aktivitäten, Spionageberichte sowie persönliche Rechner-Auswertungen. <span class="todo">BITTE AUSFÜLLEN</span> – Zweck, Rechtsgrundlage, Speicherdauer.</p>
 
-        <h2>5. Reichweitenmessung (Analytics)</h2>
-        <p>
-            Die Anwendung erfasst anonymisierte Nutzungsereignisse
-            (<code>analytics_events</code>, <code>analytics_sessions</code>,
-            <code>analytics_pageViews</code>) zur Verbesserung der Tools.
-            <span class="todo">BITTE AUSFÜLLEN</span> – Rechtsgrundlage (ggf. Einwilligung) und Widerspruchsmöglichkeit.
-        </p>
+        <h2>5. Reichweitenmessung</h2>
+        <p>Anonymisierte Nutzungsereignisse (<code>analytics_events</code>, <code>analytics_sessions</code>, <code>analytics_pageViews</code>) zur Verbesserung der Tools. <span class="todo">BITTE AUSFÜLLEN</span> – Rechtsgrundlage / Einwilligung.</p>
 
-        <h2>6. Discord-Integration (optional)</h2>
-        <p>
-            Ein optionaler serverseitiger Job veröffentlicht die öffentliche Proxima-Liste
-            in einem Discord-Kanal. Dabei werden <strong>keine personenbezogenen Nutzerdaten</strong>
-            übermittelt – nur öffentliche Spiel-Planetendaten.
-        </p>
-
-        <h2>7. Ihre Rechte</h2>
-        <p>
-            Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der
-            Verarbeitung, Datenübertragbarkeit und Widerspruch sowie ein Beschwerderecht
-            bei einer Aufsichtsbehörde. <span class="todo">BITTE AUSFÜLLEN</span> – Kontaktweg
-            für Betroffenenanfragen und zuständige Aufsichtsbehörde.
-        </p>
+        <h2>6. Ihre Rechte</h2>
+        <p>Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerspruch sowie Beschwerderecht bei einer Aufsichtsbehörde. <span class="todo">BITTE AUSFÜLLEN</span> – Kontaktweg und zuständige Aufsichtsbehörde.</p>
     </main>
     <script src="js/global-footer-loader.js"></script>
 </body>

@@ -3,544 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard - Spacenations Tools</title>
-    
-    <!-- Modern Fonts -->
+    <title>Dashboard – Spacenations Tools</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316181D'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='white' stroke-width='2'/%3E%3Cellipse cx='16' cy='16' rx='12' ry='4.4' fill='none' stroke='%2300D68F' stroke-width='1.6' transform='rotate(-20 16 16)'/%3E%3C/svg%3E">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+
     <style>
-        :root {
-            /* Razer Color Scheme */
-            --razer-green: #00FF88;
-            --razer-green-dark: #00CC6A;
-            --razer-green-light: #44FF99;
-            --razer-black: #0A0A0A;
-            --razer-dark: #111111;
-            --razer-gray: #1A1A1A;
-            --razer-gray-light: #2A2A2A;
-            --razer-white: #FFFFFF;
-            --razer-silver: #C0C0C0;
-            
-            --text-primary: var(--razer-white);
-            --text-secondary: var(--razer-silver);
-            --text-accent: var(--razer-green);
-            
-            --bg-primary: var(--razer-black);
-            --bg-secondary: var(--razer-dark);
-            --bg-tertiary: var(--razer-gray);
-            --bg-card: var(--razer-gray-light);
-            
-            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
-            --glow-green-strong: 0 0 30px rgba(0, 255, 136, 0.8);
-            --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.6);
-            
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            --font-gaming: 'Orbitron', monospace;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: var(--font-primary);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-        
-        /* Animated Background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
-                linear-gradient(45deg, var(--razer-black) 0%, var(--razer-dark) 100%);
-            z-index: -1;
-            animation: backgroundPulse 8s ease-in-out infinite;
-        }
-        
-        @keyframes backgroundPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        
-        /* Header */
-        .header {
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
-            padding: 20px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .nav {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--razer-green);
-            text-decoration: none;
-            font-family: var(--font-gaming);
-            font-weight: 700;
-            font-size: 1.5rem;
-        }
-        
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--razer-black);
-            font-weight: 900;
-            font-size: 1.2rem;
-        }
-        
-        .nav-actions {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-        
-        .btn {
-            padding: 12px 24px;
-            border-radius: 8px;
-            border: 2px solid var(--razer-green);
-            background: transparent;
-            color: var(--razer-green);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .btn:hover {
-            background: var(--razer-green);
-            color: var(--razer-black);
-            transform: translateY(-2px);
-            box-shadow: var(--glow-green);
-        }
-        
-        .btn.primary {
-            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
-            color: var(--razer-black);
-            border: none;
-        }
-        
-        .btn.primary:hover {
-            background: var(--razer-green-light);
-            box-shadow: var(--glow-green-strong);
-        }
-        
-        /* Main Content */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 40px 32px;
-        }
-        
-        .welcome-section {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-        
-        .welcome-title {
-            font-family: var(--font-gaming);
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--razer-green);
-            margin-bottom: 16px;
-            text-shadow: var(--glow-green);
-        }
-        
-        .welcome-subtitle {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-        }
-        
-        .user-info {
-            background: var(--bg-card);
-            border: 2px solid var(--razer-green);
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 40px;
-            box-shadow: var(--shadow-dark), var(--glow-green);
-        }
-        
-        .user-info h3 {
-            color: var(--razer-green);
-            font-family: var(--font-gaming);
-            font-size: 1.5rem;
-            margin-bottom: 16px;
-        }
-        
-        .info-grid {
+        /* Seitenspezifisch: Dashboard-Karten mit Aktionen + Allianz-Modal */
+        .dash-main { padding-bottom: 64px; }
+
+        .dash-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
         }
-        
-        .info-item {
-            background: var(--bg-secondary);
-            border: 1px solid var(--razer-gray);
-            border-radius: 8px;
-            padding: 16px;
+
+        .dash-card {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 20px;
         }
-        
-        .info-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+
+        .dash-card .app-tile-icon { margin-bottom: 12px; }
+
+        .dash-card h3 {
+            font-size: 15px;
+            font-weight: 600;
             margin-bottom: 4px;
         }
-        
-        .info-value {
-            color: var(--text-primary);
-            font-weight: 600;
-            font-family: var(--font-gaming);
-        }
-        
-        /* Tools Grid */
-        .tools-section {
-            margin-bottom: 40px;
-        }
-        
-        .section-title {
-            font-family: var(--font-gaming);
-            font-size: 2rem;
-            color: var(--razer-green);
-            text-align: center;
-            margin-bottom: 32px;
-            text-shadow: var(--glow-green);
-        }
-        
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-        }
-        
-        .tool-card {
-            background: var(--bg-card);
-            border: 2px solid var(--razer-green);
-            border-radius: 12px;
-            padding: 24px;
-            text-align: center;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-dark);
-        }
-        
-        .tool-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-dark), var(--glow-green);
-            border-color: var(--razer-green-light);
-        }
-        
-        .tool-icon {
-            font-size: 3rem;
-            margin-bottom: 16px;
-        }
-        
-        .tool-title {
-            font-family: var(--font-gaming);
-            font-size: 1.3rem;
-            color: var(--razer-green);
-            margin-bottom: 12px;
-        }
-        
-        .tool-description {
-            color: var(--text-secondary);
-            margin-bottom: 20px;
+
+        .dash-card p {
+            font-size: 13px;
             line-height: 1.5;
+            color: var(--text-tertiary);
+            margin-bottom: 16px;
+            flex: 1;
         }
-        
+
+        /* Aktions-Buttons in den Karten - auch von JS dynamisch erzeugt */
         .tool-link {
-            display: inline-block;
-            padding: 12px 24px;
-            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
-            color: var(--razer-black);
-            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 32px;
+            padding: 0 14px;
+            border: none;
             border-radius: 8px;
-            font-weight: 700;
-            transition: all 0.3s ease;
+            background: var(--accent);
+            color: #FFFFFF;
+            font-family: var(--font);
+            font-size: 12.5px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            white-space: nowrap;
         }
-        
-        .tool-link:hover {
-            background: var(--razer-green-light);
-            transform: translateY(-2px);
-            box-shadow: var(--glow-green);
-        }
-        
-        .section-subtitle {
-            text-align: center;
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-            font-size: 1rem;
-        }
-        
-        .tool-card.public {
-            border-color: var(--razer-gray);
-        }
-        
-        .tool-card.public:hover {
-            border-color: var(--razer-gray-light);
-        }
-        
-        .tool-card.personal {
-            border-color: var(--razer-green);
-            background: linear-gradient(135deg, var(--bg-card), rgba(0, 255, 136, 0.05));
-        }
-        
-        .tool-card.personal:hover {
-            border-color: var(--razer-green-light);
-            background: linear-gradient(135deg, var(--bg-card), rgba(0, 255, 136, 0.1));
-        }
-        
-        .tool-card.personal .tool-title {
-            color: var(--razer-green);
-        }
-        
-        /* Modal Styles */
+
+        .tool-link:hover { background: #009068; }
+
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            inset: 0;
+            background: rgba(23, 26, 34, 0.45);
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
-        
+
         .modal-content {
-            background: var(--bg-card);
-            border: 2px solid var(--razer-green);
-            border-radius: 12px;
-            padding: 32px;
-            max-width: 500px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 460px;
             width: 90%;
-            max-height: 80vh;
+            max-height: 85vh;
             overflow-y: auto;
-            box-shadow: var(--shadow-dark), var(--glow-green);
-            position: relative;
+            box-shadow: var(--shadow-lg);
         }
-        
-        .form-group {
-            margin-bottom: 24px;
+
+        .modal-content h3 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 20px;
         }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-            font-weight: 600;
-            font-family: var(--font-primary);
-            font-size: 0.9rem;
+
+        .form-group { margin-bottom: 16px; }
+
+        .modal .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 22px;
         }
-        
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: 8px;
-            border: 2px solid var(--razer-gray);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            font-family: var(--font-primary);
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-        
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--razer-green);
-            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.2);
-            background: var(--bg-tertiary);
-        }
-        
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav {
-                padding: 0 16px;
-            }
-            
-            .container {
-                padding: 20px 16px;
-            }
-            
-            .welcome-title {
-                font-size: 2rem;
-            }
-            
-            .tools-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .nav-actions {
-                gap: 12px;
-            }
-            
-            .btn {
-                padding: 10px 16px;
-                font-size: 0.9rem;
-            }
+
+        .modal .controls .btn { flex-shrink: 0; }
+
+        @media (max-width: 720px) {
+            .dash-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
-        <nav class="nav">
-            <a href="index.html?stay=true" class="logo">
-                <div class="logo-icon">SN</div>
-                <span>Spacenations</span>
+        <div class="wrap">
+            <a href="index.html?stay=true" class="wordmark">
+                <span class="mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="4.4"/>
+                        <ellipse cx="12" cy="12" rx="9" ry="3.2" transform="rotate(-20 12 12)" opacity="0.55"/>
+                    </svg>
+                </span>
+                <span><strong>Spacenations</strong><span class="thin"> Tools</span></span>
             </a>
-            
-            <div class="nav-actions">
-                <a href="index.html?stay=true" class="btn">Zur Startseite</a>
-                <a href="spy-database.html" class="btn">🕵️ Spy-Datenbank</a>
-                <a href="#" class="btn" id="alliance-nav-link" onclick="handleAllianceNavigation()">🏰 Allianz</a>
-                <a href="logout-all.html" class="btn">Abmelden</a>
-            </div>
-        </nav>
+
+            <nav class="header-auth">
+                <a href="index.html?stay=true" class="btn btn-ghost btn-sm">Alle Tools</a>
+                <a href="spy-database.html" class="btn btn-ghost btn-sm">Spionage-DB</a>
+                <a href="#" class="btn btn-ghost btn-sm" id="alliance-nav-link" onclick="handleAllianceNavigation()">Allianz</a>
+                <span class="header-divider"></span>
+                <a href="logout-all.html" class="btn btn-outline btn-sm">Abmelden</a>
+            </nav>
+        </div>
     </header>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Welcome Section -->
-        <section class="welcome-section">
-            <h1 class="welcome-title">🎮 Dein Dashboard</h1>
-            <p class="welcome-subtitle" id="welcome-message">Willkommen in Ihrem persönlichen Spacenations Tools Bereich</p>
-        </section>
+    <main class="wrap dash-main">
+        <div class="intro">
+            <h1>Dashboard</h1>
+            <p id="welcome-message">Willkommen in Ihrem persönlichen Spacenations Tools Bereich</p>
+        </div>
 
-        <!-- Personal Counter Tools Section -->
-        <section class="tools-section">
-            <h2 class="section-title">📊 Deine persönlichen Tools</h2>
-            <p class="section-subtitle">Diese Tools speichern deine Erfolge und bieten individuelle Statistiken</p>
-            <div class="tools-grid">
-                <div class="tool-card personal">
-                    <div class="tool-icon">⚔️</div>
-                    <h3 class="tool-title">AS Counter</h3>
-                    <p class="tool-description">
-                        Dein persönlicher Angriffsschiff-Counter mit Erfolgsstatistiken und gespeicherten Berechnungen.
-                    </p>
+        <section class="app-section">
+            <div class="app-section-header">
+                <h2>Deine Tools</h2>
+                <span class="tag tag-public">Mit Konto verknüpft</span>
+                <span class="head-line"></span>
+            </div>
+            <div class="dash-grid">
+                <div class="card dash-card">
+                    <span class="app-tile-icon tint-rose">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.25"/><path d="M12 2.75V6M12 18v3.25M2.75 12H6M18 12h3.25"/></svg>
+                    </span>
+                    <h3>AS Counter</h3>
+                    <p>Dein persönlicher Angriffsschiff-Counter mit Erfolgsstatistiken und gespeicherten Berechnungen.</p>
                     <a href="dashboard-as-counter.html" class="tool-link">Mein AS Counter</a>
                 </div>
-                
-                <div class="tool-card personal">
-                    <div class="tool-icon">🧮</div>
-                    <h3 class="tool-title">Battle Counter</h3>
-                    <p class="tool-description">
-                        Persönliche Schlacht-Statistiken und gespeicherte Kampfstrategien.
-                    </p>
+
+                <div class="card dash-card">
+                    <span class="app-tile-icon tint-blue">
+                        <svg viewBox="0 0 24 24"><path d="M12 3.2l6.8 2.8v4.9c0 4.4-2.9 7.4-6.8 8.9-3.9-1.5-6.8-4.5-6.8-8.9V6l6.8-2.8z"/></svg>
+                    </span>
+                    <h3>Battle Counter</h3>
+                    <p>Persönliche Schlacht-Statistiken und gespeicherte Kampfstrategien.</p>
                     <a href="battle-counter.html" class="tool-link">Mein Battle Counter</a>
                 </div>
-                
-                <div class="tool-card personal">
-                    <div class="tool-icon">🏴‍☠️</div>
-                    <h3 class="tool-title">Raid Counter</h3>
-                    <p class="tool-description">
-                        Individuelle Raid-Erfolge und gespeicherte Raid-Strategien in der Datenbank.
-                    </p>
+
+                <div class="card dash-card">
+                    <span class="app-tile-icon tint-violet">
+                        <svg viewBox="0 0 24 24"><path d="M5.5 21V3.8"/><path d="M5.5 4.5h12.2l-3 4 3 4H5.5"/></svg>
+                    </span>
+                    <h3>Raid Counter</h3>
+                    <p>Individuelle Raid-Erfolge und gespeicherte Raid-Strategien in der Datenbank.</p>
                     <a href="dashboard-raid-counter.html" class="tool-link">Mein Raid Counter</a>
                 </div>
-                
-                <div class="tool-card personal">
-                    <div class="tool-icon">💣</div>
-                    <h3 class="tool-title">Sabo Counter</h3>
-                    <p class="tool-description">
-                        Persönliche Sabotage-Statistiken und gespeicherte Sabotage-Pläne.
-                    </p>
+
+                <div class="card dash-card">
+                    <span class="app-tile-icon tint-amber">
+                        <svg viewBox="0 0 24 24"><path d="M13.2 2.6L4.8 13.4h6l-1.9 8 8.4-10.8h-6l1.9-8z"/></svg>
+                    </span>
+                    <h3>Sabo Counter</h3>
+                    <p>Persönliche Sabotage-Statistiken und gespeicherte Sabotage-Pläne.</p>
                     <a href="dashboard-sabo-counter.html" class="tool-link">Mein Sabo Counter</a>
                 </div>
-                
-                <div class="tool-card personal">
-                    <div class="tool-icon">🌌</div>
-                    <h3 class="tool-title">ProximaDB</h3>
-                    <p class="tool-description">
-                        Persönlicher Zugriff auf die Proxima-Datenbank mit deinen individuellen Spielinformationen.
-                    </p>
+
+                <div class="card dash-card">
+                    <span class="app-tile-icon tint-teal">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><ellipse cx="12" cy="12" rx="9.5" ry="3.4" transform="rotate(-18 12 12)"/></svg>
+                    </span>
+                    <h3>ProximaDB</h3>
+                    <p>Persönlicher Zugriff auf die Proxima-Datenbank mit deinen individuellen Spielinformationen.</p>
                     <a href="ProximaDB.html" class="tool-link">Meine ProximaDB</a>
                 </div>
-                
-                <div class="tool-card personal" id="allianceboard-card">
-                    <div class="tool-icon">🏰</div>
-                    <h3 class="tool-title" id="allianceboard-title">Allianzboard</h3>
-                    <p class="tool-description" id="allianceboard-description">
-                        Lade Allianz-Informationen...
-                    </p>
+
+                <div class="card dash-card" id="allianceboard-card">
+                    <span class="app-tile-icon tint-green">
+                        <svg viewBox="0 0 24 24"><circle cx="9" cy="8.2" r="3.2"/><path d="M3.2 19.4c.6-3.1 3-5 5.8-5s5.2 1.9 5.8 5"/><path d="M16.2 5.6a3.2 3.2 0 0 1 0 5.2"/><path d="M17.6 14.6c1.9.7 3.1 2.4 3.5 4.6"/></svg>
+                    </span>
+                    <h3 id="allianceboard-title">Allianzboard</h3>
+                    <p id="allianceboard-description">Lade Allianz-Informationen...</p>
                     <div id="allianceboard-actions">
                         <!-- Wird dynamisch gefüllt -->
                     </div>
                 </div>
-                
-                <div class="tool-card personal" id="spy-database-card">
-                    <div class="tool-icon">🕵️</div>
-                    <h3 class="tool-title">Spy-Datenbank</h3>
-                    <p class="tool-description" id="spy-database-description">
-                        Verwalte und analysiere Spionageberichte deiner Allianz
-                    </p>
+
+                <div class="card dash-card" id="spy-database-card">
+                    <span class="app-tile-icon tint-indigo">
+                        <svg viewBox="0 0 24 24"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg>
+                    </span>
+                    <h3>Spionage-DB</h3>
+                    <p id="spy-database-description">Verwalte und analysiere Spionageberichte deiner Allianz</p>
                     <div class="tool-actions" id="spy-database-actions">
-                        <a href="spy-database.html" class="tool-link">🕵️ Spy-Datenbank öffnen</a>
+                        <a href="spy-database.html" class="tool-link">Spionage-DB öffnen</a>
                     </div>
                 </div>
             </div>
         </section>
-
-    </div>
+    </main>
 
     <!-- Allianz Erstellung Modal -->
     <div class="modal" id="create-alliance-modal">
         <div class="modal-content">
-            <h3>🏰 Neue Allianz erstellen</h3>
+            <h3>Neue Allianz erstellen</h3>
             <form id="create-alliance-form">
-                <div class="form-group">
-                    <label for="alliance-name">Allianz Name</label>
+                <div class="form-group field">
+                    <label for="alliance-name">Allianz-Name</label>
                     <input type="text" id="alliance-name" class="input" required maxlength="50" placeholder="z.B. Space Warriors">
                 </div>
-                <div class="form-group">
-                    <label for="alliance-tag">Allianz Tag</label>
+                <div class="form-group field">
+                    <label for="alliance-tag">Allianz-Tag</label>
                     <input type="text" id="alliance-tag" class="input" required maxlength="10" placeholder="z.B. SW" style="text-transform: uppercase;">
                 </div>
-                <div class="form-group">
+                <div class="form-group field">
                     <label for="alliance-description">Beschreibung (optional)</label>
                     <textarea id="alliance-description" class="input" rows="3" maxlength="200" placeholder="Kurze Beschreibung deiner Allianz..."></textarea>
                 </div>
                 <div class="controls">
-                    <button type="submit" class="btn success">Allianz erstellen</button>
-                    <button type="button" class="btn" onclick="closeModal('create-alliance-modal')">Abbrechen</button>
+                    <button type="submit" class="btn btn-accent btn-md">Allianz erstellen</button>
+                    <button type="button" class="btn btn-outline btn-md" onclick="closeModal('create-alliance-modal')">Abbrechen</button>
                 </div>
             </form>
         </div>
@@ -550,7 +249,7 @@
         // User Dashboard JavaScript
         document.addEventListener('DOMContentLoaded', () => {
             console.log('User Dashboard loaded');
-            
+
             // Debugging: Zeige erkannte Benutzerdaten
             const username = getCurrentUsername();
             const email = getCurrentUserEmail();
@@ -558,39 +257,39 @@
             console.log('URL-Parameter:', window.location.search);
             console.log('localStorage:', localStorage.getItem('currentUsername'));
             console.log('sessionStorage:', sessionStorage.getItem('currentUsername'));
-            
+
             // Persönliche Begrüßung basierend auf Login-Daten
             updateWelcomeMessage();
-            
+
             // Allianz-Funktionalität initialisieren
             // Initialisiere Allianz-Features nach einer kurzen Verzögerung
             setTimeout(() => {
                 initializeAllianceFeatures();
             }, 1000);
-            
+
             // Hier könnte später echte Benutzerdaten aus der Datenbank geladen werden
             // z.B. aus Firebase oder einer API
         });
-        
+
         function updateWelcomeMessage() {
             const welcomeElement = document.getElementById('welcome-message');
-            
+
             // Versuche Benutzernamen aus verschiedenen Quellen zu holen
             let username = getCurrentUsername();
-            
+
             if (username) {
                 welcomeElement.textContent = `Willkommen zurück, ${username}!`;
-                welcomeElement.style.color = 'var(--razer-green)';
+                welcomeElement.style.color = 'var(--accent-strong)';
                 console.log(`User Dashboard für ${username} geladen`);
             } else {
                 // Fallback falls kein Benutzername gefunden wird
                 welcomeElement.textContent = 'Willkommen in Ihrem persönlichen Spacenations Tools Bereich';
             }
         }
-        
+
         function getCurrentUsername() {
             console.log('🔍 Suche Benutzername...');
-            
+
             // Methode 1: Aus SessionAPI (neue Standard-Methode)
             if (window.SessionAPI) {
                 const sessionData = window.SessionAPI.getUserData();
@@ -603,7 +302,7 @@
                     return sessionData.email;
                 }
             }
-            
+
             // Methode 2: Aus URL-Parameter (beim Login weitergegeben)
             const urlParams = new URLSearchParams(window.location.search);
             const usernameFromUrl = urlParams.get('username');
@@ -611,21 +310,21 @@
                 console.log('✅ Username aus URL gefunden:', usernameFromUrl);
                 return usernameFromUrl;
             }
-            
+
             // Methode 3: Aus localStorage (Legacy)
             const usernameFromStorage = localStorage.getItem('currentUsername');
             if (usernameFromStorage) {
                 console.log('✅ Username aus localStorage gefunden:', usernameFromStorage);
                 return usernameFromStorage;
             }
-            
+
             // Methode 4: Aus sessionStorage (Legacy)
             const usernameFromSession = sessionStorage.getItem('currentUsername');
             if (usernameFromSession) {
                 console.log('✅ Username aus sessionStorage gefunden:', usernameFromSession);
                 return usernameFromSession;
             }
-            
+
             // Methode 5: Aus URL-String extrahieren (falls URL-Parameter nicht richtig geparst wurden)
             const url = window.location.href;
             const usernameMatch = url.match(/[?&]username=([^&]+)/);
@@ -634,15 +333,15 @@
                 console.log('✅ Username aus URL-String gefunden:', decodedUsername);
                 return decodedUsername;
             }
-            
+
             // Methode 6: Fallback - verwende 'guest' wenn nichts gefunden wird
             console.log('⚠️ Kein Username gefunden - verwende Fallback');
             return 'guest';
         }
-        
+
         function getCurrentUserEmail() {
             // E-Mail-Adresse des eingeloggten Benutzers holen
-            
+
             // Methode 1: Aus SessionAPI (neue Standard-Methode)
             if (window.SessionAPI) {
                 const sessionData = window.SessionAPI.getUserData();
@@ -650,29 +349,29 @@
                     return sessionData.email;
                 }
             }
-            
+
             // Methode 2: Aus URL-Parameter
             const urlParams = new URLSearchParams(window.location.search);
             const emailFromUrl = urlParams.get('email');
             if (emailFromUrl) {
                 return emailFromUrl;
             }
-            
+
             // Methode 3: Aus localStorage (Legacy)
             const emailFromStorage = localStorage.getItem('currentUserEmail');
             if (emailFromStorage) {
                 return emailFromStorage;
             }
-            
+
             // Methode 4: Aus sessionStorage (Legacy)
             const emailFromSession = sessionStorage.getItem('currentUserEmail');
             if (emailFromSession) {
                 return emailFromSession;
             }
-            
+
             return null;
         }
-        
+
         // Firebase für Allianz-Features initialisieren
         async function initializeFirebaseForAlliance() {
             return new Promise((resolve, reject) => {
@@ -683,21 +382,21 @@
                         setTimeout(checkFirebase, 100);
                     }
                 };
-                
+
                 // Timeout nach 5 Sekunden
                 setTimeout(() => {
                     reject(new Error('Firebase-Initialisierung Timeout'));
                 }, 5000);
-                
+
                 checkFirebase();
             });
         }
-        
+
         // Allianz-Funktionalität
         async function initializeAllianceFeatures() {
             try {
                 console.log('Initialisiere Allianz-Features...');
-                
+
                 // Prüfe ob Firebase verfügbar ist
                 if (typeof window.FirebaseConfig === 'undefined') {
                     console.log('⚠️ Firebase nicht verfügbar - initialisiere Firebase...');
@@ -717,7 +416,7 @@
                     await window.FirebaseConfig.waitForReady();
                     console.log('Firebase initialisiert, lade Allianz-Status...');
                 }
-                
+
                 await loadAllianceStatus();
                 setupAllianceEventListeners();
                 console.log('Allianz-Features erfolgreich initialisiert');
@@ -727,11 +426,11 @@
                 setupAllianceEventListeners();
             }
         }
-        
+
         async function loadAllianceStatus() {
             try {
                 console.log('🔍 Lade Allianz-Status...');
-                
+
                 // Prüfe ob Firebase verfügbar ist
                 if (typeof window.FirebaseConfig === 'undefined' || !window.FirebaseConfig.isReady()) {
                     console.log('⚠️ Firebase nicht verfügbar - initialisiere...');
@@ -744,82 +443,56 @@
                         return;
                     }
                 }
-                
+
                 const db = window.FirebaseConfig.getDB();
-                const username = getCurrentUsername();
-                
-                if (!username) {
-                    console.log('❌ Kein Benutzername gefunden');
+                const currentUser = window.AuthAPI.getCurrentUser();
+
+                if (!currentUser) {
+                    console.log('❌ Nicht angemeldet');
                     showAllianceStatus('no-user', 'Bitte melde dich an, um Allianz-Features zu nutzen.');
                     return;
                 }
-                
-                console.log('👤 Suche Allianzen für Benutzer:', username);
-                
-                // Suche nach Allianzen, in denen der User Mitglied ist
-                const userAlliancesQuery = await db.collection('alliances')
-                    .where('members', 'array-contains', username)
+
+                console.log('👤 Suche Allianz-Mitgliedschaft für:', currentUser.uid);
+
+                const membershipQuery = await db.collection('allianceMembers')
+                    .where('uid', '==', currentUser.uid)
+                    .limit(1)
                     .get();
-                
-                console.log('📊 Gefundene Allianzen als Mitglied:', userAlliancesQuery.size);
-                
-                if (!userAlliancesQuery.empty) {
-                    const alliance = userAlliancesQuery.docs[0].data();
-                    const allianceId = userAlliancesQuery.docs[0].id;
-                    
-                    console.log('🏰 Allianz gefunden:', alliance.name, 'Status:', alliance.status);
-                    
-                    // Speichere Allianz-Daten in localStorage für Dashboard-Zugriff
-                    const allianceData = {
-                        id: allianceId,
-                        ...alliance
-                    };
-                    localStorage.setItem('currentAlliance', JSON.stringify(allianceData));
-                    localStorage.setItem('currentUsername', username);
-                    console.log('💾 Allianz-Daten in localStorage gespeichert');
-                    
-                    if (alliance.status === 'approved') {
-                        showAllianceStatus('member', alliance, allianceId);
-                    } else if (alliance.status === 'pending') {
-                        showAllianceStatus('pending', alliance, allianceId);
-                    } else if (alliance.status === 'rejected') {
-                        showAllianceStatus('rejected', alliance, allianceId);
-                    }
+
+                if (membershipQuery.empty) {
+                    console.log('❌ Keine Allianz gefunden');
+                    showAllianceStatus('none', null);
+                    return;
+                }
+
+                const membership = membershipQuery.docs[0].data();
+                const allianceDoc = await db.collection('alliances').doc(membership.allianceId).get();
+
+                if (!allianceDoc.exists) {
+                    console.log('❌ Allianz-Dokument nicht gefunden');
+                    showAllianceStatus('none', null);
+                    return;
+                }
+
+                const alliance = { id: allianceDoc.id, ...allianceDoc.data() };
+                console.log('🏰 Allianz gefunden:', alliance.name, 'Status:', alliance.status, 'Rolle:', membership.role);
+
+                if (alliance.status === 'pending') {
+                    showAllianceStatus('pending', alliance, alliance.id);
+                } else if (alliance.status === 'rejected') {
+                    showAllianceStatus('rejected', alliance, alliance.id);
+                } else if (membership.role === 'founder') {
+                    showAllianceStatus('founder', alliance, alliance.id);
                 } else {
-                    // Prüfe ob User bereits eine Allianz erstellt hat (als Gründer)
-                    console.log('🔍 Suche nach erstellten Allianzen...');
-                    const createdAlliancesQuery = await db.collection('alliances')
-                        .where('founder', '==', username)
-                        .get();
-                    
-                    console.log('📊 Gefundene erstellte Allianzen:', createdAlliancesQuery.size);
-                    
-                    if (!createdAlliancesQuery.empty) {
-                        const alliance = createdAlliancesQuery.docs[0].data();
-                        const allianceId = createdAlliancesQuery.docs[0].id;
-                        console.log('🏗️ Erstellte Allianz gefunden:', alliance.name, 'Status:', alliance.status);
-                        
-                        // Speichere Allianz-Daten in localStorage für Dashboard-Zugriff
-                        const allianceData = {
-                            id: allianceId,
-                            ...alliance
-                        };
-                        localStorage.setItem('currentAlliance', JSON.stringify(allianceData));
-                        localStorage.setItem('currentUsername', username);
-                        console.log('💾 Erstellte Allianz-Daten in localStorage gespeichert');
-                        
-                        showAllianceStatus('founder', alliance, allianceId);
-                    } else {
-                        console.log('❌ Keine Allianz gefunden');
-                        showAllianceStatus('none', null);
-                    }
+                    showAllianceStatus('member', alliance, alliance.id);
                 }
             } catch (error) {
                 console.error('❌ Fehler beim Laden der Allianz-Status:', error);
                 showAllianceStatus('error', 'Fehler beim Laden der Allianz-Informationen: ' + error.message);
             }
         }
-        
+
         function loadAllianceStatusLocal() {
             // Fallback für lokale Entwicklung
             const localAlliance = localStorage.getItem('userAlliance');
@@ -830,50 +503,50 @@
                 showAllianceStatus('none', null);
             }
         }
-        
+
         function showAllianceStatus(status, alliance, allianceId = null) {
             // Aktualisiere sowohl die Tool-Karte als auch die Navigation
             updateAllianceboardCard(status, alliance, allianceId);
             updateAllianceNavigation(status, alliance, allianceId);
         }
-        
+
         function updateAllianceboardCard(status, alliance, allianceId = null) {
             const titleElement = document.getElementById('allianceboard-title');
             const descriptionElement = document.getElementById('allianceboard-description');
             const actionsElement = document.getElementById('allianceboard-actions');
-            
+
             if (!titleElement || !descriptionElement || !actionsElement) {
                 console.warn('⚠️ Allianzboard-Elemente nicht gefunden');
                 return;
             }
-            
+
             switch (status) {
                 case 'no-user':
-                    titleElement.textContent = '🔒 Anmeldung erforderlich';
+                    titleElement.textContent = 'Anmeldung erforderlich';
                     descriptionElement.textContent = 'Bitte melde dich an, um Allianz-Features zu nutzen.';
                     actionsElement.innerHTML = '<a href="index.html" class="tool-link">Anmelden</a>';
                     break;
-                    
+
                 case 'none':
-                    titleElement.textContent = '🏰 Keine Allianz';
+                    titleElement.textContent = 'Keine Allianz';
                     descriptionElement.textContent = 'Du bist noch keiner Allianz beigetreten. Erstelle eine neue Allianz oder warte auf eine Einladung.';
                     actionsElement.innerHTML = '<button class="tool-link" onclick="openCreateAllianceModal()">Neue Allianz erstellen</button>';
                     break;
-                    
+
                 case 'pending':
-                    titleElement.textContent = `⏳ ${alliance.name} [${alliance.tag}]`;
+                    titleElement.textContent = `${alliance.name} [${alliance.tag}]`;
                     descriptionElement.textContent = `Deine Allianz "${alliance.name}" wartet auf Genehmigung durch einen Super-Admin.`;
                     actionsElement.innerHTML = '<span class="tool-link" style="opacity: 0.7;">Wartet auf Genehmigung...</span>';
                     break;
-                    
+
                 case 'rejected':
-                    titleElement.textContent = `❌ ${alliance.name} [${alliance.tag}]`;
+                    titleElement.textContent = `${alliance.name} [${alliance.tag}]`;
                     descriptionElement.textContent = `Deine Allianz "${alliance.name}" wurde abgelehnt. Kontaktiere einen Super-Admin für weitere Informationen.`;
                     actionsElement.innerHTML = '<button class="tool-link" onclick="openCreateAllianceModal()">Neue Allianz erstellen</button>';
                     break;
-                    
+
                 case 'founder':
-                    titleElement.textContent = `👑 ${alliance.name} [${alliance.tag}] (Gründer)`;
+                    titleElement.textContent = `${alliance.name} [${alliance.tag}] (Gründer)`;
                     descriptionElement.textContent = `Du hast die Allianz "${alliance.name}" erstellt. Status: ${alliance.status === 'approved' ? 'Genehmigt' : 'Wartet auf Genehmigung'}`;
                     if (alliance.status === 'approved') {
                         actionsElement.innerHTML = '<a href="alliance-dashboard-redirect.html" class="tool-link">Zum Allianzdashboard</a>';
@@ -881,88 +554,88 @@
                         actionsElement.innerHTML = '<span class="tool-link" style="opacity: 0.7;">Wartet auf Genehmigung...</span>';
                     }
                     break;
-                    
+
                 case 'member':
-                    titleElement.textContent = `🤝 ${alliance.name} [${alliance.tag}]`;
+                    titleElement.textContent = `${alliance.name} [${alliance.tag}]`;
                     descriptionElement.textContent = `Du bist Mitglied der Allianz "${alliance.name}".`;
                     actionsElement.innerHTML = '<a href="alliance-dashboard.html" class="tool-link" onclick="redirectToAllianceDashboard()">Zum Allianzdashboard</a>';
                     break;
-                    
+
                 case 'error':
-                    titleElement.textContent = '❌ Fehler';
+                    titleElement.textContent = 'Fehler';
                     descriptionElement.textContent = 'Fehler beim Laden der Allianz-Informationen.';
                     actionsElement.innerHTML = '<button class="tool-link" onclick="location.reload()">Neu laden</button>';
                     break;
             }
         }
-        
+
         function updateAllianceNavigation(status, alliance, allianceId = null) {
             const navLink = document.getElementById('alliance-nav-link');
             if (!navLink) return;
-            
+
             switch (status) {
                 case 'no-user':
-                    navLink.textContent = '🔒 Allianz';
+                    navLink.textContent = 'Allianz';
                     navLink.href = 'index.html';
                     break;
-                    
+
                 case 'none':
-                    navLink.textContent = '🏰 Allianz';
+                    navLink.textContent = 'Allianz';
                     navLink.href = '#';
                     navLink.onclick = () => openCreateAllianceModal();
                     break;
-                    
+
                 case 'pending':
-                    navLink.textContent = `⏳ ${alliance.name}`;
+                    navLink.textContent = `${alliance.name} (ausstehend)`;
                     navLink.href = '#';
                     navLink.onclick = () => alert('Allianz wartet auf Genehmigung');
                     break;
-                    
+
                 case 'rejected':
-                    navLink.textContent = '❌ Allianz';
+                    navLink.textContent = 'Allianz';
                     navLink.href = '#';
                     navLink.onclick = () => openCreateAllianceModal();
                     break;
-                    
+
                 case 'founder':
                     if (alliance.status === 'approved') {
-                        navLink.textContent = `👑 ${alliance.name}`;
+                        navLink.textContent = alliance.name;
                         navLink.href = 'alliance-dashboard-redirect.html';
                         navLink.onclick = null;
                     } else {
-                        navLink.textContent = `⏳ ${alliance.name}`;
+                        navLink.textContent = `${alliance.name} (ausstehend)`;
                         navLink.href = '#';
                         navLink.onclick = () => alert('Allianz wartet auf Genehmigung');
                     }
                     break;
-                    
+
                 case 'member':
-                    navLink.textContent = `🤝 ${alliance.name}`;
+                    navLink.textContent = alliance.name;
                     navLink.href = 'alliance-dashboard.html';
                     navLink.onclick = () => redirectToAllianceDashboard();
                     break;
-                    
+
                 case 'error':
-                    navLink.textContent = '❌ Allianz';
+                    navLink.textContent = 'Allianz';
                     navLink.href = '#';
                     navLink.onclick = () => location.reload();
                     break;
             }
         }
-        
+
         function handleAllianceNavigation() {
             // Diese Funktion wird von der Navigation aufgerufen
             // Die eigentliche Logik ist bereits in updateAllianceNavigation implementiert
             console.log('🏰 Allianz-Navigation geklickt');
         }
-        
+
         function setupAllianceEventListeners() {
             // Allianz-Erstellung Form
             const createAllianceForm = document.getElementById('create-alliance-form');
             if (createAllianceForm) {
                 createAllianceForm.addEventListener('submit', handleCreateAlliance);
             }
-            
+
             // Tag automatisch in Großbuchstaben umwandeln
             const tagInput = document.getElementById('alliance-tag');
             if (tagInput) {
@@ -971,42 +644,42 @@
                 });
             }
         }
-        
+
         async function handleCreateAlliance(event) {
             event.preventDefault();
-            
+
             // Sichere Extraktion der Formularwerte
             const nameElement = document.getElementById('alliance-name');
             const tagElement = document.getElementById('alliance-tag');
             const descriptionElement = document.getElementById('alliance-description');
-            
+
             console.log('🔍 Debug - Formular-Elemente:', {
                 nameElement: nameElement,
                 tagElement: tagElement,
                 descriptionElement: descriptionElement
             });
-            
+
             const name = nameElement ? (nameElement.value || '').trim() : '';
             const tag = tagElement ? (tagElement.value || '').trim().toUpperCase() : '';
             const description = descriptionElement ? (descriptionElement.value || '').trim() : '';
             const username = getCurrentUsername();
-            
+
             console.log('🔍 Debug - Username:', username, 'Type:', typeof username);
-            
+
             console.log('Allianz-Erstellung gestartet:', { name, tag, username });
-            
+
             console.log('🔍 Debug - Extrahierte Werte:', { name, tag, description, username });
-            
+
             if (!username || username === 'guest') {
                 alert('Bitte melde dich an, um eine Allianz zu erstellen.\n\nAktueller Username: ' + (username || 'undefined'));
                 return;
             }
-            
+
             if (!name || !tag) {
                 alert('Bitte fülle alle Pflichtfelder aus.\n\nName: "' + name + '"\nTag: "' + tag + '"');
                 return;
             }
-            
+
             // Prüfe ob alle Formular-Elemente gefunden wurden
             if (!nameElement || !tagElement || !descriptionElement) {
                 alert('Fehler: Formular-Elemente nicht gefunden. Bitte lade die Seite neu.');
@@ -1017,17 +690,17 @@
                 });
                 return;
             }
-            
+
             // Zeige Loading-Status
             const submitBtn = event.target.querySelector('button[type="submit"]');
             const originalText = submitBtn.textContent;
             submitBtn.textContent = 'Erstelle...';
             submitBtn.disabled = true;
-            
+
             try {
                 console.log('🚀 Starte Allianz-Erstellung...');
                 console.log('📋 Daten:', { name, tag, description, username });
-                
+
                 // Versuche Firebase zu verwenden
                 let allianceId;
                 if (typeof window.FirebaseConfig !== 'undefined' && window.FirebaseConfig.isReady()) {
@@ -1039,17 +712,17 @@
                     console.log('🔄 Firebase initialisiert - erstelle Allianz...');
                     allianceId = await createAllianceFirebase(name, tag, description, username);
                 }
-                
+
                 // Formular zurücksetzen
                 document.getElementById('create-alliance-form').reset();
                 closeModal('create-alliance-modal');
-                
+
                 // Status aktualisieren
                 await loadAllianceStatus();
-                
+
                 // Erfolgsmeldung
                 alert(`✅ Allianz "${name}" erfolgreich erstellt!\n\nSie wurde in der Datenbank gespeichert und wartet auf Genehmigung durch einen Super-Admin.\n\nDu kannst den Status im Admin-Dashboard überprüfen.`);
-                
+
             } catch (error) {
                 console.error('❌ Fehler beim Erstellen der Allianz:', error);
                 alert('❌ Fehler beim Erstellen der Allianz:\n\n' + error.message + '\n\nBitte stelle sicher, dass die Firebase-Datenbank initialisiert ist.');
@@ -1059,22 +732,22 @@
                 submitBtn.disabled = false;
             }
         }
-        
+
         async function initializeFirebaseForAlliance() {
             try {
                 console.log('🚀 Initialisiere Firebase für Allianz-Erstellung...');
-                
+
                 // Prüfe ob Firebase bereits initialisiert ist
                 if (typeof window.FirebaseConfig !== 'undefined' && window.FirebaseConfig.isReady()) {
                     console.log('✅ Firebase bereits initialisiert');
                     return true;
                 }
-                
+
                 // Prüfe ob Firebase verfügbar ist
                 if (typeof firebase === 'undefined') {
                     throw new Error('Firebase-Scripts nicht geladen. Bitte lade die Seite neu.');
                 }
-                
+
                 // Initialisiere Firebase direkt
                 const firebaseConfig = {
                     apiKey: 'AIzaSyDr4-ap_EubUn0UdP7hkEpS2jkzLIVgvyc',
@@ -1091,15 +764,7 @@
                     firebase.initializeApp(firebaseConfig);
                 }
 
-                // Teste die Verbindung
-                console.log('🔍 Teste Firebase-Verbindung...');
-                const db = firebase.firestore();
-                await db.collection('_test').doc('connection').set({
-                    test: true,
-                    timestamp: new Date()
-                });
-                await db.collection('_test').doc('connection').delete();
-                console.log('✅ Firebase-Verbindung erfolgreich getestet');
+                console.log('✅ Firebase-App initialisiert');
 
                 // Erstelle FirebaseConfig Mock
                 window.FirebaseConfig = {
@@ -1112,81 +777,66 @@
 
                 console.log('🎉 Firebase erfolgreich initialisiert und getestet');
                 return true;
-                
+
             } catch (error) {
                 console.error('❌ Firebase-Initialisierung fehlgeschlagen:', error);
                 throw new Error('Firebase konnte nicht initialisiert werden: ' + error.message);
             }
         }
 
-        async function createAllianceFirebase(name, tag, description, founder) {
+        async function createAllianceFirebase(name, tag, description, username) {
             try {
-                console.log('🚀 Erstelle Allianz in Firebase:', { name, tag, founder });
-                
+                console.log('🚀 Erstelle Allianz in Firebase:', { name, tag, username });
+
                 const db = window.FirebaseConfig.getDB();
                 if (!db) {
                     throw new Error('Firebase-Datenbank nicht verfügbar');
                 }
-                
-                // Prüfe ob Tag bereits existiert
-                console.log('🔍 Prüfe ob Tag bereits existiert...');
+
+                const currentUser = window.AuthAPI.getCurrentUser();
+                if (!currentUser) {
+                    throw new Error('Nicht angemeldet');
+                }
+                const founderUid = currentUser.uid;
+
                 const existingTagQuery = await db.collection('alliances')
                     .where('tag', '==', tag)
                     .get();
-                
+
                 if (!existingTagQuery.empty) {
                     throw new Error('Dieser Allianz-Tag ist bereits vergeben. Bitte wähle einen anderen Tag.');
                 }
-                
-                // Erstelle Allianz
-                console.log('📝 Erstelle Allianz-Dokument...');
+
                 const allianceData = {
                     name: name,
                     tag: tag,
                     description: description || '',
-                    founder: founder,
-                    members: [founder],
+                    founderUid: founderUid,
                     status: 'pending', // Wartet auf Super-Admin Genehmigung
                     createdAt: window.FirebaseConfig.getServerTimestamp(),
-                    admin: null, // Wird vom Super-Admin gesetzt
-                    createdBy: founder,
+                    createdBy: founderUid,
                     lastUpdated: window.FirebaseConfig.getServerTimestamp()
                 };
-                
+
                 const docRef = await db.collection('alliances').add(allianceData);
                 console.log('✅ Allianz erfolgreich erstellt mit ID:', docRef.id);
 
-                // Aktualisiere User-Dokument mit Allianz-Information
-                await db.collection('users').doc(founder).update({
-                    alliance: docRef.id,
-                    allianceRole: 'founder',
-                    lastUpdated: window.FirebaseConfig.getServerTimestamp()
+                // Founder-Mitgliedschaft anlegen (allianceMembers ersetzt das alte members-Array).
+                await db.collection('allianceMembers').doc(`${docRef.id}_${founderUid}`).set({
+                    allianceId: docRef.id,
+                    uid: founderUid,
+                    username: username,
+                    role: 'founder',
+                    permissions: { chatWrite: true, memberManage: true, spyDatabase: true },
+                    joinedAt: window.FirebaseConfig.getServerTimestamp()
                 });
-                
-                // Erstelle Standard-Berechtigungen
+
                 try {
-                    console.log('🔐 Erstelle Standard-Berechtigungen...');
-                    await db.collection('alliancePermissions').doc(docRef.id).set({
-                        chat_read: { enabled: true, description: "Chat lesen" },
-                        chat_write: { enabled: true, description: "Chat schreiben" },
-                        member_approval: { enabled: false, description: "Mitglieder bestätigen" },
-                        permission_manage: { enabled: false, description: "Berechtigungen verwalten" },
-                        spy_database: { enabled: false, description: "Spy-Datenbank" }
-                    });
-                    console.log('✅ Standard-Berechtigungen erstellt');
-                } catch (permError) {
-                    console.warn('⚠️ Fehler beim Erstellen der Berechtigungen:', permError);
-                    // Nicht kritisch - Allianz wurde trotzdem erstellt
-                }
-                
-                // Erstelle Aktivitäts-Log
-                try {
-                    console.log('📊 Erstelle Aktivitäts-Log...');
                     await db.collection('allianceActivities').add({
                         allianceId: docRef.id,
                         type: 'alliance_created',
-                        member: founder,
-                        performedBy: founder,
+                        member: username,
+                        performedBy: founderUid,
                         timestamp: window.FirebaseConfig.getServerTimestamp(),
                         details: {
                             allianceName: name,
@@ -1194,21 +844,19 @@
                             message: `Allianz "${name}" wurde erstellt und wartet auf Genehmigung`
                         }
                     });
-                    console.log('✅ Aktivitäts-Log erstellt');
                 } catch (activityError) {
                     console.warn('⚠️ Fehler beim Erstellen des Aktivitäts-Logs:', activityError);
-                    // Nicht kritisch
                 }
-                
+
                 console.log('🎉 Allianz-Erstellung vollständig abgeschlossen!');
                 return docRef.id;
-                
+
             } catch (error) {
                 console.error('❌ Fehler beim Erstellen der Allianz in Firebase:', error);
                 throw error;
             }
         }
-        
+
         function createAllianceLocal(name, tag, description, founder) {
             const allianceData = {
                 name: name,
@@ -1219,11 +867,11 @@
                 status: 'pending',
                 createdAt: new Date().toISOString()
             };
-            
+
             localStorage.setItem('userAlliance', JSON.stringify(allianceData));
             console.log('Allianz lokal erstellt:', name);
         }
-        
+
         function openCreateAllianceModal() {
             const modal = document.getElementById('create-alliance-modal');
             if (!modal) {
@@ -1231,12 +879,12 @@
                 alert('Fehler: Allianz-Modal nicht gefunden. Bitte lade die Seite neu.');
                 return;
             }
-            
+
             // Prüfe ob alle Formular-Elemente existieren
             const nameElement = document.getElementById('alliance-name');
             const tagElement = document.getElementById('alliance-tag');
             const descriptionElement = document.getElementById('alliance-description');
-            
+
             if (!nameElement || !tagElement || !descriptionElement) {
                 console.error('❌ Formular-Elemente nicht gefunden!', {
                     nameElement: !!nameElement,
@@ -1246,15 +894,15 @@
                 alert('Fehler: Formular-Elemente nicht gefunden. Bitte lade die Seite neu.');
                 return;
             }
-            
+
             console.log('✅ Modal und Formular-Elemente gefunden');
             modal.style.display = 'flex';
         }
-        
+
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
         }
-        
+
         // Modal schließen bei Klick außerhalb
         window.addEventListener('click', function(event) {
             const modals = document.querySelectorAll('.modal');
@@ -1264,7 +912,7 @@
                 }
             });
         });
-        
+
         // Debug-Funktion für Username-Problem
         function debugUsername() {
             console.log('🔍 DEBUG USERNAME:');
@@ -1276,7 +924,7 @@
             console.log('getCurrentUsername() result:', getCurrentUsername());
             console.log('getCurrentUsername() type:', typeof getCurrentUsername());
         }
-        
+
         // Debug-Funktion für Firebase-Problem
         function debugFirebase() {
             console.log('🔍 DEBUG FIREBASE:');
@@ -1291,37 +939,14 @@
                 firestore: typeof firebase !== 'undefined' && typeof firebase.firestore === 'function'
             });
         }
-        
+
         // Redirect-Funktion für individuelles Allianz-Dashboard
-        async function redirectToAllianceDashboard() {
-            try {
-                console.log('🚀 Leite zum individuellen Allianz-Dashboard weiter...');
-                
-                // Lade aktuelle Allianz-Daten
-                const storedAlliance = localStorage.getItem('currentAlliance');
-                const storedUsername = localStorage.getItem('currentUsername');
-                
-                if (storedAlliance && storedUsername) {
-                    const allianceData = JSON.parse(storedAlliance);
-                    console.log('✅ Allianz-Daten gefunden:', allianceData.name);
-                    
-                    // Verwende individuelles Dashboard mit Allianz-ID
-                    const individualDashboardUrl = `alliance-dashboard.html?id=${allianceData.id}&username=${encodeURIComponent(storedUsername)}`;
-                    console.log('🏰 Weiterleitung zu individuellem Dashboard:', individualDashboardUrl);
-                    
-                    window.location.href = individualDashboardUrl;
-                } else {
-                    console.log('⚠️ Keine Allianz-Daten gefunden, verwende Redirect-System');
-                    // Fallback: Verwende das Redirect-System
-                    window.location.href = 'alliance-dashboard-redirect.html';
-                }
-                
-            } catch (error) {
-                console.error('❌ Fehler beim Weiterleiten zum Allianz-Dashboard:', error);
-                alert('Fehler beim Weiterleiten zum Allianz-Dashboard: ' + error.message);
-            }
+        function redirectToAllianceDashboard() {
+            // Die Redirect-Seite löst die Allianz direkt über die allianceMembers-Mitgliedschaft
+            // der angemeldeten UID auf - kein localStorage-Zwischenspeicher mehr nötig.
+            window.location.href = 'alliance-dashboard-redirect.html';
         }
-        
+
         // Debug-Button hinzufügen (nur für Entwicklung)
         document.addEventListener('DOMContentLoaded', () => {
             // Füge Debug-Button hinzu (nur sichtbar wenn ?debug=true in URL)
@@ -1343,7 +968,7 @@
                 debugBtn.style.marginRight = '10px';
                 debugBtn.onclick = debugUsername;
                 document.body.appendChild(debugBtn);
-                
+
                 // Firebase Debug Button
                 const firebaseDebugBtn = document.createElement('button');
                 firebaseDebugBtn.textContent = '🔥 Debug Firebase';
@@ -1362,20 +987,20 @@
             }
         });
     </script>
-    
+
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    
+
     <!-- Session Management Scripts -->
     <script src="js/logger.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/session-manager.js"></script>
     <script src="js/auth-manager.js"></script>
     <script src="js/firebase-sync.js"></script>
-    
-    <!-- Firebase Migration Script -->
-    <script src="js/firebase-migration.js"></script>
+
+    <!-- Global Footer Loader -->
+    <script src="js/global-footer-loader.js"></script>
 </body>
 </html>

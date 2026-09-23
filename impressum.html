@@ -3,59 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impressum - Spacenations Tools</title>
+    <title>Impressum – Spacenations Tools</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/theme-variables.css">
-    <link rel="stylesheet" href="css/content-page.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+    <style>
+        .legal { max-width: 820px; margin: 0 auto; padding: 36px 20px 88px; }
+        .legal h1 { font-size: clamp(1.6rem,4vw,2.1rem); margin: 0 0 6px; color: var(--text-primary); letter-spacing: -0.01em; }
+        .legal .lead { color: var(--text-secondary); margin: 0 0 26px; }
+        .legal h2 { font-size: 1.05rem; margin: 30px 0 8px; color: var(--text-primary); }
+        .legal p { margin: 0 0 12px; color: var(--text-secondary); line-height: 1.65; }
+        .todo { display:inline-block; background: var(--accent-soft); border:1px solid var(--accent); color: var(--accent-strong); padding:0 8px; border-radius:6px; font-size:.78rem; font-weight:600; }
+        .notice { background: var(--card); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:12px; padding:14px 16px; margin:0 0 26px; color: var(--text-secondary); font-size:.92rem; box-shadow: var(--shadow-sm); }
+    </style>
 </head>
 <body>
-    <header class="page-header">
-        <a class="home" href="index.html">← Startseite</a>
-        <span class="brand">SPACENATIONS TOOLS</span>
+    <header class="header">
+        <div class="wrap">
+            <a href="index.html" class="wordmark"><span><strong>Spacenations</strong><span class="thin"> Tools</span></span></a>
+            <nav class="header-auth"><a href="index.html" class="btn btn-ghost btn-sm">Alle Tools</a></nav>
+        </div>
     </header>
-    <main class="content">
+    <main class="legal">
         <h1>Impressum</h1>
         <p class="lead">Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG).</p>
-
-        <div class="notice">
-            <strong>Hinweis:</strong> Diese Seite ist ein Gerüst. Alle mit
-            <span class="todo">BITTE AUSFÜLLEN</span> markierten Angaben müssen mit den
-            echten Betreiberdaten ergänzt und rechtlich geprüft werden. Für ein Impressum
-            gibt es gesetzliche Pflichtangaben – im Zweifel einen Impressums-Generator
-            oder eine Rechtsberatung nutzen.
-        </div>
+        <div class="notice"><strong>Hinweis:</strong> Diese Seite ist ein Gerüst. Alle mit <span class="todo">BITTE AUSFÜLLEN</span> markierten Angaben müssen mit den echten Betreiberdaten ergänzt und rechtlich geprüft werden.</div>
 
         <h2>Diensteanbieter</h2>
-        <p>
-            <span class="todo">BITTE AUSFÜLLEN</span> – Name / Firma des Betreibers<br>
-            <span class="todo">BITTE AUSFÜLLEN</span> – Straße und Hausnummer<br>
-            <span class="todo">BITTE AUSFÜLLEN</span> – PLZ und Ort<br>
-            <span class="todo">BITTE AUSFÜLLEN</span> – Land
-        </p>
+        <p><span class="todo">BITTE AUSFÜLLEN</span> – Name / Firma<br><span class="todo">BITTE AUSFÜLLEN</span> – Straße und Hausnummer<br><span class="todo">BITTE AUSFÜLLEN</span> – PLZ und Ort<br><span class="todo">BITTE AUSFÜLLEN</span> – Land</p>
 
         <h2>Kontakt</h2>
-        <p>
-            E-Mail: <span class="todo">BITTE AUSFÜLLEN</span><br>
-            Telefon (optional): <span class="todo">BITTE AUSFÜLLEN</span>
-        </p>
+        <p>E-Mail: <span class="todo">BITTE AUSFÜLLEN</span></p>
 
         <h2>Verantwortlich für den Inhalt</h2>
         <p><span class="todo">BITTE AUSFÜLLEN</span> – Name und Anschrift der verantwortlichen Person</p>
 
-        <h2>Haftung für Inhalte</h2>
-        <p>
-            <span class="todo">BITTE AUSFÜLLEN</span> – hier den geprüften Haftungsausschluss
-            einfügen. Bis dahin gilt: Dieses Projekt ist ein inoffizielles Community-Werkzeug
-            und steht in keiner Verbindung zu den Machern von Spacenations.
-        </p>
-
-        <h2>Haftung für Links</h2>
-        <p><span class="todo">BITTE AUSFÜLLEN</span> – geprüften Text zu externen Links einfügen.</p>
-
-        <h2>Urheberrecht</h2>
-        <p><span class="todo">BITTE AUSFÜLLEN</span> – geprüften Urheberrechtshinweis einfügen.</p>
+        <h2>Haftung für Inhalte &amp; Links</h2>
+        <p><span class="todo">BITTE AUSFÜLLEN</span> – geprüften Haftungsausschluss einfügen. Dieses Projekt ist ein inoffizielles Community-Werkzeug und steht in keiner Verbindung zu den Machern von Spacenations.</p>
     </main>
     <script src="js/global-footer-loader.js"></script>
 </body>

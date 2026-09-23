@@ -3,433 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrierung - Spacenations Tools</title>
+    <title>Registrierung – Spacenations Tools</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316181D'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='white' stroke-width='2'/%3E%3Cellipse cx='16' cy='16' rx='12' ry='4.4' fill='none' stroke='%2300D68F' stroke-width='1.6' transform='rotate(-20 16 16)'/%3E%3C/svg%3E">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+
     <style>
-        :root {
-            --primary: #00FF88;
-            --primary-dark: #00CC6A;
-            --bg-dark: #0A0A0A;
-            --bg-card: #111111;
-            --border: rgba(0, 255, 136, 0.2);
-            --text-primary: #FFFFFF;
-            --text-secondary: #C0C0C0;
-            --error: #FF4444;
-            --success: #00FF88;
-            --warning: #FF9900;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-primary);
-            min-height: 100vh;
+        /* Seitenspezifisch: zentrierte Auth-Karte */
+        .auth-main {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            position: relative;
-            overflow: hidden;
-            padding: 20px;
+            padding: 56px 18px 80px;
         }
-        
-        /* Background effect */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
+
+        .auth-card {
             width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 30% 70%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 70% 30%, rgba(0, 255, 136, 0.03) 0%, transparent 50%);
-            pointer-events: none;
+            max-width: 460px;
+            padding: 36px 32px 32px;
         }
-        
-        .register-container {
-            width: 100%;
-            max-width: 480px;
-            position: relative;
-            z-index: 1;
+
+        .auth-head {
+            margin-bottom: 28px;
         }
-        
-        .register-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 48px 32px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .register-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-        }
-        
-        .register-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        
-        .register-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-        
-        .register-title {
-            font-family: 'Orbitron', monospace;
-            font-size: 28px;
+
+        .auth-head h1 {
+            font-size: 22px;
             font-weight: 700;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+            margin-bottom: 6px;
         }
-        
-        .register-subtitle {
-            color: var(--text-secondary);
+
+        .auth-head p {
             font-size: 14px;
-            font-weight: 400;
+            color: var(--text-secondary);
         }
-        
+
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            gap: 14px;
         }
-        
-        .form-group {
-            margin-bottom: 24px;
-        }
-        
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .form-label .required {
-            color: var(--error);
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 15px;
-            font-family: inherit;
-            transition: all 0.3s ease;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: rgba(0, 255, 136, 0.05);
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
-        }
-        
-        .form-input::placeholder {
-            color: rgba(192, 192, 192, 0.4);
-        }
-        
-        .form-input.error {
-            border-color: var(--error);
-            background: rgba(255, 68, 68, 0.05);
-        }
-        
+
+        .form-group { margin-bottom: 18px; }
+
+        /* Passwortstärke */
         .password-strength {
             margin-top: 8px;
             height: 4px;
-            background: rgba(0, 0, 0, 0.3);
+            background: #EEF0F3;
             border-radius: 2px;
             overflow: hidden;
         }
-        
+
         .password-strength-bar {
             height: 100%;
             width: 0;
             transition: all 0.3s ease;
             border-radius: 2px;
         }
-        
-        .password-strength-bar.weak {
-            width: 33%;
-            background: var(--error);
-        }
-        
-        .password-strength-bar.medium {
-            width: 66%;
-            background: var(--warning);
-        }
-        
-        .password-strength-bar.strong {
-            width: 100%;
-            background: var(--success);
-        }
-        
+
+        .password-strength-bar.weak   { width: 33%;  background: var(--danger); }
+        .password-strength-bar.medium { width: 66%;  background: #DE8500; }
+        .password-strength-bar.strong { width: 100%; background: var(--accent); }
+
         .password-strength-text {
-            margin-top: 4px;
-            font-size: 11px;
-            color: var(--text-secondary);
+            margin-top: 5px;
+            font-size: 11.5px;
+            color: var(--text-tertiary);
         }
-        
+
+        /* Checkbox-Zeile */
         .form-checkbox {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 24px;
+            gap: 10px;
+            margin: 4px 0 22px;
         }
-        
+
         .form-checkbox input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+            width: 17px;
+            height: 17px;
             margin-top: 2px;
-            accent-color: var(--primary);
+            accent-color: var(--accent);
             cursor: pointer;
         }
-        
+
         .form-checkbox label {
             flex: 1;
             color: var(--text-secondary);
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 13px;
+            line-height: 1.55;
             cursor: pointer;
         }
-        
+
         .form-checkbox a {
-            color: var(--primary);
+            color: var(--accent-strong);
             text-decoration: none;
-            transition: opacity 0.3s ease;
+            font-weight: 500;
         }
-        
-        .form-checkbox a:hover {
-            opacity: 0.8;
-        }
-        
-        .register-button {
-            width: 100%;
-            padding: 16px;
-            background: var(--primary);
-            color: var(--bg-dark);
-            border: none;
-            border-radius: 8px;
-            font-family: 'Orbitron', monospace;
-            font-size: 16px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .register-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.6s ease;
-        }
-        
-        .register-button:hover::before {
-            left: 100%;
-        }
-        
-        .register-button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 255, 136, 0.3);
-        }
-        
-        .register-button:active {
-            transform: translateY(0);
-        }
-        
-        .register-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
+
+        .form-checkbox a:hover { text-decoration: underline; }
+
+        .register-button { width: 100%; }
+
+        /* Meldungen */
         .message {
-            margin-bottom: 20px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 14px;
+            margin-bottom: 18px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 500;
             display: none;
         }
-        
+
         .message.error {
-            background: rgba(255, 68, 68, 0.1);
-            border: 1px solid rgba(255, 68, 68, 0.3);
-            color: var(--error);
+            background: var(--danger-soft);
+            border: 1px solid rgba(217, 48, 37, 0.25);
+            color: var(--danger);
         }
-        
+
         .message.success {
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            color: var(--success);
+            background: var(--accent-soft);
+            border: 1px solid rgba(0, 168, 120, 0.3);
+            color: var(--accent-strong);
         }
-        
+
         .login-link {
             text-align: center;
             margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
+            padding-top: 22px;
+            border-top: 1px solid var(--line-soft);
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: 13.5px;
         }
-        
+
         .login-link a {
-            color: var(--primary);
+            color: var(--accent-strong);
             text-decoration: none;
             font-weight: 600;
-            transition: opacity 0.3s ease;
         }
-        
-        .login-link a:hover {
-            opacity: 0.8;
-        }
-        
-        .back-link {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            z-index: 10;
-        }
-        
-        .back-link:hover {
-            color: var(--primary);
-            transform: translateX(-4px);
-        }
-        
+
+        .login-link a:hover { text-decoration: underline; }
+
         @media (max-width: 540px) {
-            .register-card {
-                padding: 32px 24px;
-            }
-            
-            .register-title {
-                font-size: 24px;
-            }
-            
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .back-link {
-                position: static;
-                margin-bottom: 20px;
-            }
+            .auth-card { padding: 28px 20px 24px; }
+            .form-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <a href="index.html" class="back-link">
-        <span>←</span>
-        <span>Zurück</span>
-    </a>
-    
-    <div class="register-container">
-        <div class="register-card">
-            <div class="register-header">
-                <div class="register-icon">🚀</div>
-                <h1 class="register-title">Registrierung</h1>
-                <p class="register-subtitle">Erstelle deinen Account</p>
+    <header class="header">
+        <div class="wrap">
+            <a href="index.html" class="wordmark">
+                <span class="mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="4.4"/>
+                        <ellipse cx="12" cy="12" rx="9" ry="3.2" transform="rotate(-20 12 12)" opacity="0.55"/>
+                    </svg>
+                </span>
+                <span><strong>Spacenations</strong><span class="thin"> Tools</span></span>
+            </a>
+
+            <nav class="header-auth">
+                <a href="index.html" class="btn btn-ghost btn-sm">Zur Übersicht</a>
+                <a href="https://beta4.game.spacenations.eu/" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Zum Spiel <span class="ext">↗</span></a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="auth-main">
+        <div class="card auth-card">
+            <div class="auth-head">
+                <h1>Konto erstellen</h1>
+                <p>In einer Minute startklar – kostenlos für alle Spieler.</p>
             </div>
-            
+
             <div id="msg-error" class="message error"></div>
             <div id="msg-success" class="message success"></div>
-            
+
             <form id="register-form">
                 <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label" for="firstName">
-                            Vorname <span class="required">*</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            id="firstName" 
-                            class="form-input" 
-                            placeholder="Max" 
+                    <div class="form-group field">
+                        <label for="firstName">Vorname</label>
+                        <input
+                            type="text"
+                            id="firstName"
+                            placeholder="Max"
                             required
                             autocomplete="given-name"
                         >
                     </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="lastName">
-                            Nachname <span class="required">*</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            id="lastName" 
-                            class="form-input" 
-                            placeholder="Mustermann" 
+
+                    <div class="form-group field">
+                        <label for="lastName">Nachname</label>
+                        <input
+                            type="text"
+                            id="lastName"
+                            placeholder="Mustermann"
                             required
                             autocomplete="family-name"
                         >
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="email">
-                        E-Mail Adresse <span class="required">*</span>
-                    </label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        class="form-input" 
-                        placeholder="max@example.com" 
+
+                <div class="form-group field">
+                    <label for="email">E-Mail-Adresse</label>
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="max@example.com"
                         required
                         autocomplete="email"
                     >
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="password">
-                        Passwort <span class="required">*</span>
-                    </label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        class="form-input" 
-                        placeholder="••••••••" 
+
+                <div class="form-group field">
+                    <label for="password">Passwort</label>
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="••••••••"
                         required
                         autocomplete="new-password"
                         minlength="6"
@@ -439,38 +238,35 @@
                     </div>
                     <div class="password-strength-text" id="strength-text"></div>
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="confirmPassword">
-                        Passwort bestätigen <span class="required">*</span>
-                    </label>
-                    <input 
-                        type="password" 
-                        id="confirmPassword" 
-                        class="form-input" 
-                        placeholder="••••••••" 
+
+                <div class="form-group field">
+                    <label for="confirmPassword">Passwort bestätigen</label>
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        placeholder="••••••••"
                         required
                         autocomplete="new-password"
                     >
                 </div>
-                
+
                 <div class="form-checkbox">
                     <input type="checkbox" id="terms" required>
                     <label for="terms">
                         Ich akzeptiere die <a href="#" onclick="event.preventDefault(); alert('AGB werden noch erstellt');">Nutzungsbedingungen</a> und die <a href="#" onclick="event.preventDefault(); alert('Datenschutzerklärung wird noch erstellt');">Datenschutzerklärung</a>
                     </label>
                 </div>
-                
-                <button type="submit" class="register-button" id="register-btn">
-                    Account erstellen
+
+                <button type="submit" class="btn btn-accent btn-md register-button" id="register-btn">
+                    Konto erstellen
                 </button>
             </form>
-            
+
             <div class="login-link">
-                Bereits einen Account? <a href="dashboard.html">Jetzt anmelden</a>
+                Bereits ein Konto? <a href="index.html">Jetzt anmelden</a>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -481,7 +277,7 @@
     <script src="js/logger.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth-manager.js"></script>
-    
+
     <script>
         // Message functions
         function showError(msg) {
@@ -490,13 +286,13 @@
             errorEl.textContent = msg;
             errorEl.style.display = 'block';
             successEl.style.display = 'none';
-            
+
             // Auto-hide after 5 seconds
             setTimeout(() => {
                 errorEl.style.display = 'none';
             }, 5000);
         }
-        
+
         function showSuccess(msg) {
             const errorEl = document.getElementById('msg-error');
             const successEl = document.getElementById('msg-success');
@@ -504,50 +300,50 @@
             successEl.style.display = 'block';
             errorEl.style.display = 'none';
         }
-        
+
         // Password strength checker
         function checkPasswordStrength(password) {
             let strength = 0;
             const strengthBar = document.getElementById('strength-bar');
             const strengthText = document.getElementById('strength-text');
-            
+
             if (!password) {
                 strengthBar.className = 'password-strength-bar';
                 strengthText.textContent = '';
                 return;
             }
-            
+
             // Check length
             if (password.length >= 8) strength++;
             if (password.length >= 12) strength++;
-            
+
             // Check for different character types
             if (/[a-z]/.test(password)) strength++;
             if (/[A-Z]/.test(password)) strength++;
             if (/[0-9]/.test(password)) strength++;
             if (/[^a-zA-Z0-9]/.test(password)) strength++;
-            
+
             // Update UI
             if (strength <= 2) {
                 strengthBar.className = 'password-strength-bar weak';
                 strengthText.textContent = 'Schwaches Passwort';
-                strengthText.style.color = 'var(--error)';
+                strengthText.style.color = 'var(--danger)';
             } else if (strength <= 4) {
                 strengthBar.className = 'password-strength-bar medium';
                 strengthText.textContent = 'Mittleres Passwort';
-                strengthText.style.color = 'var(--warning)';
+                strengthText.style.color = '#DE8500';
             } else {
                 strengthBar.className = 'password-strength-bar strong';
                 strengthText.textContent = 'Starkes Passwort';
-                strengthText.style.color = 'var(--success)';
+                strengthText.style.color = 'var(--accent-strong)';
             }
         }
-        
+
         // Password input listener
         document.getElementById('password').addEventListener('input', function(e) {
             checkPasswordStrength(e.target.value);
         });
-        
+
         // Form validation
         function validateForm() {
             const firstName = document.getElementById('firstName').value.trim();
@@ -556,60 +352,60 @@
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             const terms = document.getElementById('terms').checked;
-            
+
             if (!firstName || !lastName) {
                 showError('Bitte geben Sie Ihren vollständigen Namen ein');
                 return false;
             }
-            
+
             if (!email || !email.includes('@')) {
                 showError('Bitte geben Sie eine gültige E-Mail-Adresse ein');
                 return false;
             }
-            
+
             if (password.length < 6) {
                 showError('Das Passwort muss mindestens 6 Zeichen lang sein');
                 return false;
             }
-            
+
             if (password !== confirmPassword) {
                 showError('Die Passwörter stimmen nicht überein');
                 return false;
             }
-            
+
             if (!terms) {
                 showError('Bitte akzeptieren Sie die Nutzungsbedingungen');
                 return false;
             }
-            
+
             return true;
         }
-        
+
         // Handle registration
         document.getElementById('register-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
             if (!validateForm()) {
                 return;
             }
-            
+
             const button = document.getElementById('register-btn');
             const originalText = button.textContent;
-            
+
             // Disable button and show loading
             button.disabled = true;
             button.textContent = 'Registrierung läuft...';
-            
+
             try {
                 // Wait for auth to be ready
                 await window.AuthAPI.waitForInit();
-                
+
                 // Get form values
                 const firstName = document.getElementById('firstName').value.trim();
                 const lastName = document.getElementById('lastName').value.trim();
                 const email = document.getElementById('email').value.trim();
                 const password = document.getElementById('password').value;
-                
+
                 // Create user data
                 const userData = {
                     firstName: firstName,
@@ -617,25 +413,25 @@
                     displayName: `${firstName} ${lastName}`,
                     email: email
                 };
-                
+
                 // Register user
                 const result = await window.AuthAPI.register(email, password, userData.displayName);
-                
+
                 if (!result.success) {
                     throw new Error(result.error || 'Registrierung fehlgeschlagen');
                 }
-                
+
                 // Show success message
-                showSuccess('Account erfolgreich erstellt! Weiterleitung zum Dashboard...');
-                
+                showSuccess('Konto erfolgreich erstellt! Weiterleitung zum Dashboard...');
+
                 // Redirect to dashboard after 2 seconds
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'user-dashboard.html';
                 }, 2000);
-                
+
             } catch (error) {
                 console.error('Registration error:', error);
-                
+
                 // Handle specific Firebase errors
                 let errorMessage = 'Ein Fehler ist aufgetreten';
                 if (error.message.includes('email-already-in-use')) {
@@ -647,7 +443,7 @@
                 } else if (error.message) {
                     errorMessage = error.message;
                 }
-                
+
                 showError(errorMessage);
             } finally {
                 // Re-enable button
@@ -655,25 +451,23 @@
                 button.textContent = originalText;
             }
         });
-        
+
         // Check if already logged in
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 await window.AuthAPI.waitForInit();
-                
+
+                // Bereits angemeldet? Nur freundlich hinweisen, NICHT zwangsweise weiterleiten.
                 window.AuthAPI.onAuthStateChange((user) => {
                     if (user) {
-                        showSuccess('Sie sind bereits angemeldet. Weiterleitung zum Dashboard...');
-                        setTimeout(() => {
-                            window.location.href = 'dashboard.html';
-                        }, 1500);
+                        showSuccess('Du bist bereits angemeldet – du kannst jederzeit zur Übersicht oder zum Dashboard wechseln.');
                     }
                 });
             } catch (error) {
                 console.error('Auth init error:', error);
             }
         });
-        
+
         // Focus first input on load
         window.addEventListener('load', () => {
             document.getElementById('firstName').focus();

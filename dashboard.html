@@ -239,8 +239,7 @@
                 userDetailsDiv.innerHTML = `
                     <div><strong>Benutzer:</strong> ${displayName}</div>
                     <div><strong>E-Mail:</strong> ${user.email}</div>
-                    <div><strong>Super-Admin:</strong> ${userData.isSuperAdmin === true ? '✅ Ja' : '❌ Nein'}</div>
-                    <div><strong>Alliance-Admin:</strong> ${userData.isAllianceAdmin === true ? '✅ Ja' : '❌ Nein'}</div>
+                    <div><strong>Super-Admin:</strong> ${userData.globalRole === 'global_admin' ? '✅ Ja' : '❌ Nein'}</div>
                 `;
                 userInfoDiv.style.display = 'block';
                 

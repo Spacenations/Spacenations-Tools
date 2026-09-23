@@ -3,67 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hilfe & FAQ - Spacenations Tools</title>
+    <title>Hilfe &amp; FAQ – Spacenations Tools</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/theme-variables.css">
-    <link rel="stylesheet" href="css/content-page.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+    <style>
+        .legal { max-width: 820px; margin: 0 auto; padding: 36px 20px 88px; }
+        .legal h1 { font-size: clamp(1.6rem,4vw,2.1rem); margin: 0 0 6px; color: var(--text-primary); letter-spacing: -0.01em; }
+        .legal .lead { color: var(--text-secondary); margin: 0 0 26px; }
+        .legal p { margin: 0 0 12px; color: var(--text-secondary); line-height: 1.65; }
+        .legal a { color: var(--accent-strong); }
+        .todo { display:inline-block; background: var(--accent-soft); border:1px solid var(--accent); color: var(--accent-strong); padding:0 8px; border-radius:6px; font-size:.78rem; font-weight:600; }
+        .notice { background: var(--card); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:12px; padding:14px 16px; margin:22px 0 0; color: var(--text-secondary); font-size:.92rem; box-shadow: var(--shadow-sm); }
+        ul.faq { list-style:none; padding:0; }
+        ul.faq li { margin-bottom:18px; padding:16px 18px; background: var(--card); border:1px solid var(--line); border-radius:12px; box-shadow: var(--shadow-sm); }
+        ul.faq .q { font-weight:600; color: var(--text-primary); margin-bottom:4px; }
+        ul.faq .a { color: var(--text-secondary); line-height:1.6; }
+    </style>
 </head>
 <body>
-    <header class="page-header">
-        <a class="home" href="index.html">← Startseite</a>
-        <span class="brand">SPACENATIONS TOOLS</span>
+    <header class="header">
+        <div class="wrap">
+            <a href="index.html" class="wordmark"><span><strong>Spacenations</strong><span class="thin"> Tools</span></span></a>
+            <nav class="header-auth"><a href="index.html" class="btn btn-ghost btn-sm">Alle Tools</a></nav>
+        </div>
     </header>
-    <main class="content">
+    <main class="legal">
         <h1>Hilfe &amp; FAQ</h1>
         <p class="lead">Häufige Fragen zu den Tools.</p>
-
         <ul class="faq">
-            <li>
-                <div class="q">Was ist Spacenations Tools?</div>
-                <div class="a">
-                    Eine inoffizielle Sammlung von Hilfswerkzeugen für das Browserspiel
-                    Spacenations: Kampf-, Raid- und Sabotage-Rechner, die Proxima-Planetenliste,
-                    Allianz-Verwaltung und eine Spionage-Datenbank. Das Projekt ist nicht mit
-                    den Machern des Spiels verbunden.
-                </div>
-            </li>
-            <li>
-                <div class="q">Brauche ich ein Konto?</div>
-                <div class="a">
-                    Die Rechner und die Proxima-Liste sind ohne Login nutzbar. Für Allianz-
-                    und Spionage-Funktionen sowie zum Speichern eigener Auswertungen ist ein
-                    kostenloses Konto nötig (Registrierung über <a href="register.html">Registrieren</a>).
-                </div>
-            </li>
-            <li>
-                <div class="q">Wie melde ich mich an?</div>
-                <div class="a">
-                    Die Anmeldung erfolgt mit deiner <strong>E-Mail-Adresse</strong> und deinem
-                    Passwort über die Login-Seite.
-                </div>
-            </li>
-            <li>
-                <div class="q">Sind die Berechnungen verbindlich?</div>
-                <div class="a">
-                    Nein. Alle Rechner liefern Schätzwerte zur Orientierung und werden ohne
-                    Gewähr bereitgestellt.
-                </div>
-            </li>
-            <li>
-                <div class="q">Ich habe einen Fehler gefunden – was tun?</div>
-                <div class="a">
-                    Melde dich über die <a href="kontakt.html">Kontakt-Seite</a>.
-                    <span class="todo">BITTE AUSFÜLLEN</span> – bevorzugter Melde-Weg (z. B. Discord).
-                </div>
-            </li>
+            <li><div class="q">Was ist Spacenations Tools?</div><div class="a">Eine inoffizielle Sammlung von Hilfswerkzeugen für das Browserspiel Spacenations: Kampf-, Raid- und Sabotage-Rechner, Proxima-Planetenliste, Rec-Res-Finder, Allianz-Verwaltung und eine Spionage-Datenbank. Das Projekt ist nicht mit den Machern des Spiels verbunden.</div></li>
+            <li><div class="q">Brauche ich ein Konto?</div><div class="a">Die Rechner, ProximaDB und der Rec-Res-Finder sind ohne Login nutzbar. Für Allianz- und Spionage-Funktionen sowie zum Speichern eigener Auswertungen ist ein kostenloses Konto nötig (<a href="register.html">Registrieren</a>).</div></li>
+            <li><div class="q">Wie melde ich mich an?</div><div class="a">Die Anmeldung erfolgt mit deiner <strong>E-Mail-Adresse</strong> und deinem Passwort.</div></li>
+            <li><div class="q">Sind die Berechnungen verbindlich?</div><div class="a">Nein. Alle Rechner liefern Schätzwerte zur Orientierung und werden ohne Gewähr bereitgestellt.</div></li>
+            <li><div class="q">Ich habe einen Fehler gefunden – was tun?</div><div class="a">Melde dich über die <a href="kontakt.html">Kontakt-Seite</a>.</div></li>
         </ul>
-
-        <div class="notice">
-            Weitere Fragen &amp; Antworten können hier ergänzt werden
-            (<span class="todo">BITTE AUSFÜLLEN</span>).
-        </div>
+        <div class="notice">Weitere Fragen &amp; Antworten können hier ergänzt werden (<span class="todo">BITTE AUSFÜLLEN</span>).</div>
     </main>
     <script src="js/global-footer-loader.js"></script>
 </body>

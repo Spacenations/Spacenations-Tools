@@ -14,12 +14,17 @@ const FIREBASE_CONFIG = {
     measurementId: 'G-SKWJWH2ERX'
 };
 
-// Logger-Integration
-const firebaseLog = window.log || {
-    firebase: (msg, data) => console.log('🔥 FIREBASE:', msg, data),
-    error: (msg, err, data) => console.error('❌ FIREBASE ERROR:', msg, err, data),
-    debug: (msg, data) => console.log('🔍 FIREBASE DEBUG:', msg, data)
-};
+// Logger-Integration. Prüft nicht nur, ob window.log existiert, sondern ob es tatsächlich
+// die erwartete Form hat - ein global gleichnamiges window.log (z.B. von einer
+// Browser-Erweiterung) ohne .error()/.firebase() würde sonst übernommen und beim ersten
+// Aufruf mit "firebaseLog.error is not a function" abstürzen.
+const firebaseLog = (window.log && typeof window.log.error === 'function' && typeof window.log.firebase === 'function')
+    ? window.log
+    : {
+        firebase: (msg, data) => console.log('🔥 FIREBASE:', msg, data),
+        error: (msg, err, data) => console.error('❌ FIREBASE ERROR:', msg, err, data),
+        debug: (msg, data) => console.log('🔍 FIREBASE DEBUG:', msg, data)
+    };
 
 class FirebaseManager {
     constructor() {
@@ -60,7 +65,22 @@ class FirebaseManager {
             // Services initialisieren
             this.auth = firebase.auth();
             this.db = firebase.firestore();
-            
+
+            // Nur für lokale Verifikation: verbindet auf explizites Opt-in gegen den
+            // Firebase-Emulator statt gegen die echte Produktivdatenbank. Doppelt
+            // abgesichert (Hostname UND expliziter Opt-in), damit das nie versehentlich
+            // in Produktion aktiv werden kann.
+            const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+            const wantsEmulator = isLocalHost && (
+                new URLSearchParams(window.location.search).get('useEmulator') === '1' ||
+                window.localStorage.getItem('useFirebaseEmulator') === '1'
+            );
+            if (wantsEmulator) {
+                this.auth.useEmulator('http://127.0.0.1:9099', { disableWarnings: true });
+                this.db.useEmulator('127.0.0.1', 8080);
+                firebaseLog.firebase('⚠️ Verbunden mit lokalem Firebase-Emulator (nicht Produktion)');
+            }
+
             // Firestore-Einstellungen (merge: true, um Warnungen zu vermeiden)
             this.db.settings({
                 cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
@@ -115,7 +135,7 @@ class FirebaseManager {
                 }
             }
         } catch (e) {
-            firebaseLog.debug('JSON-Konfiguration nicht verfügbar', { error: e?.message });
+            firebaseLog.firebase('JSON-Konfiguration nicht verfügbar', { error: e?.message });
         }
 
         if (!isStaticHost) {
@@ -129,13 +149,13 @@ class FirebaseManager {
                         return apiConfig;
                     }
                 } else {
-                    firebaseLog.debug('API nicht erreichbar', { status: apiResponse.status });
+                    firebaseLog.firebase('API nicht erreichbar', { status: apiResponse.status });
                 }
             } catch (e) {
-                firebaseLog.debug('API-Konfiguration nicht verfügbar', { error: e?.message });
+                firebaseLog.firebase('API-Konfiguration nicht verfügbar', { error: e?.message });
             }
         } else {
-            firebaseLog.debug('Statischer Host – API-Config wird übersprungen');
+            firebaseLog.firebase('Statischer Host – API-Config wird übersprungen');
         }
 
         // Fallback auf inline Konfiguration
@@ -144,19 +164,15 @@ class FirebaseManager {
     }
     
     async testConnection() {
-        try {
-            // Teste Auth-Verbindung
-            const authTest = this.auth.currentUser;
-            firebaseLog.debug('Auth-Verbindung getestet');
-            
-            // Teste Firestore-Verbindung
-            await this.db.collection('_test').doc('connection').get();
-            firebaseLog.debug('Firestore-Verbindung getestet');
-            
-        } catch (error) {
-            firebaseLog.error('Verbindungstest fehlgeschlagen', error);
-            // Nicht werfen - Firebase kann trotzdem funktionieren
+        // Rein lokale Prüfung, dass Auth/Firestore-Objekte existieren - kein Netzwerk-Roundtrip.
+        // Ein echter Firestore-Read hier bräuchte eine eigens dafür freigegebene Collection in
+        // firestore.rules, obwohl das Ergebnis nirgends ausgewertet wird (auch bisher wurde der
+        // Fehler nur geloggt, nie geworfen) - das lohnt keine Extra-Regel für jeden Besucher.
+        if (!this.auth || !this.db) {
+            firebaseLog.error('Verbindungstest fehlgeschlagen', new Error('Auth/Firestore nicht initialisiert'));
+            return;
         }
+        firebaseLog.firebase('Auth-/Firestore-Objekte vorhanden');
     }
     
     // Warten bis Firebase bereit ist

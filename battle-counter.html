@@ -3,513 +3,249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spacenations Battle-Counter - Kampfrechner</title>
-    <!-- Gemeinsame Theme-Variablen -->
-    <link rel="stylesheet" href="css/theme-variables.css">
-    <link rel="stylesheet" href="css/enhanced-navigation.css">
-    <!-- Fonts im Stil des neuen Designs -->
+    <title>Battle Counter – Spacenations Tools</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316181D'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='white' stroke-width='2'/%3E%3Cellipse cx='16' cy='16' rx='12' ry='4.4' fill='none' stroke='%2300D68F' stroke-width='1.6' transform='rotate(-20 16 16)'/%3E%3C/svg%3E">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+
     <style>
-        /* Razer-Design Variablen */
-        :root {
-            --battle-primary: #00FF88;
-            --battle-secondary: #00CC6A;
-            --battle-success: #00FF88;
-            --battle-error: #FF4444;
-            --input-bg: #1A1A1A;
-            --input-border: rgba(0, 255, 136, 0.3);
-            --calc-bg: #111111;
-            
-            --razer-green: #00FF88;
-            --razer-green-light: #44FF99;
-            --razer-black: #0A0A0A;
-            --razer-dark: #111111;
-            --razer-gray: #1A1A1A;
-            --razer-white: #FFFFFF;
-            --razer-silver: #C0C0C0;
-            
-            --text-primary: var(--razer-white);
-            --text-secondary: var(--razer-silver);
-            
-            --bg-primary: var(--razer-black);
-            --bg-secondary: var(--razer-dark);
-            --bg-panel: var(--razer-dark);
-            --bg-card: var(--razer-gray);
-            
-            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
-            --glow-green-strong: 0 0 30px rgba(0, 255, 136, 0.8);
-            
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            --font-gaming: 'Orbitron', monospace;
-        }
+        /* Seitenspezifisch: Rechner mit Tab-Umschalter */
+        .tool-main { padding-bottom: 64px; max-width: 980px; }
 
-        /* Footer styles are now loaded from global-footer-loader.js */
+        .calc-card { margin-top: 22px; }
 
-        /* Main Layout */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: var(--font-primary);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-        
-        /* Animated Background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
-                linear-gradient(45deg, var(--razer-black) 0%, var(--razer-dark) 100%);
-            z-index: -1;
-            animation: backgroundPulse 8s ease-in-out infinite;
-        }
-        
-        @keyframes backgroundPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 30px 20px;
-            background: var(--bg-panel);
-            border: 2px solid var(--border-primary);
-            border-radius: 15px;
-            box-shadow: 0 0 20px var(--border-shadow);
-            backdrop-filter: blur(10px);
-        }
-
-        .header h1 {
-            font-family: var(--font-gaming);
-            font-size: 2.5rem;
-            color: var(--battle-primary);
-            text-shadow: var(--glow-green);
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-            animation: titleGlow 4s ease-in-out infinite;
-        }
-        
-        @keyframes titleGlow {
-            0%, 100% { 
-                filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.3));
-            }
-            50% { 
-                filter: drop-shadow(0 0 30px rgba(0, 255, 136, 0.6));
-            }
-        }
-
-        .header .subtitle {
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            font-weight: 400;
-        }
-
-        /* Battle Calculator Styles */
-        .battle-calculator {
-            background: var(--calc-bg);
-            border: 2px solid var(--border-primary);
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 0 20px var(--border-shadow);
-            backdrop-filter: blur(10px);
-        }
-
+        /* Segment-Umschalter */
         .calculator-tabs {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 30px;
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+            background: #F0F1F4;
+            border-radius: 10px;
+            margin-bottom: 24px;
         }
 
         .calc-tab {
-            background: var(--card-bg);
-            border: 2px solid var(--card-border);
+            border: none;
+            background: transparent;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: var(--font);
+            font-size: 13.5px;
+            font-weight: 600;
             color: var(--text-secondary);
-            padding: 15px 25px;
-            border-radius: 10px;
             cursor: pointer;
-            font-weight: 700;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            font-family: 'Orbitron', monospace;
-            letter-spacing: 1px;
+            transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .calc-tab:hover {
-            border-color: var(--battle-secondary);
-            color: var(--battle-secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
-        }
+        .calc-tab:hover { color: var(--text-primary); }
 
         .calc-tab.active {
-            background: linear-gradient(135deg, var(--battle-primary), #ff9f5a);
-            border-color: var(--battle-primary);
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.4);
+            background: var(--card);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
         }
 
-        .calc-panel {
-            display: none;
-            background: var(--card-bg);
-            border: 2px solid var(--card-border);
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 25px;
-        }
+        .calc-panel { display: none; }
 
         .calc-panel.active {
             display: block;
-            animation: fadeIn 0.4s ease;
+            animation: fadeIn 0.25s ease;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
+            from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .calc-panel h3 {
-            color: var(--text-primary);
-            margin-bottom: 25px;
-            font-size: 1.4rem;
-            font-weight: 700;
-            text-align: center;
-            font-family: 'Orbitron', monospace;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 18px;
         }
 
         .calc-inputs {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .input-group label {
-            color: var(--text-secondary);
-            font-weight: 700;
-            font-size: 1rem;
-            letter-spacing: 0.5px;
-        }
-
-        .input-group input {
-            padding: 15px 18px;
-            border: 2px solid var(--input-border);
-            border-radius: 8px;
-            background: var(--input-bg);
-            color: var(--text-primary);
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-family: 'Rajdhani', sans-serif;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--battle-secondary);
-            box-shadow: 0 0 15px rgba(74, 144, 226, 0.4);
-            transform: translateY(-1px);
-        }
-
-        .calc-button {
-            display: block;
-            margin: 0 auto 25px auto;
-            width: auto;
-            min-width: 300px;
-            max-width: 400px;
-            background: linear-gradient(135deg, var(--battle-secondary), #3a5998);
-            color: white;
-            border: none;
-            padding: 18px 30px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Orbitron', monospace;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .calc-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.5);
-        }
-
-        .calc-button:active {
-            transform: translateY(0);
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
         .calc-result {
-            background: rgba(34, 197, 94, 0.1);
-            border: 2px solid var(--battle-success);
+            margin-top: 20px;
             border-radius: 12px;
-            padding: 25px;
-            color: var(--battle-success);
-            font-weight: 700;
-            text-align: center;
+            padding: 18px 20px;
             display: none;
-            animation: slideIn 0.5s ease;
+            border: 1px solid rgba(0, 168, 120, 0.3);
+            background: var(--accent-soft);
+            color: var(--accent-strong);
         }
 
-        .calc-result.show {
-            display: block;
-        }
+        .calc-result.show { display: block; animation: fadeIn 0.25s ease; }
 
         .calc-result.error {
-            background: rgba(220, 38, 38, 0.1);
-            border-color: var(--battle-error);
-            color: var(--battle-error);
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-15px); }
-            to { opacity: 1; transform: translateY(0); }
+            border-color: rgba(217, 48, 37, 0.25);
+            background: var(--danger-soft);
+            color: var(--danger);
         }
 
         .result-main {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            font-family: 'Orbitron', monospace;
-            letter-spacing: 1px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 14px;
         }
 
         .result-breakdown {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 20px;
-            font-size: 1rem;
+            background: var(--card);
+            border: 1px solid var(--line-soft);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 13.5px;
             line-height: 1.8;
+            color: var(--text-secondary);
             text-align: left;
         }
 
-        .result-breakdown strong {
-            color: var(--battle-primary);
-        }
+        .result-breakdown strong { color: var(--text-primary); }
 
-        /* Examples Section */
+        /* Beispiele */
         .calc-examples {
-            background: var(--feature-bg);
-            border: 2px solid var(--border-primary);
-            border-radius: 12px;
-            padding: 25px;
-            text-align: center;
+            margin-top: 22px;
+            padding-top: 20px;
+            border-top: 1px solid var(--line-soft);
         }
 
         .calc-examples h4 {
-            color: var(--text-primary);
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            font-family: 'Orbitron', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
         }
 
         .example-buttons {
             display: flex;
-            gap: 15px;
-            justify-content: center;
+            gap: 10px;
             flex-wrap: wrap;
         }
 
-        .example-btn {
-            background: var(--accent-secondary);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            font-family: 'Rajdhani', sans-serif;
-        }
-
-        .example-btn:hover {
-            background: var(--accent-primary);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
-        }
-
-
-        /* Navigation Back */
-        .nav-back {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--card-bg);
-            border: 2px solid var(--card-border);
-            color: var(--text-secondary);
-            text-decoration: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin-bottom: 20px;
-        }
-
-        .nav-back:hover {
-            border-color: var(--battle-primary);
-            color: var(--battle-primary);
-            transform: translateX(-5px);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .calculator-tabs {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .calc-tab {
-                width: 100%;
-                max-width: 300px;
-            }
-
-            .calc-inputs {
-                grid-template-columns: 1fr;
-            }
-
-            .example-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .example-btn {
-                width: 100%;
-                max-width: 300px;
-            }
+        @media (max-width: 720px) {
+            .calculator-tabs { width: 100%; }
+            .calc-tab { flex: 1; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Navigation Back -->
-        <a href="index.html" class="nav-back">
-            ← Zurück zur Hauptseite
-        </a>
+    <header class="header">
+        <div class="wrap">
+            <a href="index.html" class="wordmark">
+                <span class="mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="4.4"/>
+                        <ellipse cx="12" cy="12" rx="9" ry="3.2" transform="rotate(-20 12 12)" opacity="0.55"/>
+                    </svg>
+                </span>
+                <span><strong>Spacenations</strong><span class="thin"> Tools</span></span>
+            </a>
 
-        <!-- Header -->
-        <div class="header">
-            <h1>🧮 BATTLE-COUNTER</h1>
-            <div class="subtitle">Kampfrechner für Spacenations</div>
+            <nav class="header-auth">
+                <a href="index.html" class="btn btn-ghost btn-sm">Alle Tools</a>
+                <a href="https://beta4.game.spacenations.eu/" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Zum Spiel <span class="ext">↗</span></a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="wrap tool-main">
+        <div class="page-head">
+            <span class="tool-icon tint-blue">
+                <svg viewBox="0 0 24 24"><path d="M12 3.2l6.8 2.8v4.9c0 4.4-2.9 7.4-6.8 8.9-3.9-1.5-6.8-4.5-6.8-8.9V6l6.8-2.8z"/></svg>
+            </span>
+            <div>
+                <h1>Battle Counter</h1>
+                <p>Benötigte Angriffspunkte oder Stabilitätsabschuss berechnen.</p>
+            </div>
         </div>
 
-
-        <!-- Battle Calculator -->
-        <div class="battle-calculator">
-                <div class="calculator-tabs">
-                    <button class="calc-tab active" onclick="switchCalculatorTab('reverse')">
-                        🎯 AS Ermitteln
-                    </button>
-                    <button class="calc-tab" onclick="switchCalculatorTab('forward')">
-                        ⚔️ Stabilitätsabschuss
-                    </button>
-                </div>
+        <div class="card calc-card">
+            <div class="calculator-tabs">
+                <button class="calc-tab active" onclick="switchCalculatorTab('reverse')">
+                    AS ermitteln
+                </button>
+                <button class="calc-tab" onclick="switchCalculatorTab('forward')">
+                    Stabilitätsabschuss
+                </button>
+            </div>
 
             <!-- AS Ermitteln (Rückwärtsrechnung) -->
             <div id="reverse-calc" class="calc-panel active">
-                <h3>🎯 Wie viele Angriffspunkte werden benötigt?</h3>
+                <h3>Wie viele Angriffspunkte werden benötigt?</h3>
                 <div class="calc-inputs">
-                    <div class="input-group">
-                        <label>Stabilitätsverlust:</label>
+                    <div class="field">
+                        <label for="reverse-stability">Stabilitätsverlust</label>
                         <input type="number" id="reverse-stability" placeholder="z.B. 156897" min="0">
                     </div>
-                    <div class="input-group">
-                        <label>Panzerung des Ziels:</label>
+                    <div class="field">
+                        <label for="reverse-armor">Panzerung des Ziels</label>
                         <input type="number" id="reverse-armor" placeholder="z.B. 3241" min="0">
                     </div>
-                    <div class="input-group">
-                        <label>Kampfdauer (Sekunden):</label>
+                    <div class="field">
+                        <label for="reverse-duration">Kampfdauer (Sekunden)</label>
                         <input type="number" id="reverse-duration" placeholder="z.B. 78" min="1" max="3600">
                     </div>
                 </div>
-                <button class="calc-button" onclick="calculateReverse()">
-                    🧮 Angriffspunkte berechnen
+                <button class="btn btn-accent btn-md" onclick="calculateReverse()">
+                    Angriffspunkte berechnen
                 </button>
                 <div id="reverse-result" class="calc-result"></div>
             </div>
 
             <!-- Stabilitätsabschuss (Vorwärtsrechnung) -->
             <div id="forward-calc" class="calc-panel">
-                <h3>⚔️ Wie viel Stabilität geht verloren?</h3>
+                <h3>Wie viel Stabilität geht verloren?</h3>
                 <div class="calc-inputs">
-                    <div class="input-group">
-                        <label>Angriffspunkte (AS):</label>
+                    <div class="field">
+                        <label for="forward-attack">Angriffspunkte (AS)</label>
                         <input type="number" id="forward-attack" placeholder="z.B. 25000" min="0">
                     </div>
-                    <div class="input-group">
-                        <label>Panzerung des Ziels:</label>
+                    <div class="field">
+                        <label for="forward-armor">Panzerung des Ziels</label>
                         <input type="number" id="forward-armor" placeholder="z.B. 3241" min="0">
                     </div>
-                    <div class="input-group">
-                        <label>Kampfdauer (Sekunden):</label>
+                    <div class="field">
+                        <label for="forward-duration">Kampfdauer (Sekunden)</label>
                         <input type="number" id="forward-duration" placeholder="z.B. 78" min="1" max="3600">
                     </div>
                 </div>
-                <button class="calc-button" onclick="calculateForward()">
-                    🧮 Stabilitätsabschuss berechnen
+                <button class="btn btn-accent btn-md" onclick="calculateForward()">
+                    Stabilitätsabschuss berechnen
                 </button>
                 <div id="forward-result" class="calc-result"></div>
             </div>
 
             <!-- Beispiele -->
             <div class="calc-examples">
-                <h4>💡 Beispiele zum Ausprobieren</h4>
+                <h4>Beispiele zum Ausprobieren</h4>
                 <div class="example-buttons">
-                    <button class="example-btn" onclick="loadExample(1)">
-                        📝 Beispiel 1: 156k Stabilität
+                    <button class="btn btn-outline btn-sm example-btn" onclick="loadExample(1)">
+                        Beispiel 1: 156k Stabilität
                     </button>
-                    <button class="example-btn" onclick="loadExample(2)">
-                        📝 Beispiel 2: 832k Stabilität
+                    <button class="btn btn-outline btn-sm example-btn" onclick="loadExample(2)">
+                        Beispiel 2: 832k Stabilität
                     </button>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Global Footer wird automatisch geladen -->
 
     <!-- Scripts -->
     <script src="js/battle-calculator.js"></script>
-    <script src="js/theme-manager.js"></script>
     <script src="js/global-footer-loader.js"></script>
-    
+
     <script>
         // Battle Calculator Functions
         let battleCalc = null;
@@ -563,10 +299,10 @@
             const armor = parseFloat(document.getElementById('forward-armor').value);
             const duration = parseFloat(document.getElementById('forward-duration').value);
 
-            const validation = battleCalc.validateInputs({ 
-                'Angriffspunkte': attack, 
-                'Panzerung': armor, 
-                'Kampfdauer': duration 
+            const validation = battleCalc.validateInputs({
+                'Angriffspunkte': attack,
+                'Panzerung': armor,
+                'Kampfdauer': duration
             });
 
             if (!validation.isValid) {
@@ -584,22 +320,22 @@
 
             let resultHtml = `
                 <div class="result-main">
-                    ⚔️ <strong>Stabilitätsverlust: ${battleCalc.formatNumber(stabilityLoss, 0)}</strong>
+                    <strong>Stabilitätsverlust: ${battleCalc.formatNumber(stabilityLoss, 0)}</strong>
                 </div>
                 <div class="result-breakdown">
-                    <strong>🔍 Detaillierte Berechnung:</strong><br>
+                    <strong>Detaillierte Berechnung:</strong><br>
                     • Angriffspunkte: ${battleCalc.formatNumber(attack, 0)}<br>
                     • Panzerung: ${battleCalc.formatNumber(armor, 0)}<br>
                     • Effektiver Angriff: ${battleCalc.formatNumber(effectiveAttack, 0)}<br>
                     • Kampfdauer: ${duration} Sekunden<br><br>
-                    <strong>📐 Formel:</strong> (${battleCalc.formatNumber(effectiveAttack, 0)} ÷ 3600) × ${duration} = ${battleCalc.formatNumber(stabilityLoss, 0)}
+                    <strong>Formel:</strong> (${battleCalc.formatNumber(effectiveAttack, 0)} ÷ 3600) × ${duration} = ${battleCalc.formatNumber(stabilityLoss, 0)}
                 </div>
             `;
 
             if (effectiveAttack <= 0) {
                 resultHtml = `
                     <div class="result-main">
-                        🛡️ <strong>Kein Schaden möglich!</strong>
+                        <strong>Kein Schaden möglich!</strong>
                     </div>
                     <div class="result-breakdown">
                         Die Panzerung (${battleCalc.formatNumber(armor, 0)}) ist größer oder gleich den Angriffspunkten (${battleCalc.formatNumber(attack, 0)}).<br>
@@ -624,10 +360,10 @@
             const armor = parseFloat(document.getElementById('reverse-armor').value);
             const duration = parseFloat(document.getElementById('reverse-duration').value);
 
-            const validation = battleCalc.validateInputs({ 
-                'Stabilitätsverlust': stability, 
-                'Panzerung': armor, 
-                'Kampfdauer': duration 
+            const validation = battleCalc.validateInputs({
+                'Stabilitätsverlust': stability,
+                'Panzerung': armor,
+                'Kampfdauer': duration
             });
 
             if (!validation.isValid) {
@@ -645,15 +381,15 @@
 
             let resultHtml = `
                 <div class="result-main">
-                    🎯 <strong>Benötigte Angriffspunkte: ${battleCalc.formatNumber(requiredAttack, 0)}</strong>
+                    <strong>Benötigte Angriffspunkte: ${battleCalc.formatNumber(requiredAttack, 0)}</strong>
                 </div>
                 <div class="result-breakdown">
-                    <strong>🔍 Detaillierte Berechnung:</strong><br>
+                    <strong>Detaillierte Berechnung:</strong><br>
                     • Stabilitätsverlust: ${battleCalc.formatNumber(stability, 0)}<br>
                     • Panzerung des Ziels: ${battleCalc.formatNumber(armor, 0)}<br>
                     • Kampfdauer: ${duration} Sekunden<br>
                     • Effektiver Angriff benötigt: ${battleCalc.formatNumber(effectiveAttack, 0)}<br><br>
-                    <strong>📐 Formel:</strong> (${battleCalc.formatNumber(stability, 0)} × 3600 ÷ ${duration}) + ${battleCalc.formatNumber(armor, 0)} = ${battleCalc.formatNumber(requiredAttack, 0)}
+                    <strong>Formel:</strong> (${battleCalc.formatNumber(stability, 0)} × 3600 ÷ ${duration}) + ${battleCalc.formatNumber(armor, 0)} = ${battleCalc.formatNumber(requiredAttack, 0)}
                 </div>
             `;
 
@@ -670,27 +406,27 @@
                 document.getElementById('reverse-stability').value = '156897';
                 document.getElementById('reverse-armor').value = '3241';
                 document.getElementById('reverse-duration').value = '78';
-                
+
                 // Stelle sicher, dass AS Ermitteln Tab aktiv ist
                 document.querySelectorAll('.calc-tab').forEach(tab => tab.classList.remove('active'));
                 document.querySelectorAll('.calc-panel').forEach(panel => panel.classList.remove('active'));
                 document.querySelectorAll('.calc-tab')[0].classList.add('active');
                 document.getElementById('reverse-calc').classList.add('active');
-                
+
                 setTimeout(() => calculateReverse(), 300);
-                
+
             } else if (exampleNumber === 2) {
                 // Beispiel 2: Flotte mit 832.312 Stabilität und 12.324 Panzer, Dauer 100 Sek.
                 document.getElementById('reverse-stability').value = '832312';
                 document.getElementById('reverse-armor').value = '12324';
                 document.getElementById('reverse-duration').value = '100';
-                
-                // Stelle sicher, dass AS Ermitteln Tab aktiv ist  
+
+                // Stelle sicher, dass AS Ermitteln Tab aktiv ist
                 document.querySelectorAll('.calc-tab').forEach(tab => tab.classList.remove('active'));
                 document.querySelectorAll('.calc-panel').forEach(panel => panel.classList.remove('active'));
                 document.querySelectorAll('.calc-tab')[0].classList.add('active');
                 document.getElementById('reverse-calc').classList.add('active');
-                
+
                 setTimeout(() => calculateReverse(), 300);
             }
         }
@@ -698,13 +434,13 @@
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             initializeBattleCalculator();
-            
+
             // Enter-Taste Support für Eingabefelder
             document.querySelectorAll('.calc-panel input').forEach(input => {
                 input.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
                         const panel = this.closest('.calc-panel');
-                        const button = panel.querySelector('.calc-button');
+                        const button = panel.querySelector('.btn-accent');
                         if (button) button.click();
                     }
                 });

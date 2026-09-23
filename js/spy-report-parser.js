@@ -5,7 +5,7 @@
 
 class SpyReportParser {
     constructor() {
-        this.apiBaseUrl = 'https://beta1.game.spacenations.eu/api/spy-report/';
+        this.apiBaseUrl = 'https://beta4.game.spacenations.eu/api/spy-report/';
         this.init();
     }
     
@@ -581,7 +581,7 @@ class SpyReportParser {
             'very_high': { text: 'Sehr Hoch', color: '#9C27B0', icon: '⚫' }
         };
         
-        return levels[threatLevel] || { text: 'Unbekannt', color: '#9AA1AC', icon: '⚪' };
+        return levels[threatLevel] || levels['unknown'];
     }
 }
 

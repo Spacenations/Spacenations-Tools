@@ -3,38 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Changelog - Spacenations Tools</title>
+    <title>Changelog – Spacenations Tools</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/theme-variables.css">
-    <link rel="stylesheet" href="css/content-page.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+    <style>
+        .legal { max-width: 820px; margin: 0 auto; padding: 36px 20px 88px; }
+        .legal h1 { font-size: clamp(1.6rem,4vw,2.1rem); margin: 0 0 6px; color: var(--text-primary); letter-spacing: -0.01em; }
+        .legal .lead { color: var(--text-secondary); margin: 0 0 26px; }
+        .todo { display:inline-block; background: var(--accent-soft); border:1px solid var(--accent); color: var(--accent-strong); padding:0 8px; border-radius:6px; font-size:.78rem; font-weight:600; }
+        .notice { background: var(--card); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:12px; padding:14px 16px; margin:22px 0 0; color: var(--text-secondary); font-size:.92rem; box-shadow: var(--shadow-sm); }
+        .entry { background: var(--card); border:1px solid var(--line); border-radius:14px; box-shadow: var(--shadow-sm); padding:20px 22px; }
+        .entry h2 { font-size:1rem; margin:0 0 10px; color: var(--text-primary); }
+        .entry ul { margin:0; padding-left:20px; color: var(--text-secondary); line-height:1.7; }
+    </style>
 </head>
 <body>
-    <header class="page-header">
-        <a class="home" href="index.html">← Startseite</a>
-        <span class="brand">SPACENATIONS TOOLS</span>
+    <header class="header">
+        <div class="wrap">
+            <a href="index.html" class="wordmark"><span><strong>Spacenations</strong><span class="thin"> Tools</span></span></a>
+            <nav class="header-auth"><a href="index.html" class="btn btn-ghost btn-sm">Alle Tools</a></nav>
+        </div>
     </header>
-    <main class="content">
+    <main class="legal">
         <h1>Changelog</h1>
         <p class="lead">Was sich in Spacenations Tools geändert hat.</p>
-
-        <dl class="entries">
-            <dt>2026-09 · Sicherheits- &amp; Aufräum-Überarbeitung</dt>
-            <dd>
-                <ul>
-                    <li>Rollen-System vereinheitlicht: ein einziges Rollen-Feld statt mehrerer widersprüchlicher Varianten.</li>
-                    <li>Sicherheit: Admin-Backdoors und hartcodierte E-Mail-Listen entfernt; Firestore-Regeln decken alle Datenbereiche ab.</li>
-                    <li>Server gegen Path-Traversal abgesichert; keine externen Abhängigkeiten mehr.</li>
-                    <li>Spionage-Datenbank zeigt echte Berichte; Beispieldaten sind klar gekennzeichnet.</li>
-                    <li>Aufräumen: zahlreiche tote, doppelte und Debug-Dateien entfernt.</li>
-                </ul>
-            </dd>
-        </dl>
-
-        <div class="notice">
-            Weitere Einträge hier ergänzen (<span class="todo">BITTE AUSFÜLLEN</span>).
+        <div class="entry">
+            <h2>2026-09 · Neues Design + Sicherheits-Überarbeitung</h2>
+            <ul>
+                <li>Neues, helles Design-System (app.css) für alle Seiten.</li>
+                <li>Rec-Res-Finder in die Tool-Sammlung aufgenommen.</li>
+                <li>Rollen-System vereinheitlicht (ein Rollen-Feld statt mehrerer Varianten).</li>
+                <li>Sicherheit: Admin-Backdoors entfernt, Server gegen Path-Traversal abgesichert, Firestore-Regeln decken alle Datenbereiche ab.</li>
+                <li>Aufräumen: zahlreiche Debug-/Test-/Setup-Seiten entfernt.</li>
+            </ul>
         </div>
+        <div class="notice">Weitere Einträge hier ergänzen (<span class="todo">BITTE AUSFÜLLEN</span>).</div>
     </main>
     <script src="js/global-footer-loader.js"></script>
 </body>
