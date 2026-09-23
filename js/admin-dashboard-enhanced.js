@@ -429,7 +429,7 @@
     // ProximaDB integration - ruft dieselbe externe Spiel-API direkt auf wie
     // ProximaDB.html. Die frühere Python/SQLite-Pipeline wurde entfernt, da sie auf
     // Railway nie persistierte und den falschen Rhythmus fuhr (siehe Systemanalyse).
-    const PROXIMA_API_URL = 'https://beta4.game.spacenations.eu/api/proxima';
+    const PROXIMA_API_URL = '/api/proxima';  // Server-Proxy - echte Spiel-API bleibt verborgen
 
     async function loadProximaData() {
         try {
