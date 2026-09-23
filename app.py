@@ -207,6 +207,8 @@ class SpacenationsRequestHandler(SimpleHTTPRequestHandler):
                 self.handle_firebase_config()
             elif path == '/api/proxima-discord/run':
                 self.handle_proxima_discord_run()
+            elif path == '/api/proxima-archive':
+                self.handle_proxima_archive()
             else:
                 self.send_error(404, "API endpoint not found")
 
@@ -288,6 +290,21 @@ class SpacenationsRequestHandler(SimpleHTTPRequestHandler):
         self.send_header('Content-Type', 'application/json; charset=utf-8')
         self.end_headers()
         self.wfile.write(json.dumps({"ok": ok, "message": message}, ensure_ascii=False).encode('utf-8'))
+
+    def handle_proxima_archive(self):
+        """Proxima-Archiv: welche Planeten wann/wo verschwunden sind (JSON)."""
+        try:
+            from proxima_discord import load_archive_public
+            data = load_archive_public()
+        except Exception as e:
+            data = {"planets": [], "total": 0, "active": 0, "gone": 0,
+                    "updatedAt": None, "error": str(e)}
+
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+        self.wfile.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
 
     def handle_proxima_sync(self, post_data):
         """Handle Proxima sync requests"""
