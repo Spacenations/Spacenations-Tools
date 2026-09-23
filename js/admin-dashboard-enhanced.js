@@ -400,48 +400,43 @@
 
     // ProximaDB integration
     async function loadProximaData() {
+        // Direkt von der Spiel-API laden (das serverseitige proxima_data.json /
+        // die Python-Pipeline wurden entfernt - sie liefen in Produktion nie).
+        const PROXIMA_API = 'https://beta4.game.spacenations.eu/api/proxima';
         try {
-            // Load from proxima_data.json
-            const response = await fetch('proxima_data.json');
-            if (response.ok) {
-                const data = await response.json();
-                state.proximaData = data;
-                
-                // Calculate statistics
-                const totalSystems = data.length;
-                const lastUpdate = data.length > 0 ? data[0][3] : null; // Assuming timestamp is at index 3
-                const updateStatus = lastUpdate ? 'Aktuell' : 'Unbekannt';
-                
-                document.getElementById('proxima-total-systems').textContent = totalSystems;
-                document.getElementById('proxima-last-update').textContent = lastUpdate ? formatDate(lastUpdate) : '-';
-                document.getElementById('proxima-update-status').textContent = updateStatus;
-                
-                // Calculate next update (assuming daily updates)
-                const nextUpdate = lastUpdate ? new Date(new Date(lastUpdate).getTime() + 24 * 60 * 60 * 1000) : null;
-                document.getElementById('proxima-next-update').textContent = nextUpdate ? formatDate(nextUpdate) : '-';
-                
-                renderProximaStats();
-            } else {
-                throw new Error('ProximaDB Daten nicht verfügbar');
-            }
+            const response = await fetch(PROXIMA_API, { headers: { 'Accept': 'application/json' }, cache: 'no-store' });
+            if (!response.ok) throw new Error('ProximaDB Daten nicht verfügbar');
+            const raw = await response.json();
+            const data = (Array.isArray(raw) ? raw : []).map(p => ({
+                name: String(p.name || ''),
+                coordinates: String(p.coordinates || ''),
+                score: Number(p.score || 0),
+                deleteOn: String(p.deleteOn || '')
+            })).sort((a, b) => b.score - a.score);
+            state.proximaData = data;
+
+            document.getElementById('proxima-total-systems').textContent = data.length;
+            document.getElementById('proxima-last-update').textContent = new Date().toLocaleString('de-DE');
+            document.getElementById('proxima-update-status').textContent = 'Live';
+            document.getElementById('proxima-next-update').textContent = 'Live-Abruf';
+            renderProximaStats();
         } catch (error) {
             console.error('ProximaDB Fehler:', error);
-            document.getElementById('proxima-total-systems').textContent = 'Fehler';
-            document.getElementById('proxima-last-update').textContent = 'Fehler';
-            document.getElementById('proxima-update-status').textContent = 'Fehler';
-            document.getElementById('proxima-next-update').textContent = 'Fehler';
+            ['proxima-total-systems', 'proxima-last-update', 'proxima-update-status', 'proxima-next-update']
+                .forEach(id => { const el = document.getElementById(id); if (el) el.textContent = 'Fehler'; });
         }
     }
 
     function renderProximaStats() {
         if (!state.proximaData) return;
         
+        const d = state.proximaData;
         const stats = {
-            totalSystems: state.proximaData.length,
-            topSystem: state.proximaData.length > 0 ? state.proximaData[0][0] : 'Unbekannt',
-            topScore: state.proximaData.length > 0 ? state.proximaData[0][2] : 0,
-            averageScore: state.proximaData.length > 0 ? 
-                Math.round(state.proximaData.reduce((sum, system) => sum + system[2], 0) / state.proximaData.length) : 0
+            totalSystems: d.length,
+            topSystem: d.length > 0 ? d[0].name : 'Unbekannt',
+            topScore: d.length > 0 ? d[0].score : 0,
+            averageScore: d.length > 0 ?
+                Math.round(d.reduce((sum, s) => sum + (s.score || 0), 0) / d.length) : 0
         };
 
         document.getElementById('proxima-stats').innerHTML = `
