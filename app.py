@@ -205,6 +205,8 @@ class SpacenationsRequestHandler(SimpleHTTPRequestHandler):
                 self.handle_status_check()
             elif path == '/api/firebase-config':
                 self.handle_firebase_config()
+            elif path == '/api/proxima-discord/run':
+                self.handle_proxima_discord_run()
             else:
                 self.send_error(404, "API endpoint not found")
 
@@ -274,6 +276,19 @@ class SpacenationsRequestHandler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(firebase_config).encode())
 
+    def handle_proxima_discord_run(self):
+        """Manuelles Ausloesen: postet die aktuelle Proxima-Liste sofort nach Discord."""
+        try:
+            from proxima_discord import run_once
+            ok, message = run_once()
+        except Exception as e:
+            ok, message = False, f"Modul-Fehler: {e}"
+
+        self.send_response(200 if ok else 503)
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.end_headers()
+        self.wfile.write(json.dumps({"ok": ok, "message": message}, ensure_ascii=False).encode('utf-8'))
+
     def handle_proxima_sync(self, post_data):
         """Handle Proxima sync requests"""
         try:
@@ -305,32 +320,6 @@ class SpacenationsRequestHandler(SimpleHTTPRequestHandler):
         logger.info(f"{self.address_string()} - {format % args}")
 
 
-def start_proxima_scheduler():
-    """Start Proxima data scheduler in background thread"""
-    def scheduler():
-        while True:
-            try:
-                # Import and run Proxima fetcher
-                try:
-                    from proxima_fetcher import ProximaFetcher
-                    fetcher = ProximaFetcher()
-                    fetcher.run_sync()
-                    logger.info("Proxima sync completed successfully")
-                except ImportError:
-                    logger.warning("Proxima fetcher not available")
-                except Exception as e:
-                    logger.error(f"Proxima sync error: {e}")
-
-                time.sleep(3600)  # Run every hour
-            except Exception as e:
-                logger.error(f"Proxima scheduler error: {e}")
-                time.sleep(60)  # Wait 1 minute on error
-
-    thread = threading.Thread(target=scheduler, daemon=True)
-    thread.start()
-    logger.info("Proxima scheduler started")
-
-
 def main():
     """Main application entry point"""
     global start_time
@@ -343,8 +332,14 @@ def main():
     server_address = ('', port)
     httpd = ThreadingHTTPServer(server_address, SpacenationsRequestHandler)
 
-    # Start Proxima scheduler
-    start_proxima_scheduler()
+    # Optionaler Hintergrund-Job: haelt eine Discord-Nachricht mit der aktuellen
+    # Proxima-Liste aktuell. Laeuft nur, wenn DISCORD_PROXIMA_WEBHOOK gesetzt ist;
+    # blockiert den Webserver nie.
+    try:
+        from proxima_discord import start_proxima_discord
+        start_proxima_discord()
+    except Exception as e:
+        logger.warning(f"Proxima→Discord-Job nicht gestartet: {e}")
 
     logger.info(f"🚀 Spacenations Tools Server starting on port {port}")
     logger.info(f"🌍 Environment: {os.getenv('RAILWAY_ENVIRONMENT', 'development')}")
