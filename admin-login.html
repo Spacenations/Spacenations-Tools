@@ -239,10 +239,9 @@
                         type="email" 
                         id="email" 
                         class="form-input" 
-                        placeholder="E-Mail-Adresse" 
+                        placeholder="E-Mail-Adresse"
                         required
                         autocomplete="username"
-                        value="t.o@trend4media.de"
                     >
                 </div>
                 
@@ -308,35 +307,17 @@
             document.getElementById('msg-success').style.display = 'none';
         }
         
-        // Super-Admin-Verifikation (mit Fallback)
+        // Super-Admin-Verifikation – ausschließlich über die Firestore-Rolle
         async function verifySuperAdmin(user) {
             try {
                 console.log('🔍 Prüfe Super-Admin-Status für:', user.email);
-                
-                // Hardcoded Admin-Liste (Fallback bei Firestore-Problemen)
-                const adminEmails = [
-                    't.o@trend4media.de',
-                    'info@trend4media.de', 
-                    'admin@spacenations.eu'
-                ];
-                
-                // Prüfe hardcoded Liste zuerst
-                if (adminEmails.includes(user.email.toLowerCase())) {
-                    console.log('✅ Super-Admin-Status bestätigt (Hardcoded-Liste)');
-                    return true;
-                }
-                
-                // Versuche Firestore-Check (optional)
-                try {
-                    const isSuperAdmin = await window.AuthAPI.checkSuperAdminStatus(user);
-                    console.log('✅ Super-Admin-Status bestätigt (Firestore):', isSuperAdmin);
-                    return isSuperAdmin;
-                } catch (firestoreError) {
-                    console.warn('⚠️ Firestore-Check fehlgeschlagen, verwende Fallback:', firestoreError.message);
-                    // Fallback bereits oben geprüft
-                    return false;
-                }
-                
+
+                // Einziges Kriterium: globalRole === 'global_admin' (via AuthAPI).
+                // Keine hartcodierten E-Mail-Listen oder Fallback-Backdoors mehr.
+                const isSuperAdmin = await window.AuthAPI.checkSuperAdminStatus(user);
+                console.log('✅ Super-Admin-Status geprüft (Firestore):', isSuperAdmin);
+                return isSuperAdmin === true;
+
             } catch (error) {
                 console.error('❌ Super-Admin-Verifikation fehlgeschlagen:', error);
                 throw new Error('Berechtigung konnte nicht überprüft werden.');
@@ -450,7 +431,7 @@
                             const currentUser = window.AuthAPI.getCurrentUser();
                             const userData = window.AuthAPI.getUserData();
                             
-                            if (userData?.isSuperAdmin || currentUser.email === 't.o@trend4media.de') {
+                            if (userData?.globalRole === 'global_admin' || userData?.isSuperAdmin === true) {
                                 updateStatus('Bereits als Admin angemeldet', 'success');
                                 showSuccess(`Bereits angemeldet als ${userData?.username || currentUser.email}. Weiterleitung...`);
                                 

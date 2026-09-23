@@ -239,24 +239,13 @@ class AuthManager {
             return input;
         }
         
-        // Für Benutzernamen: Fallback-Mapping (ohne Firestore)
-        const usernameToEmailMap = {
-            'daikin': 't.o@trend4media.de',
-            'admin': 't.o@trend4media.de',
-            'trend4media_admin': 't.o@trend4media.de'
-        };
-        
-        const mappedEmail = usernameToEmailMap[input.toLowerCase()];
-        if (mappedEmail) {
-            authLog.auth('Benutzername zu E-Mail gemappt:', input, '->', mappedEmail);
-            return mappedEmail;
-        }
-        
-        // Wenn es wie eine E-Mail aussieht, aber Validation fehlschlägt
+        // Kein hartcodiertes Benutzername→E-Mail-Mapping mehr: Login erfolgt
+        // über die E-Mail-Adresse. Sieht die Eingabe wie eine E-Mail aus,
+        // wird sie trotz strenger Validierung versucht.
         if (input.includes('@')) {
-            return input; // Versuche es trotzdem
+            return input;
         }
-        
+
         return null;
     }
     

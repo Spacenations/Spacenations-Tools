@@ -625,7 +625,7 @@ class AutoGlobalFooterLoader {
                     const adminLoginLink = document.getElementById('auto-admin-login-link');
                     const adminDashboardLink = document.getElementById('auto-admin-dashboard-link');
                     
-                    if (userData && userData.isSuperAdmin === true) {
+                    if (userData && (userData.globalRole === 'global_admin' || userData.isSuperAdmin === true)) {
                         if (adminLoginLink) adminLoginLink.parentElement.style.display = 'none';
                         if (adminDashboardLink) adminDashboardLink.parentElement.style.display = 'block';
                     } else {
