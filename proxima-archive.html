@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxima-Archiv – Spacenations Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/app.css?v=light-2">
+    <style>
+        .arch { max-width: var(--container, 1440px); margin: 0 auto; padding: 28px 20px 88px; }
+        .arch-head h1 { font-size: clamp(1.6rem,4vw,2.1rem); margin: 0 0 4px; color: var(--text-primary); letter-spacing: -0.01em; }
+        .arch-head .lead { color: var(--text-secondary); margin: 0 0 22px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 14px; margin-bottom: 22px; }
+        .stat { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-sm); padding: 16px 18px; }
+        .stat .k { font-size: .8rem; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+        .stat .v { font-size: 1.7rem; font-weight: 700; color: var(--text-primary); margin-top: 4px; }
+        .stat .v.gone { color: var(--danger); }
+        .stat .v.active { color: var(--accent-strong); }
+        .filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .filters button { font: inherit; cursor: pointer; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--card); color: var(--text-secondary); font-weight: 600; }
+        .filters button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+        .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-sm); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; font-size: .93rem; }
+        th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--line-soft); white-space: nowrap; }
+        th { color: var(--text-tertiary); font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; position: sticky; top: 0; background: var(--card); }
+        td.num { text-align: right; font-variant-numeric: tabular-nums; }
+        tr:last-child td { border-bottom: none; }
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .78rem; font-weight: 600; }
+        .badge.active { background: var(--accent-soft); color: var(--accent-strong); }
+        .badge.gone { background: var(--danger-soft); color: var(--danger); }
+        .muted { color: var(--text-tertiary); }
+        .empty, .loading { padding: 40px 20px; text-align: center; color: var(--text-secondary); }
+        .table-wrap { overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="wrap">
+            <a href="index.html" class="wordmark"><span><strong>Spacenations</strong><span class="thin"> Tools</span></span></a>
+            <nav class="header-auth">
+                <a href="ProximaDB.html" class="btn btn-ghost btn-sm">ProximaDB</a>
+                <a href="index.html" class="btn btn-ghost btn-sm">Alle Tools</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="arch">
+        <div class="arch-head">
+            <h1>Proxima-Archiv</h1>
+            <p class="lead">Welche Planeten wann und wo (Koordinaten) verschwunden sind.</p>
+        </div>
+
+        <div class="stats" id="stats"></div>
+
+        <div class="filters">
+            <button data-filter="all" class="active">Alle</button>
+            <button data-filter="active">Aktiv</button>
+            <button data-filter="gone">Verschwunden</button>
+        </div>
+
+        <div class="card">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th><th>Koordinaten</th><th class="num">Punkte</th>
+                            <th class="num">Woche</th><th>Status</th>
+                            <th>Zuerst gesehen</th><th>Verschwunden am</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rows"></tbody>
+                </table>
+            </div>
+            <div class="loading" id="loading">Lade Archiv…</div>
+            <div class="empty" id="empty" style="display:none">Noch keine Archiv-Daten. Das Archiv füllt sich, sobald der Server die Proxima-Liste abruft.</div>
+        </div>
+    </main>
+
+    <script>
+        let ALL = [];
+        let filter = 'all';
+
+        function esc(v) {
+            return String(v == null ? '' : v).replace(/[&<>"']/g, c => (
+                {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+            ));
+        }
+        function fmtDate(iso) {
+            if (!iso) return '<span class="muted">–</span>';
+            const d = new Date(iso);
+            if (isNaN(d)) return '<span class="muted">–</span>';
+            return d.toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+        function fmtNum(n) { return Number(n || 0).toLocaleString('de-DE'); }
+
+        function render() {
+            const rows = document.getElementById('rows');
+            const empty = document.getElementById('empty');
+            const list = ALL.filter(p => filter === 'all' ? true : p.status === filter);
+            if (!list.length) {
+                rows.innerHTML = '';
+                empty.style.display = 'block';
+                empty.textContent = ALL.length ? 'Keine Planeten in dieser Ansicht.' : 'Noch keine Archiv-Daten. Das Archiv füllt sich, sobald der Server die Proxima-Liste abruft.';
+                return;
+            }
+            empty.style.display = 'none';
+            rows.innerHTML = list.map(p => {
+                const gone = p.status === 'gone';
+                return `<tr>
+                    <td>${esc(p.name)}</td>
+                    <td>${esc(p.coordinates)}</td>
+                    <td class="num">${fmtNum(p.score)}</td>
+                    <td class="num">${esc(p.week)}</td>
+                    <td><span class="badge ${gone ? 'gone' : 'active'}">${gone ? 'verschwunden' : 'aktiv'}</span></td>
+                    <td>${fmtDate(p.firstSeen)}</td>
+                    <td>${gone ? fmtDate(p.disappearedAt) : '<span class="muted">–</span>'}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderStats(d) {
+            document.getElementById('stats').innerHTML = `
+                <div class="stat"><div class="k">Aktiv</div><div class="v active">${fmtNum(d.active)}</div></div>
+                <div class="stat"><div class="k">Verschwunden</div><div class="v gone">${fmtNum(d.gone)}</div></div>
+                <div class="stat"><div class="k">Gesamt erfasst</div><div class="v">${fmtNum(d.total)}</div></div>
+                <div class="stat"><div class="k">Stand</div><div class="v" style="font-size:1rem;padding-top:8px">${fmtDate(d.updatedAt)}</div></div>`;
+        }
+
+        document.querySelectorAll('.filters button').forEach(b => b.addEventListener('click', () => {
+            document.querySelectorAll('.filters button').forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+            filter = b.dataset.filter;
+            render();
+        }));
+
+        (async () => {
+            try {
+                const res = await fetch('/api/proxima-archive', { cache: 'no-store' });
+                const data = await res.json();
+                ALL = Array.isArray(data.planets) ? data.planets : [];
+                renderStats(data);
+                render();
+            } catch (e) {
+                document.getElementById('loading').textContent = 'Archiv konnte nicht geladen werden: ' + e.message;
+                return;
+            }
+            document.getElementById('loading').style.display = 'none';
+        })();
+    </script>
+    <script src="js/global-footer-loader.js"></script>
+</body>
+</html>
