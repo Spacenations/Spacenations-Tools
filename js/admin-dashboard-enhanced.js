@@ -1316,7 +1316,7 @@ ${state.proximaData.length > 10 ? `\n... und ${state.proximaData.length - 10} we
                 <strong>Zugriff verweigert: Nur Super-Admins</strong><br><br>
                 <strong>Fehler:</strong> ${e.message}<br><br>
                 <strong>Lösungen:</strong><br>
-                1. Verwenden Sie das Setup-Tool: <a href="setup-super-admin.html" style="color: #ff8c42;">Setup-Tool öffnen</a><br>
+                1. Stellen Sie sicher, dass Ihr Konto Super-Admin-Rechte besitzt.<br>
                 2. Seite neu laden (F5)<br>
                 3. Browser-Extensions temporär deaktivieren<br><br>
                 <strong>Debugging:</strong> Öffnen Sie die Browser-Konsole (F12) für weitere Details.

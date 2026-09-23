@@ -53,28 +53,11 @@
             const doc = await db.collection('users').doc(user.uid).get();
             
             if (!doc.exists) {
-                console.warn('⚠️ Benutzerdokument nicht gefunden in Firestore');
-                console.log('🔧 Erstelle Benutzerdokument automatisch...');
-                
-                // Automatically create user document with Super Admin rights
-                try {
-                    await db.collection('users').doc(user.uid).set({
-                        email: user.email,
-                        username: user.displayName || user.email.split('@')[0],
-                        isSuperAdmin: true,
-                        isAllianceAdmin: false,
-                        createdAt: window.FirebaseConfig.getServerTimestamp(),
-                        lastLogin: window.FirebaseConfig.getServerTimestamp(),
-                        autoCreated: true
-                    });
-                    
-                    console.log('✅ Benutzerdokument automatisch erstellt mit Super-Admin Rechten');
-                    return true;
-                    
-                } catch (error) {
-                    console.error('❌ Fehler beim Erstellen des Benutzerdokuments:', error);
-                    throw new Error('Benutzerdokument konnte nicht erstellt werden: ' + error.message);
-                }
+                // SICHERHEIT: Kein Auto-Grant. Fehlt das Benutzerdokument, wird der
+                // Zugriff verweigert. (Früher wurde hier still ein Super-Admin-Konto
+                // angelegt -> jeder eingeloggte Nutzer ohne Doc wurde Admin.)
+                console.warn('⚠️ Kein Benutzerdokument – Super-Admin-Zugriff verweigert');
+                throw new Error('Zugriff verweigert: Nur Super-Admins');
             }
             
             const userData = doc.data();
@@ -92,21 +75,7 @@
             console.log('🔧 Benutzerdokument vorhanden, aber isSuperAdmin nicht true');
             console.log('📋 Verfügbare Felder:', Object.keys(userData));
             
-            // Show alert with detailed information for debugging
-            const errorMsg = `
-Super-Admin Zugriff verweigert!
-
-Benutzer: ${user.email}
-UID: ${user.uid}
-isSuperAdmin: ${userData.isSuperAdmin} (${typeof userData.isSuperAdmin})
-
-Verfügbare Felder: ${Object.keys(userData).join(', ')}
-
-Bitte verwenden Sie das Setup-Tool:
-https://trend4media.github.io/Spacenations-Tools/setup-super-admin.html
-            `;
-            
-            alert(errorMsg);
+            alert('Super-Admin-Zugriff verweigert.');
             throw new Error('Zugriff verweigert: Nur Super-Admins');
         }
 
