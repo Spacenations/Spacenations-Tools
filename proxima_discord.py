@@ -643,6 +643,51 @@ def run_once():
         return False, f"Unerwarteter Fehler: {e}"
 
 
+def run_weekly_once():
+    """Fester Wochen-Post, idempotent pro ISO-Woche (fuer den externen Cron/Backup).
+    Legt einmal pro Woche eine NEUE Discord-Nachricht an (loest den Ping aus);
+    bei weiteren Aufrufen derselben Woche wird nur aktualisiert. Koordiniert sich
+    ueber dieselbe State-Datei wie der interne Loop (kein Doppel-Post)."""
+    webhook_url = _get_webhook_url()
+    if not webhook_url:
+        return False, "Discord-Webhook nicht gesetzt (DISCORD_PROXIMA_WEBHOOK in Railway anlegen)."
+    api_url = os.getenv("PROXIMA_API_URL", DEFAULT_API_URL).strip() or DEFAULT_API_URL
+    max_rows = _env_int("PROXIMA_DISCORD_MAX_ROWS", 30)
+    try:
+        state = _load_state()
+        this_week = _iso_week_id(_berlin_now())
+        already = state.get("weekly_week") == this_week
+        if not already:
+            state["message_id"] = None          # neue Nachricht -> Webhook/Ping
+            state["weekly_week"] = this_week
+            _save_state(state)
+        _posted, count = _sync_once(webhook_url, api_url, max_rows, state, force=True)
+        if already:
+            return True, f"Wochen-Post lief bereits; Liste aktualisiert ({count} Planeten)."
+        return True, f"Wochen-Post gesendet ({count} Planeten, inkl. Excel)."
+    except urllib.error.HTTPError as e:
+        return False, f"HTTP-Fehler: {_http_error_detail(e)}"
+    except urllib.error.URLError as e:
+        return False, f"Netzwerk-Fehler (API/Discord nicht erreichbar): {e}"
+    except Exception as e:
+        return False, f"Unerwarteter Fehler: {e}"
+
+
+def refresh_archive_once():
+    """Nur das Archiv aktualisieren (kein Discord). Fuer die feste 17:31-Abfrage:
+    erfasst zuverlaessig, welche Planeten inzwischen verschwunden sind."""
+    api_url = os.getenv("PROXIMA_API_URL", DEFAULT_API_URL).strip() or DEFAULT_API_URL
+    try:
+        planets = _fetch_proxima(api_url)
+        _update_archive(planets)
+        pub = load_archive_public()
+        return True, f"Archiv aktualisiert: {pub['active']} aktiv, {pub['gone']} verschwunden."
+    except urllib.error.URLError as e:
+        return False, f"Netzwerk-Fehler (API nicht erreichbar): {e}"
+    except Exception as e:
+        return False, f"Unerwarteter Fehler: {e}"
+
+
 def start_proxima_discord():
     """Startet den Hintergrund-Thread, sofern eine Webhook-URL konfiguriert ist."""
     webhook_url = _get_webhook_url()

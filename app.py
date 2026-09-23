@@ -25,6 +25,13 @@ logger = logging.getLogger(__name__)
 # Dokumenten-Wurzel: aus ihr (und nur aus ihr) werden Dateien ausgeliefert.
 BASE_DIR = os.path.realpath(os.getcwd())
 
+# Proxima-Proxy: die echte Spiel-API-URL bleibt bewusst serverseitig und wird
+# dem Client NICHT offengelegt. Kurzer Cache schont die Spiel-API bei vielen
+# gleichzeitigen Besuchern.
+PROXIMA_UPSTREAM = os.getenv('PROXIMA_API_URL', 'https://beta4.game.spacenations.eu/api/proxima')
+PROXIMA_PROXY_TTL = 60
+_proxima_proxy_cache = {"ts": 0.0, "body": None}
+
 
 class SpacenationsRequestHandler(SimpleHTTPRequestHandler):
     """Custom Request Handler für Space Nations Tools"""
@@ -207,8 +214,14 @@ class SpacenationsRequestHandler(SimpleHTTPRequestHandler):
                 self.handle_firebase_config()
             elif path == '/api/proxima-discord/run':
                 self.handle_proxima_discord_run()
+            elif path == '/api/proxima-discord/weekly':
+                self.handle_proxima_discord_weekly()
             elif path == '/api/proxima-archive':
                 self.handle_proxima_archive()
+            elif path == '/api/proxima-archive/refresh':
+                self.handle_proxima_archive_refresh()
+            elif path == '/api/proxima':
+                self.handle_proxima_data()
             else:
                 self.send_error(404, "API endpoint not found")
 
@@ -305,6 +318,66 @@ class SpacenationsRequestHandler(SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
         self.wfile.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
+
+    def handle_proxima_discord_weekly(self):
+        """Fester Wochen-Post (idempotent pro Woche) - fuer den externen Cron."""
+        try:
+            from proxima_discord import run_weekly_once
+            ok, message = run_weekly_once()
+        except Exception as e:
+            ok, message = False, f"Modul-Fehler: {e}"
+
+        self.send_response(200 if ok else 503)
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.end_headers()
+        self.wfile.write(json.dumps({"ok": ok, "message": message}, ensure_ascii=False).encode('utf-8'))
+
+    def handle_proxima_archive_refresh(self):
+        """Archiv aktualisieren (kein Discord) - fuer die feste 17:31-Abfrage."""
+        try:
+            from proxima_discord import refresh_archive_once
+            ok, message = refresh_archive_once()
+        except Exception as e:
+            ok, message = False, f"Modul-Fehler: {e}"
+
+        self.send_response(200 if ok else 503)
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.end_headers()
+        self.wfile.write(json.dumps({"ok": ok, "message": message}, ensure_ascii=False).encode('utf-8'))
+
+    def handle_proxima_data(self):
+        """Proxy fuer die Proxima-Liste. Die echte Spiel-API wird serverseitig
+        abgefragt und bleibt dem Client verborgen (kurzer Cache schont die API)."""
+        import urllib.request as _urlreq
+        now = time.time()
+        body = _proxima_proxy_cache.get("body")
+        if body is None or (now - _proxima_proxy_cache.get("ts", 0)) >= PROXIMA_PROXY_TTL:
+            try:
+                req = _urlreq.Request(
+                    PROXIMA_UPSTREAM,
+                    headers={'Accept': 'application/json', 'User-Agent': 'Spacenations-Tools/1.0'},
+                )
+                with _urlreq.urlopen(req, timeout=20) as r:
+                    body = r.read()
+                _proxima_proxy_cache["body"] = body
+                _proxima_proxy_cache["ts"] = now
+            except Exception as e:
+                logger.warning(f"Proxima-Proxy Fehler: {e}")
+                if body is None:
+                    self.send_response(502)
+                    self.send_header('Content-Type', 'application/json; charset=utf-8')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"error": "Datenquelle nicht erreichbar"}).encode('utf-8'))
+                    return
+                # sonst: veralteten Cache-Inhalt ausliefern
+
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Cache-Control', 'public, max-age=30')
+        self.end_headers()
+        self.wfile.write(body)
 
     def handle_proxima_sync(self, post_data):
         """Handle Proxima sync requests"""
